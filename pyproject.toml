@@ -8,5 +8,9 @@ version = "0.1.0"
 description = "Agentic search for convenience that aims to support local businesses"
 requires-python = ">=3.12"
 dependencies = [
-    "aiohttp>=3.13.5"
+    "aiohttp>=3.13.5",
+    "fastapi>=0.136.3",
+    "uvicorn>=0.48.0",
+    "opentelemetry-distro",
+    "opentelemetry-instrumentation-fastapi"
 ]
