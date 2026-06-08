@@ -25,6 +25,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH"
 
+ENV APP_IP="0.0.0.0" \
+    APP_PORT="9022"
+
 WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
@@ -34,4 +37,4 @@ COPY . /app
 RUN useradd -m appuser
 USER appuser
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9022"]
+CMD ["uvicorn", "src.main:app", "--host", ${APP_IP}, "--port", ${APP_PORT}]
