@@ -1,0 +1,9 @@
+# Mac
+**/.DS_Store
+
+# Python env
+**/__pycache__/
+**/.venv/
+
+# Env var
+**/.env
