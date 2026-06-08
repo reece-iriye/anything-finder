@@ -29,7 +29,7 @@ async def get_human_readable_search_results(
         Doc("UUID for knowledge-based filtering to provide stronger recommendations."),
     ],
     restaurant_search_request_payload: Annotated[
-        src.schemas.geo_search.request.GeoLocationRestaurantSearch,
+        src.schemas.geo_search.request.GeoLocationRestaurantSearchRequest,
         Doc(
             "Geolocation data for searching restaurants by city/state."
             "Data is translated to coordinates for bounding-box search to be conducted"
