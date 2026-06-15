@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-import httpx
-from langgraph.graph.state import CompiledStateGraph
+from langchain_core.language_models import BaseChatModel
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 import uvicorn
 
 from contextlib import asynccontextmanager
@@ -8,25 +8,37 @@ import os
 
 import src.routers
 from src.agents.geo_search.graph import compile_geo_graph
+from src.utils.llm import make_llm
 from src.utils.nominatim import make_nominatim_client
 from src.utils.overpass import make_overpass_client
+
+# Each graph node can use a different served model; all share one vLLM endpoint.
+_LLM_ROLES = ("intent", "search", "synthesize")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    nominatim: httpx.AsyncClient = make_nominatim_client()
-    overpass: httpx.AsyncClient = make_overpass_client()
-    geo_graph: CompiledStateGraph = compile_geo_graph()
+    nominatim = make_nominatim_client()
+    overpass = make_overpass_client()
+    llms: dict[str, BaseChatModel] = {role: make_llm(role) for role in _LLM_ROLES}
 
-    app.state.nominatim = nominatim
-    app.state.overpass = overpass
-    app.state.geo_graph = geo_graph
+    # The Postgres checkpointer shares conversation state across k8s replicas. Its
+    # connection pool lives for the duration of the context manager.
+    dsn = os.environ["POSTGRES_DSN"]
+    async with AsyncPostgresSaver.from_conn_string(dsn) as checkpointer:
+        await checkpointer.setup()
 
-    yield
+        app.state.nominatim = nominatim
+        app.state.overpass = overpass
+        app.state.geo_graph = compile_geo_graph(
+            llms, nominatim, overpass, checkpointer
+        )
 
-    await app.state.nominatim.aclose()
-    await app.state.overpass.aclose()
-    await app.state.geo_graph.aclear_cache()
+        try:
+            yield
+        finally:
+            await nominatim.aclose()
+            await overpass.aclose()
 
 
 app = FastAPI(

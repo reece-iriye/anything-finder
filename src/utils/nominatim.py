@@ -90,6 +90,26 @@ async def forward_geocode_with_nominatim(
     return float(results[0]["lat"]), float(results[0]["lon"])
 
 
+async def geocode_query(
+    query: str,
+    client: httpx.AsyncClient,
+) -> tuple[float, float]:
+    """Free-text forward geocode (e.g. 'near The Colony Grandscape Mall').
+
+    Unlike :func:`forward_geocode_with_nominatim`, this takes an unstructured phrase
+    via Nominatim's ``q`` parameter, for location hints extracted from a query.
+    """
+    response = await client.get(
+        "/search",
+        params={"q": query, "format": "jsonv2", "limit": 1},
+    )
+    response.raise_for_status()
+    results = response.json()
+    if not results:
+        raise ValueError(f"No coordinates found for {query!r}")
+    return float(results[0]["lat"]), float(results[0]["lon"])
+
+
 _EARTH_RADIUS_MILES = 3958.8
 
 

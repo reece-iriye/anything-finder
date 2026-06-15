@@ -21,5 +21,14 @@ dependencies = [
     "langchain-core>=1.4.1",
     "langchain-openai>=1.2.2",
     "deepagents>=0.6.8",
-    "polars>=1.41.2"
+    "polars>=1.41.2",
+    "langgraph-checkpoint-postgres>=3.1.0",
+    "psycopg[binary,pool]>=3.3.0"
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-m 'not live'"
+markers = [
+    "live: tests that require a real vLLM endpoint and/or Postgres (opt-in)",
 ]

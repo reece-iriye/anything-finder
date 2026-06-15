@@ -10,11 +10,9 @@ import src.schemas.geo_search
 import src.services.geo_search
 from src.agents.geo_search.graph import get_geo_graph
 from src.utils.nominatim import (
+    Coordinates,
     get_nominatim_client,
     forward_geocode_with_nominatim,
-)
-from src.utils.overpass import (
-    get_overpass_client,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,85 +21,72 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/geo-search/restaurants")
 
 
-@router.get(
-    path="{user_id}",
-    response_class=src.schemas.geo_search.response.GeoLocationRestaurantSearchResponse,
+@router.post(
+    path="/{user_id}",
+    response_model=src.schemas.geo_search.GeoLocationRestaurantSearchResponse,
 )
-async def get_human_readable_search_results_with_user_context(
+async def search_restaurants_for_user(
     user_id: Annotated[
         str,
         Doc("UUID for knowledge-based filtering to provide stronger recommendations."),
     ],
-    restaurant_search_request_payload: Annotated[
-        src.schemas.geo_search.request.GeoLocationRestaurantSearchRequest,
+    payload: Annotated[
+        src.schemas.geo_search.GeoLocationRestaurantSearchRequest,
         Doc(
-            "Geolocation data for searching restaurants by city/state."
-            "Data is translated to coordinates for bounding-box search to be conducted"
-            "as proximate the the coordinates as possible."
+            "Natural-language restaurant search. Location is taken from the query "
+            "text, or overridden by city/state or latitude/longitude."
         ),
     ],
     nominatim_client: Annotated[
-        Annotated[httpx.AsyncClient, Depends(get_nominatim_client)],
-        Doc(
-            "Already instantiated client for sending requests to Nominatim "
-            "service, which handles location resolution when no coordinates "
-            "are passed in."
-        ),
-    ],
-    overpass_client: Annotated[
-        Annotated[httpx.AsyncClient, Depends(get_overpass_client)],
-        Doc(
-            "Already instantiated client for sending requests to Overpass "
-            "service, which handles finding establishments and businesses "
-            "based on a relative provided location."
-        ),
+        httpx.AsyncClient,
+        Depends(get_nominatim_client),
     ],
     geo_search_workflow: Annotated[
-        Annotated[CompiledStateGraph, Depends(get_geo_graph)],
-        Doc("Compiled LangGraph StateGraph for restaurant search AI Workflow."),
+        CompiledStateGraph,
+        Depends(get_geo_graph),
     ],
 ):
-    req_city: str | None = restaurant_search_request_payload.city
-    req_state: str | None = restaurant_search_request_payload.state
-    req_lat: float | None = restaurant_search_request_payload.latitude
-    req_long: float | None = restaurant_search_request_payload.longitude
+    city, state = payload.city, payload.state
+    lat, lon = payload.latitude, payload.longitude
 
-    if (req_city or req_state) and (req_lat or req_long):
+    has_place = bool(city or state)
+    has_coord = lat is not None or lon is not None
+    if has_place and has_coord:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body. Bits of both combinations were provided.",
+            detail="INVALID INPUT: provide city/state OR latitude/longitude, not both.",
         )
-
-    if req_city and req_state:
-        req_lat, req_long = await forward_geocode_with_nominatim(
-            city=req_city,
-            state=req_state,
-            client=nominatim_client,
-        )
-
-    if not req_lat or not req_long:
+    if (lat is None) != (lon is None):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body. Either combination was NOT provided.",
+            detail="INVALID INPUT: latitude and longitude must be provided together.",
         )
 
-    search_client = await src.services.geo_search.RestaurantSearch.create(
-        latitude=req_lat,
-        longitude=req_long,
+    # Resolve an optional coordinate override; otherwise the graph geocodes the
+    # location phrase extracted from the query text.
+    location: Coordinates | None = None
+    if city and state:
+        lat, lon = await forward_geocode_with_nominatim(
+            city=city, state=state, client=nominatim_client
+        )
+    if lat is not None and lon is not None:
+        location = Coordinates(lat=lat, lon=lon)
+
+    search = await src.services.geo_search.RestaurantSearch.create(
         user_id=user_id,
-        nominatim_client=nominatim_client,
-        overpass_client=overpass_client,
+        raw_query=payload.query,
+        session_id=payload.session_id,
+        location=location,
+        radius_m=payload.radius_m,
+        include_casual=payload.include_casual,
         geo_search_workflow=geo_search_workflow,
     )
 
-    resp_str, err, err_code = await search_client.ainvoke_search_workflow()
+    response, err, err_code = await search.ainvoke_search_workflow()
     if err is not None:
         raise HTTPException(
-            status_code=err_code,
+            status_code=err_code or status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"INTERNAL SERVER ERROR: {err}",
         )
 
-    return src.schemas.geo_search.GeoLocationRestaurantSearchResponse(
-        response=resp_str,
-        error=None,
-    )
+    return src.schemas.geo_search.GeoLocationRestaurantSearchResponse(response=response)
