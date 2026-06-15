@@ -1,18 +1,32 @@
 from fastapi import FastAPI
+import httpx
+from langgraph.graph.state import CompiledStateGraph
 import uvicorn
 
 from contextlib import asynccontextmanager
 import os
 
 import src.routers
-from src.utils.location_utils import make_nominatim_client
+from src.agents.geo_search.graph import compile_geo_graph
+from src.utils.nominatim import make_nominatim_client
+from src.utils.overpass import make_overpass_client
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.nominatim = make_nominatim_client()
+    nominatim: httpx.AsyncClient = make_nominatim_client()
+    overpass: httpx.AsyncClient = make_overpass_client()
+    geo_graph: CompiledStateGraph = compile_geo_graph()
+
+    app.state.nominatim = nominatim
+    app.state.overpass = overpass
+    app.state.geo_graph = geo_graph
+
     yield
+
     await app.state.nominatim.aclose()
+    await app.state.overpass.aclose()
+    await app.state.geo_graph.aclear_cache()
 
 
 app = FastAPI(

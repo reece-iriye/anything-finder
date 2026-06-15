@@ -1,16 +1,20 @@
-import httpx
-from fastapi import APIRouter, Depends, HTTPException, status
 from annotated_doc import Doc
+from fastapi import APIRouter, Depends, HTTPException, status
+import httpx
+from langgraph.graph.state import CompiledStateGraph
 
 import logging
 from typing import Annotated
 
 import src.schemas.geo_search
 import src.services.geo_search
-from src.utils.location_utils import (
+from src.agents.geo_search.graph import get_geo_graph
+from src.utils.nominatim import (
     get_nominatim_client,
     forward_geocode_with_nominatim,
-    reverse_geocode_with_nominatim,
+)
+from src.utils.overpass import (
+    get_overpass_client,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,7 +27,7 @@ router = APIRouter(prefix="/api/geo-search/restaurants")
     path="{user_id}",
     response_class=src.schemas.geo_search.response.GeoLocationRestaurantSearchResponse,
 )
-async def get_human_readable_search_results(
+async def get_human_readable_search_results_with_user_context(
     user_id: Annotated[
         str,
         Doc("UUID for knowledge-based filtering to provide stronger recommendations."),
@@ -36,7 +40,26 @@ async def get_human_readable_search_results(
             "as proximate the the coordinates as possible."
         ),
     ],
-    nominatim_client: Annotated[httpx.AsyncClient, Depends(get_nominatim_client)],
+    nominatim_client: Annotated[
+        Annotated[httpx.AsyncClient, Depends(get_nominatim_client)],
+        Doc(
+            "Already instantiated client for sending requests to Nominatim "
+            "service, which handles location resolution when no coordinates "
+            "are passed in."
+        ),
+    ],
+    overpass_client: Annotated[
+        Annotated[httpx.AsyncClient, Depends(get_overpass_client)],
+        Doc(
+            "Already instantiated client for sending requests to Overpass "
+            "service, which handles finding establishments and businesses "
+            "based on a relative provided location."
+        ),
+    ],
+    geo_search_workflow: Annotated[
+        Annotated[CompiledStateGraph, Depends(get_geo_graph)],
+        Doc("Compiled LangGraph StateGraph for restaurant search AI Workflow."),
+    ],
 ):
     req_city: str | None = restaurant_search_request_payload.city
     req_state: str | None = restaurant_search_request_payload.state
@@ -46,7 +69,7 @@ async def get_human_readable_search_results(
     if (req_city or req_state) and (req_lat or req_long):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body.",
+            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body. Bits of both combinations were provided.",
         )
 
     if req_city and req_state:
@@ -59,7 +82,7 @@ async def get_human_readable_search_results(
     if not req_lat or not req_long:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body.",
+            detail="INVALID INPUT: city & state *xor* latitude & longitude must be supplied in request body. Either combination was NOT provided.",
         )
 
     search_client = await src.services.geo_search.RestaurantSearch.create(
@@ -67,9 +90,11 @@ async def get_human_readable_search_results(
         longitude=req_long,
         user_id=user_id,
         nominatim_client=nominatim_client,
+        overpass_client=overpass_client,
+        geo_search_workflow=geo_search_workflow,
     )
 
-    resp_str, err, err_code = await search_client.invoke_search_workflow()
+    resp_str, err, err_code = await search_client.ainvoke_search_workflow()
     if err is not None:
         raise HTTPException(
             status_code=err_code,
