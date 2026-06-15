@@ -5,15 +5,23 @@ import math
 import os
 from dataclasses import dataclass
 
-_NOMINATIM_USE_EXTERNAL = (
+_NOMINATIM_USE_EXTERNAL: bool = (
     os.getenv("NOMINATIM_USE_EXTERNAL_API", "false").lower() == "true"
+)
+_NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE: bool = (
+    os.getenv("NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE", "false").lower()
+    == "true"
 )
 _NOMINATIM_BASE_URL = os.getenv(
     "NOMINATIM_BASE_URL",
     (
         "https://nominatim.openstreetmap.org"
         if _NOMINATIM_USE_EXTERNAL
-        else "http://nominatim-service:8080"
+        else (
+            "http://nominatim-service.geosearch.svc.cluster.local:8080"
+            if _NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE
+            else "http://nominatim-service:8080"
+        )
     ),
 )
 _NOMINATIM_TIMEOUT = float(os.getenv("NOMINATIM_TIMEOUT_SECONDS", "2.0"))
@@ -82,6 +90,26 @@ async def forward_geocode_with_nominatim(
     return float(results[0]["lat"]), float(results[0]["lon"])
 
 
+async def geocode_query(
+    query: str,
+    client: httpx.AsyncClient,
+) -> tuple[float, float]:
+    """Free-text forward geocode (e.g. 'near The Colony Grandscape Mall').
+
+    Unlike :func:`forward_geocode_with_nominatim`, this takes an unstructured phrase
+    via Nominatim's ``q`` parameter, for location hints extracted from a query.
+    """
+    response = await client.get(
+        "/search",
+        params={"q": query, "format": "jsonv2", "limit": 1},
+    )
+    response.raise_for_status()
+    results = response.json()
+    if not results:
+        raise ValueError(f"No coordinates found for {query!r}")
+    return float(results[0]["lat"]), float(results[0]["lon"])
+
+
 _EARTH_RADIUS_MILES = 3958.8
 
 
@@ -100,7 +128,12 @@ def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float
 def make_nominatim_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
         base_url=_NOMINATIM_BASE_URL,
-        timeout=_NOMINATIM_TIMEOUT,
+        timeout=httpx.Timeout(_NOMINATIM_TIMEOUT, connect=2.0),
+        limits=httpx.Limits(
+            max_connections=20,
+            max_keepalive_connections=10,
+            keepalive_expiry=30.0,
+        ),
         headers={"Accept-Language": "en"},
     )
 
