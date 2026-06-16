@@ -1,0 +1,39 @@
+# -----------------------------------------------------------------------
+# Phase 3 — self-hosted vLLM (Qwen2.5-7B-AWQ on a 16 GiB RTX 5060 Ti)
+#
+# Prerequisites in the kind cluster:
+#   1. NVIDIA device plugin installed:
+#        helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+#        helm install nvdp nvdp/nvidia-device-plugin --namespace kube-system
+#   2. The kind node must have GPU pass-through configured via
+#      nvidia-container-runtime (see kind GPU config docs).
+#   3. On first run vLLM will pull the model from Hugging Face (~5 GB).
+#      The download is cached on vllm.persistence; subsequent restarts skip it.
+#
+# Usage:
+#   helm install af ./charts/anything-finder \
+#     -f ./charts/anything-finder/values-phase3.yaml
+# -----------------------------------------------------------------------
+
+vllm:
+  enabled: true
+  model: Qwen/Qwen2.5-7B-Instruct-AWQ
+  gpuMemoryUtilization: "0.90"
+  maxModelLen: "8192"
+  resources:
+    limits:
+      nvidia.com/gpu: "1"
+      memory: 16Gi
+    requests:
+      memory: 14Gi
+      cpu: "2"
+
+llm:
+  baseUrl: http://vllm-service:8000/v1
+  model: Qwen/Qwen2.5-7B-Instruct-AWQ
+  apiKey: EMPTY
+  # Give the model extra time on first cold load.
+  timeoutSeconds: "120"
+  roles:
+    synthesize:
+      temperature: "0.4"

@@ -1,0 +1,15 @@
+apiVersion: v2
+name: anything-finder
+description: >
+  Anything Finder restaurant-search service and all its runtime dependencies:
+  Postgres (LangGraph checkpointer), Nominatim (geocoding), Overpass (OSM POI),
+  a shared OSM data server, and either a self-hosted vLLM, a canned LLM stub,
+  or an external LLM API.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - restaurant
+  - geosearch
+  - langgraph
+  - vllm

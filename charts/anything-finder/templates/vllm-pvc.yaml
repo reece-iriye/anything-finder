@@ -1,0 +1,16 @@
+{{- if .Values.vllm.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vllm-pvc
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vllm
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.vllm.persistence.size }}
+  storageClassName: {{ .Values.vllm.persistence.storageClass }}
+{{- end }}

@@ -1,0 +1,134 @@
+{{- if .Values.llmStub.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-stub-script
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: llm-stub
+data:
+  server.py: |
+    #!/usr/bin/env python3
+    """
+    Minimal OpenAI chat-completions stub for integration testing.
+
+    Identifies which pipeline node is calling by request shape:
+      response_format.json_schema present → parse_intent
+        Returns STUB_INTENT_JSON as the assistant message content so
+        LangChain's with_structured_output can parse it into CravingIntent.
+
+      tools present, no prior tool result  → search node first call
+        Returns a tool_call for the first tool in the list (search_restaurants)
+        with a fixed radius so the deepagents loop runs exactly once.
+
+      tools present, tool result in history → search node wrap-up
+        Returns a plain-text stop message so the loop terminates.
+
+      otherwise → synthesize
+        Returns STUB_SYNTHESIZE_TEXT as the assistant message content.
+    """
+    import json
+    import os
+    import time
+    import uuid
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    INTENT_JSON = os.environ.get(
+        "STUB_INTENT_JSON",
+        '{"craving":"restaurant","vibe":[],"location_phrase":null}',
+    )
+    SYNTH_TEXT = os.environ.get(
+        "STUB_SYNTHESIZE_TEXT",
+        "Here are some great restaurant options near you!",
+    )
+
+
+    def _make_response(model: str, message: dict, finish_reason: str) -> bytes:
+        payload = {
+            "id": f"chatcmpl-{uuid.uuid4().hex}",
+            "object": "chat.completion",
+            "created": int(time.time()),
+            "model": model,
+            "choices": [
+                {"index": 0, "message": message, "finish_reason": finish_reason}
+            ],
+            "usage": {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+            },
+        }
+        return json.dumps(payload).encode()
+
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/health":
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"status":"ok"}')
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length))
+
+            model = body.get("model", "stub")
+            messages = body.get("messages", [])
+            tools = body.get("tools", [])
+            response_format = body.get("response_format") or {}
+
+            if response_format.get("type") == "json_schema":
+                # parse_intent: LangChain structured output expects valid JSON content
+                msg = {"role": "assistant", "content": INTENT_JSON}
+                payload = _make_response(model, msg, "stop")
+
+            elif tools:
+                has_tool_result = any(m.get("role") == "tool" for m in messages)
+                if not has_tool_result:
+                    # search first call: call search_restaurants once at 2 km
+                    call_id = f"call_{uuid.uuid4().hex[:8]}"
+                    tool_name = tools[0]["function"]["name"]
+                    msg = {
+                        "role": "assistant",
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": call_id,
+                                "type": "function",
+                                "function": {
+                                    "name": tool_name,
+                                    "arguments": json.dumps({"radius_m": 2000}),
+                                },
+                            }
+                        ],
+                    }
+                    payload = _make_response(model, msg, "tool_calls")
+                else:
+                    # search wrap-up: agent is satisfied, stop the loop
+                    msg = {"role": "assistant", "content": "Search complete."}
+                    payload = _make_response(model, msg, "stop")
+
+            else:
+                # synthesize: return canned recommendation text
+                msg = {"role": "assistant", "content": SYNTH_TEXT}
+                payload = _make_response(model, msg, "stop")
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, fmt, *args):  # silence per-request access log
+            pass
+
+
+    if __name__ == "__main__":
+        port = int(os.environ.get("PORT", "8000"))
+        print(f"LLM stub listening on :{port}", flush=True)
+        HTTPServer(("0.0.0.0", port), Handler).serve_forever()
+{{- end }}

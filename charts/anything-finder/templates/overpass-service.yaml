@@ -1,0 +1,16 @@
+{{- if .Values.overpass.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: overpass-service
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: overpass
+spec:
+  selector:
+    app.kubernetes.io/component: overpass
+  ports:
+    - name: http
+      port: {{ .Values.overpass.service.port }}
+      targetPort: 80
+{{- end }}

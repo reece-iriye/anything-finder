@@ -7,7 +7,7 @@ from src.schemas.geo_search.intent import CravingIntent
 
 class GeoSearchState(TypedDict, total=False):
     # NOTE: every field is persisted by the Postgres checkpointer, so values must be
-    # serializable. Never put httpx clients or the LLM here -- those are closure-bound
+    # serializable. Never put httpx clients or the LLM here. Those are closure-bound
     # into the node factories at graph-compile time.
 
     # ========= INPUT =========

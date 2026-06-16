@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: osm-server-pvc
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: osm-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.osm.persistence.size }}
+  storageClassName: {{ .Values.osm.persistence.storageClass }}

@@ -1,0 +1,23 @@
+Anything Finder has been deployed.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Phase:  {{ if .Values.llmStub.enabled }}2 — mocked LLM (stub){{ else if .Values.vllm.enabled }}3 — self-hosted vLLM{{ else }}4 — external LLM{{ end }}
+ LLM:    {{ .Values.llm.baseUrl }}
+ Model:  {{ .Values.llm.model }}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OSM region: {{ .Values.osm.pbfUrl }}
+The osm-server pod downloads the PBF on first start and serves it to
+Nominatim and Overpass. First-time import can take 30 min – several hours
+depending on cluster resources. Watch progress with:
+
+  kubectl logs -f deployment/nominatim -c wait-for-pbf
+  kubectl logs -f deployment/nominatim
+
+Reach the app:
+
+  kubectl port-forward svc/anything-finder-service {{ .Values.app.service.port }}:{{ .Values.app.service.port }}
+  curl http://localhost:{{ .Values.app.service.port }}/health
+  curl -s -X POST http://localhost:{{ .Values.app.service.port }}/api/geo-search/restaurants/user-1 \
+    -H 'Content-Type: application/json' \
+    -d '{"query":"quiet sushi near The Colony TX","city":"The Colony","state":"TX"}'

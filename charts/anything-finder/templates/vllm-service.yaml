@@ -1,0 +1,16 @@
+{{- if .Values.vllm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-service
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vllm
+spec:
+  selector:
+    app.kubernetes.io/component: vllm
+  ports:
+    - name: http
+      port: {{ .Values.vllm.service.port }}
+      targetPort: {{ .Values.vllm.service.port }}
+{{- end }}

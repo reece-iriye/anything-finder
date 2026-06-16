@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: osm-server
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: osm-server
+spec:
+  replicas: 1
+  # Recreate so the PVC is never held by a terminating pod while the new
+  # one's initContainer tries to mount it on a single-node kind cluster.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: osm-server
+  template:
+    metadata:
+      labels:
+        {{- include "anything-finder.labels" . | nindent 8 }}
+        app.kubernetes.io/component: osm-server
+    spec:
+      initContainers:
+        - name: download-pbf
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              DEST="/data/{{ include "anything-finder.pbfFilename" . }}"
+              if [ -f "$DEST" ]; then
+                echo "PBF already present, skipping download."
+                exit 0
+              fi
+              echo "Downloading {{ .Values.osm.pbfUrl }} ..."
+              curl -fSL --retry 3 -o "${DEST}.part" "{{ .Values.osm.pbfUrl }}"
+              mv "${DEST}.part" "$DEST"
+              echo "Download complete."
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /{{ include "anything-finder.pbfFilename" . }}
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /{{ include "anything-finder.pbfFilename" . }}
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: osm-server-pvc

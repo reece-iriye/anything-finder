@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------
+# Phase 4 — external OpenAI-compatible LLM
+#
+# The API key must exist as a Kubernetes Secret before installing:
+#   kubectl create secret generic llm-api-key \
+#     --from-literal=api-key=<your-key>
+#
+# Point baseUrl at any OpenAI-compatible endpoint:
+#   OpenAI:    https://api.openai.com/v1
+#   Anthropic: https://api.anthropic.com/v1   (needs openai-compatible proxy)
+#   Together:  https://api.together.xyz/v1
+#
+# Usage:
+#   kubectl create secret generic llm-api-key --from-literal=api-key=<key>
+#   helm install af ./charts/anything-finder \
+#     -f ./charts/anything-finder/values-phase4.yaml
+# -----------------------------------------------------------------------
+
+llm:
+  baseUrl: https://api.openai.com/v1
+  model: gpt-4o-mini
+  # Pull the key from a pre-existing Secret so it never lives in values.
+  apiKeySecretRef:
+    name: llm-api-key
+    key: api-key
+  timeoutSeconds: "30"
+  roles:
+    synthesize:
+      temperature: "0.4"

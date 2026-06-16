@@ -1,0 +1,16 @@
+{{- if .Values.nominatim.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: nominatim-service
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nominatim
+spec:
+  selector:
+    app.kubernetes.io/component: nominatim
+  ports:
+    - name: http
+      port: {{ .Values.nominatim.service.port }}
+      targetPort: 8080
+{{- end }}

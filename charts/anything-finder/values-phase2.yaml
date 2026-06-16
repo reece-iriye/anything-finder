@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------------
+# Phase 2 — mocked LLM, real Postgres + Nominatim + Overpass
+#
+# The LLM stub speaks the OpenAI chat-completions API and returns canned
+# responses shaped to match the parse_intent / search / synthesize nodes.
+#
+# Usage:
+#   helm install af ./charts/anything-finder \
+#     -f ./charts/anything-finder/values-phase2.yaml
+# -----------------------------------------------------------------------
+
+llmStub:
+  enabled: true
+  # Tune these to match the integration test scenario you're running.
+  intentJson: '{"craving":"sushi","vibe":["quiet"],"location_phrase":"The Colony, TX"}'
+  synthesizeText: "Near Sushi on Main is your best bet for a quiet dinner."
+
+llm:
+  baseUrl: http://llm-stub-service:8000/v1
+  model: stub
+  apiKey: EMPTY

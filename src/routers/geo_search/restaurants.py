@@ -89,4 +89,6 @@ async def search_restaurants_for_user(
             detail=f"INTERNAL SERVER ERROR: {err}",
         )
 
-    return src.schemas.geo_search.GeoLocationRestaurantSearchResponse(response=response)
+    return src.schemas.geo_search.GeoLocationRestaurantSearchResponse(
+        response=response,
+    )
