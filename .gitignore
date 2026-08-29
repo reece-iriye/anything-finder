@@ -4,6 +4,7 @@
 # Python env
 **/__pycache__/
 **/.venv/
+**/*egg-info/
 
 # Env var
 **/.env

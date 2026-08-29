@@ -38,9 +38,7 @@ def make_parse_intent_node(llm: BaseChatModel) -> GeoNode:
         if not raw:
             return {"errors": ["parse_intent: raw_query is required"]}
         try:
-            intent = await structured.ainvoke(
-                [("system", system_prompt), ("human", raw)]
-            )
+            intent = await structured.ainvoke([("system", system_prompt), ("human", raw)])
         except Exception as exc:  # surface, don't crash the graph
             return {"errors": [f"parse_intent failed: {exc}"]}
         return {"intent": intent}
@@ -64,10 +62,7 @@ def make_resolve_location_node(nominatim: httpx.AsyncClient) -> GeoNode:
         phrase = intent.location_phrase if intent else None
         if not phrase:
             return {
-                "errors": [
-                    "resolve_location: no coordinates supplied and no location "
-                    "phrase found in the query"
-                ]
+                "errors": ["resolve_location: no coordinates supplied and no location " "phrase found in the query"]
             }
         try:
             lat, lon = await geocode_query(phrase, nominatim)
@@ -188,11 +183,7 @@ def rank_node(state: GeoSearchState) -> dict[str, Any]:
         cuisine = str(c.get("tags", {}).get("cuisine", "")).lower()
         name = str(c.get("name", "")).lower()
         match = 1.0 if craving and (craving in cuisine or craving in name) else 0.0
-        dist = (
-            haversine_miles(loc.lat, loc.lon, c["lat"], c["lon"])
-            if loc is not None
-            else 0.0
-        )
+        dist = haversine_miles(loc.lat, loc.lon, c["lat"], c["lon"]) if loc is not None else 0.0
         # Category matches first, then nearer venues (negate distance so higher
         # tuples sort first under reverse=True).
         return (match, -dist)
@@ -215,12 +206,7 @@ def make_synthesize_node(llm: BaseChatModel) -> GeoNode:
         top = ranked[:5]
         venue_lines = (
             "\n".join(
-                f"- {c['name']}"
-                + (
-                    f" (cuisine: {c['tags']['cuisine']})"
-                    if c.get("tags", {}).get("cuisine")
-                    else ""
-                )
+                f"- {c['name']}" + (f" (cuisine: {c['tags']['cuisine']})" if c.get("tags", {}).get("cuisine") else "")
                 for c in top
             )
             or "(no venues found)"

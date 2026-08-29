@@ -26,6 +26,14 @@ dependencies = [
     "psycopg[binary,pool]>=3.3.0"
 ]
 
+[tool.pyright]
+typeCheckingMode = "basic"
+reportArgumentType = false
+reportGeneralTypeIssues = false
+
+[tool.pycodestyle]
+ignore = ["E", "W"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 addopts = "-m 'not live'"
