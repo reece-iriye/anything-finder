@@ -1,11 +1,10 @@
 """Schema stability guards.
 
-These pin the public shape of the request/response/intent models so accidental
-field renames or type changes (which would silently break the API contract or the
-graph state) fail loudly. Update intentionally when the contract changes.
+These pin the public shape of the request/response models so accidental field
+renames or type changes (which would silently break the API contract) fail loudly.
+Update intentionally when the contract changes.
 """
 
-from src.schemas.geo_search.intent import CravingIntent
 from src.schemas.geo_search.request import GeoLocationRestaurantSearchRequest
 from src.schemas.geo_search.response import GeoLocationRestaurantSearchResponse
 
@@ -37,14 +36,6 @@ def test_request_contract():
 
 def test_response_contract():
     assert set(_fields(GeoLocationRestaurantSearchResponse)) == {"response"}
-
-
-def test_intent_contract():
-    assert set(_fields(CravingIntent)) == {"craving", "vibe", "location_phrase"}
-    # craving required; vibe defaults to empty list; location_phrase optional.
-    intent = CravingIntent(craving="sushi")
-    assert intent.vibe == []
-    assert intent.location_phrase is None
 
 
 def test_request_defaults_are_safe():

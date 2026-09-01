@@ -1,37 +1,42 @@
+from contextlib import asynccontextmanager
+from pathlib import Path
+import os
+
 from fastapi import FastAPI
-from langchain_core.language_models import BaseChatModel
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 import uvicorn
 
-from contextlib import asynccontextmanager
-import os
-
 import src.routers
-from src.agents.geo_search.graph import compile_geo_graph
+from src.agents.geo_search.agent import build_restaurant_agent
 from src.utils.llm import make_llm
 from src.utils.nominatim import make_nominatim_client
 from src.utils.overpass import make_overpass_client
-
-# Each graph node can use a different served model; all share one vLLM endpoint.
-_LLM_ROLES = ("intent", "search", "synthesize")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     nominatim = make_nominatim_client()
     overpass = make_overpass_client()
-    llms: dict[str, BaseChatModel] = {role: make_llm(role) for role in _LLM_ROLES}
+    llm = make_llm("agent")
 
-    # The Postgres checkpointer shares conversation state across k8s replicas. Its
-    # connection pool lives for the duration of the context manager.
+    prefs_dir = Path(os.environ.get("FOOD_PREFERENCES_DIR", "data/preferences"))
+    home_city = os.environ.get("HOME_CITY", "Dallas")
+    home_state = os.environ.get("HOME_STATE", "TX")
+
     dsn = os.environ["POSTGRES_DSN"]
     async with AsyncPostgresSaver.from_conn_string(dsn) as checkpointer:
         await checkpointer.setup()
 
         app.state.nominatim = nominatim
         app.state.overpass = overpass
-        app.state.geo_graph = compile_geo_graph(
-            llms, nominatim, overpass, checkpointer
+        app.state.restaurant_agent = build_restaurant_agent(
+            llm,
+            nominatim,
+            overpass,
+            prefs_dir=prefs_dir,
+            home_city=home_city,
+            home_state=home_state,
+            checkpointer=checkpointer,
         )
 
         try:

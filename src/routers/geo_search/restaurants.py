@@ -8,7 +8,7 @@ from typing import Annotated
 
 import src.schemas.geo_search
 import src.services.geo_search
-from src.agents.geo_search.graph import get_geo_graph
+from src.agents.geo_search.agent import get_restaurant_agent
 from src.utils.nominatim import (
     Coordinates,
     get_nominatim_client,
@@ -41,9 +41,9 @@ async def search_restaurants_for_user(
         httpx.AsyncClient,
         Depends(get_nominatim_client),
     ],
-    geo_search_workflow: Annotated[
+    restaurant_agent: Annotated[
         CompiledStateGraph,
-        Depends(get_geo_graph),
+        Depends(get_restaurant_agent),
     ],
 ):
     city, state = payload.city, payload.state
@@ -62,8 +62,7 @@ async def search_restaurants_for_user(
             detail="INVALID INPUT: latitude and longitude must be provided together.",
         )
 
-    # Resolve an optional coordinate override; otherwise the graph geocodes the
-    # location phrase extracted from the query text.
+    # Resolve an optional coordinate override; otherwise the agent geocodes from the query.
     location: Coordinates | None = None
     if city and state:
         lat, lon = await forward_geocode_with_nominatim(
@@ -79,7 +78,7 @@ async def search_restaurants_for_user(
         location=location,
         radius_m=payload.radius_m,
         include_casual=payload.include_casual,
-        geo_search_workflow=geo_search_workflow,
+        restaurant_agent=restaurant_agent,
     )
 
     response, err, err_code = await search.ainvoke_search_workflow()

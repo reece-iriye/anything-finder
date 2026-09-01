@@ -1,5 +1,5 @@
-from .graph import compile_geo_graph
+from .agent import build_restaurant_agent
 
 __all__ = [
-    "compile_geo_graph",
+    "build_restaurant_agent",
 ]

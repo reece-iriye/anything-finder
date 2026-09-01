@@ -1,43 +1,37 @@
 import httpx
-from langgraph.checkpoint.memory import InMemorySaver
+from langchain_core.messages import AIMessage
 import pytest
 
-from src.agents.geo_search import nodes
-from src.agents.geo_search.graph import compile_geo_graph
+from src.agents.geo_search import agent as agent_module
+from src.agents.geo_search.agent import build_restaurant_agent
 from src.main import app
 
 
-class _SingleCallAgent:
-    def __init__(self, tool):
-        self._tool = tool
+class _FakeAgent:
+    def __init__(self, text: str = "Try Near Sushi for a quiet bite."):
+        self._text = text
 
-    async def ainvoke(self, _inp, config=None):
-        await self._tool.ainvoke({"radius_m": 2000})
-        return {"messages": []}
+    async def ainvoke(self, inp, config=None):
+        return {"messages": [AIMessage(content=self._text)]}
 
 
 @pytest.fixture
-async def client(monkeypatch, fake_llms, nominatim_client, overpass_client):
-    # Stub Overpass at the tool boundary so the API test needs no live HTTP and avoids
-    # any transport conflict with the ASGI test client.
-    async def fake_query_restaurants(_client, **kwargs):
-        return [
-            {"name": "Near Sushi", "amenity": "restaurant", "lat": 33.0, "lon": -96.0,
-             "tags": {"cuisine": "sushi"}}
-        ]
-
-    monkeypatch.setattr(nodes, "query_restaurants", fake_query_restaurants)
+async def client(monkeypatch, fake_llm, nominatim_client, overpass_client, tmp_path):
     monkeypatch.setattr(
-        nodes,
+        agent_module,
         "create_deep_agent",
-        lambda model, tools, system_prompt: _SingleCallAgent(tools[0]),
+        lambda model, tools, system_prompt, checkpointer=None: _FakeAgent(),
     )
 
-    # ASGITransport does not run the lifespan, so wire app.state by hand.
     app.state.nominatim = nominatim_client
     app.state.overpass = overpass_client
-    app.state.geo_graph = compile_geo_graph(
-        fake_llms, nominatim_client, overpass_client, InMemorySaver()
+    app.state.restaurant_agent = build_restaurant_agent(
+        fake_llm,
+        nominatim_client,
+        overpass_client,
+        prefs_dir=tmp_path / "prefs",
+        home_city="Dallas",
+        home_state="TX",
     )
 
     transport = httpx.ASGITransport(app=app)
@@ -71,7 +65,7 @@ async def test_rejects_place_and_coords_together(client):
 async def test_rejects_partial_coordinates(client):
     resp = await client.post(
         "/api/geo-search/restaurants/user-123",
-        json={"query": "sushi", "latitude": 33.0},  # missing longitude
+        json={"query": "sushi", "latitude": 33.0},
     )
     assert resp.status_code == 400
 

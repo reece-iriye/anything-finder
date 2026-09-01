@@ -23,7 +23,8 @@ dependencies = [
     "deepagents>=0.6.8",
     "polars>=1.41.2",
     "langgraph-checkpoint-postgres>=3.1.0",
-    "psycopg[binary,pool]>=3.3.0"
+    "psycopg[binary,pool]>=3.3.0",
+    "langchain-anthropic>=1.7.0",
 ]
 
 [tool.pyright]
@@ -39,4 +40,11 @@ asyncio_mode = "auto"
 addopts = "-m 'not live'"
 markers = [
     "live: tests that require a real vLLM endpoint and/or Postgres (opt-in)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-httpx>=0.36.2",
 ]
