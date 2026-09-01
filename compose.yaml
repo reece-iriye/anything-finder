@@ -1,0 +1,218 @@
+---
+services:
+  # ─── PostgreSQL (checkpointer) ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: af-postgres
+    environment:
+      POSTGRES_DB: anything_finder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── OSM Data Server ───────────────────────────────────────────────────────
+  # Downloads the PBF once and serves it over HTTP so Nominatim and Overpass
+  # can import from the same local source instead of hitting the internet.
+  osm-server:
+    image: python:3.12-slim
+    container_name: af-osm-server
+    working_dir: /app
+    environment:
+      OSM_PBF_URL: https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf
+      OSM_DATA_DIR: /data
+    command: bash -c "apt-get update -qq && apt-get install -y -q libexpat1 && pip install osmium --quiet && python3 /app/scripts/osm_prepare.py"
+    ports:
+      - "8081:8080"
+    volumes:
+      - .:/app
+      - osm_data:/data
+    healthcheck:
+      # Healthy as soon as the PBF is downloaded and being served; nominatim
+      # can start importing while the bz2 conversion continues in the background.
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/texas-latest.osm.pbf').close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  # ─── OSM bz2 sentinel ──────────────────────────────────────────────────────
+  # Becomes healthy only after osm_prepare.py finishes the PBF→bz2 conversion.
+  # Overpass depends on this instead of osm-server so it waits for the right file.
+  osm-bz2-ready:
+    image: python:3.12-slim
+    container_name: af-osm-bz2-ready
+    volumes:
+      - osm_data:/data
+    command:
+      - python3
+      - -c
+      - |
+        import time
+        from pathlib import Path
+        p = Path('/data/texas-latest.osm.bz2')
+        while not p.exists():
+            print('Waiting for bz2...', flush=True)
+            time.sleep(30)
+        print('bz2 ready.', flush=True)
+        while True:
+            time.sleep(3600)
+    healthcheck:
+      test: ["CMD", "python3", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/data/texas-latest.osm.bz2').exists() else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 120
+      start_period: 60s
+
+  # ─── Nominatim (Geocoding) ─────────────────────────────────────────────────
+  nominatim:
+    image: mediagis/nominatim:4.4
+    container_name: af-nominatim
+    shm_size: '3g'
+    environment:
+      PBF_URL: http://osm-server:8080/texas-latest.osm.pbf
+      NOMINATIM_PASSWORD: nominatim
+    ports:
+      - "8082:8080"
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+    depends_on:
+      osm-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ─── Overpass (POI Lookup) ─────────────────────────────────────────────────
+  overpass:
+    image: wiktorn/overpass-api:latest
+    container_name: af-overpass
+    environment:
+      OVERPASS_META: "no"
+      OVERPASS_MODE: init
+      OVERPASS_PLANET_URL: http://osm-server:8080/texas-latest.osm.bz2
+    ports:
+      - "8083:80"
+    volumes:
+      - overpass_data:/db
+    depends_on:
+      osm-server:
+        condition: service_healthy
+      osm-bz2-ready:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/api/interpreter?data=[out:json];out;"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ─── Anything Finder App ───────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: af-app
+    environment:
+      # ─── App ───────────────────────────────────
+      APP_IP: 0.0.0.0
+      APP_PORT: 9022
+      APP_LOG_LEVEL: info
+
+      # ─── LLM Backend (vLLM with external Qwen) ─
+      # For local vLLM on GPU, change to: http://localhost:8000/v1
+      # For Anthropic Claude, set LLM_BACKEND=claude and add ANTHROPIC_API_KEY
+      LLM_BACKEND: vllm
+      LLM_BASE_URL: http://vllm:8000/v1
+      LLM_API_KEY: EMPTY
+      LLM_MODEL: Qwen/Qwen3.8-27B
+      LLM_TEMPERATURE: "0.2"
+      LLM_TIMEOUT_SECONDS: "30"
+      LLM_MAX_RETRIES: "2"
+
+      # ─── Agent Config ──────────────────────────
+      FOOD_PREFERENCES_DIR: data/preferences
+      HOME_CITY: Dallas
+      HOME_STATE: TX
+
+      # ─── PostgreSQL (Checkpointer) ─────────────
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/anything_finder
+
+      # ─── Nominatim (Geocoding) ─────────────────
+      NOMINATIM_USE_EXTERNAL_API: "false"
+      NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE: "false"
+      NOMINATIM_BASE_URL: http://nominatim:8080
+      NOMINATIM_TIMEOUT_SECONDS: "2.0"
+
+      # ─── Overpass (POI Lookup) ──────────────────
+      OVERPASS_USE_EXTERNAL_API: "false"
+      OVERPASS_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE: "false"
+      OVERPASS_BASE_URL: http://overpass:80
+      OVERPASS_TIMEOUT_SECONDS: "3.0"
+    ports:
+      - "9022:9022"
+    volumes:
+      - .:/workspace
+      - app_cache:/root/.cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nominatim:
+        condition: service_healthy
+      overpass:
+        condition: service_healthy
+    command: python -m anything_finder
+
+  # ─── vLLM (Optional: for local GPU inference) ──────────────────────────────
+  # Uncomment if you have NVIDIA GPU and want to run Qwen locally.
+  # Requires: NVIDIA Container Runtime installed.
+  #
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: af-vllm
+  #   environment:
+  #     CUDA_VISIBLE_DEVICES: "0"
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - huggingface_cache:/root/.cache/huggingface
+  #   command: >
+  #     vllm serve Qwen/Qwen3.8-27B
+  #       --api-key EMPTY
+  #       --gpu-memory-utilization 0.90
+  #       --max-model-len 8192
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 120s
+
+volumes:
+  postgres_data:
+  osm_data:
+  nominatim_data:
+  overpass_data:
+  app_cache:
+  # huggingface_cache:  # Uncomment with vllm service
+
+networks:
+  default:
+    name: af-network
