@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Download a Geofabrik OSM PBF extract and convert it to osm.bz2 for Overpass."""
+"""Serve pre-prepared OSM data files over HTTP for Nominatim and Overpass.
 
-import bz2
+Run `make osm-convert` once before starting docker compose to produce
+data/Dallas.osm.bz2 from data/Dallas.osm.gz.
+"""
+
 import http.server
 import os
 import socketserver
@@ -9,13 +12,10 @@ import sys
 import urllib.request
 from pathlib import Path
 
-import osmium
-
-PBF_URL = os.getenv(
-    "OSM_PBF_URL",
-    "https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf",
-)
 DATA_DIR = Path(os.getenv("OSM_DATA_DIR", "/data"))
+_LOCAL_PBF = os.getenv("OSM_PBF_FILENAME")
+_LOCAL_GZ  = os.getenv("OSM_GZ_FILENAME")
+_PBF_URL   = os.getenv("OSM_PBF_URL", "")
 
 
 def download(url: str, dest: Path) -> None:
@@ -30,65 +30,6 @@ def download(url: str, dest: Path) -> None:
     print(f"{dest.name} downloaded.", flush=True)
 
 
-class _Converter(osmium.SimpleHandler):
-    def __init__(self, out: Path) -> None:
-        super().__init__()
-        self._w = bz2.open(out, "wt", encoding="utf-8")
-        self._w.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        self._w.write('<osm version="0.6" generator="PyOsmium">\n')
-
-    def node(self, n) -> None:
-        tags = "".join(f'<tag k="{t.k}" v="{t.v}"/>' for t in n.tags)
-        self._w.write(
-            f'  <node id="{n.id}" lat="{n.location.lat:.7f}"'
-            f' lon="{n.location.lon:.7f}" version="{n.version}">\n'
-        )
-        if tags:
-            self._w.write(f"    {tags}\n")
-        self._w.write("  </node>\n")
-
-    def way(self, w) -> None:
-        refs = "".join(f'<nd ref="{nd.ref}"/>' for nd in w.nodes)
-        tags = "".join(f'<tag k="{t.k}" v="{t.v}"/>' for t in w.tags)
-        self._w.write(f'  <way id="{w.id}" version="{w.version}">\n')
-        if refs:
-            self._w.write(f"    {refs}\n")
-        if tags:
-            self._w.write(f"    {tags}\n")
-        self._w.write("  </way>\n")
-
-    def relation(self, r) -> None:
-        members = "".join(
-            f'<member type="{m.type}" ref="{m.ref}" role="{m.role}"/>'
-            for m in r.members
-        )
-        tags = "".join(f'<tag k="{t.k}" v="{t.v}"/>' for t in r.tags)
-        self._w.write(f'  <relation id="{r.id}" version="{r.version}">\n')
-        if members:
-            self._w.write(f"    {members}\n")
-        if tags:
-            self._w.write(f"    {tags}\n")
-        self._w.write("  </relation>\n")
-
-    def close(self) -> None:
-        self._w.write("</osm>\n")
-        self._w.close()
-
-
-def convert(pbf: Path, bz2_out: Path) -> None:
-    print("Converting PBF to osm.bz2...", flush=True)
-    tmp = bz2_out.with_suffix(".tmp")
-    c = _Converter(tmp)
-    try:
-        c.apply_file(str(pbf))
-        c.close()
-        tmp.rename(bz2_out)
-    except Exception:
-        tmp.unlink(missing_ok=True)
-        raise
-    print("Conversion complete.", flush=True)
-
-
 def serve(directory: Path, port: int = 8080) -> None:
     os.chdir(directory)
     with socketserver.TCPServer(("", port), http.server.SimpleHTTPRequestHandler) as httpd:
@@ -99,19 +40,33 @@ def serve(directory: Path, port: int = 8080) -> None:
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    pbf_name = PBF_URL.rsplit("/", 1)[-1]
-    pbf = DATA_DIR / pbf_name
-    bz2_out = DATA_DIR / pbf_name.replace(".osm.pbf", ".osm.bz2")
-
-    if not pbf.exists():
-        download(PBF_URL, pbf)
+    # ── Resolve PBF ────────────────────────────────────────────────────────────
+    if _LOCAL_PBF:
+        pbf = DATA_DIR / _LOCAL_PBF
+        if not pbf.exists():
+            print(f"Fatal: {pbf} not found — place the file there and restart.", flush=True)
+            sys.exit(1)
+        print(f"{pbf.name} found.", flush=True)
+    elif _PBF_URL:
+        pbf_name = _PBF_URL.rsplit("/", 1)[-1]
+        pbf = DATA_DIR / pbf_name
+        if not pbf.exists():
+            download(_PBF_URL, pbf)
+        else:
+            print(f"{pbf.name} already cached.", flush=True)
     else:
-        print(f"{pbf.name} already cached.", flush=True)
+        print("Fatal: set OSM_PBF_FILENAME or OSM_PBF_URL", flush=True)
+        sys.exit(1)
 
+    # ── Check bz2 ──────────────────────────────────────────────────────────────
+    bz2_out = DATA_DIR / pbf.name.replace(".osm.pbf", ".osm.bz2")
     if not bz2_out.exists():
-        convert(pbf, bz2_out)
-    else:
-        print(f"{bz2_out.name} already cached.", flush=True)
+        print(
+            f"Fatal: {bz2_out.name} not found — run `make osm-convert` first.",
+            flush=True,
+        )
+        sys.exit(1)
+    print(f"{bz2_out.name} found.", flush=True)
 
     serve(DATA_DIR)
 

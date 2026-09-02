@@ -1,4 +1,4 @@
-.PHONY: add add-dev remove remove-dev update install dev
+.PHONY: add add-dev remove remove-dev update install dev osm-convert
 
 # make add pkg=requests
 # make add pkg="requests>=2.28"
@@ -40,3 +40,9 @@ install:
 
 dev:
 	uvicorn src.main:app --host 127.0.0.1 --port 9022 --reload
+
+osm-convert:
+	@test -f data/Dallas.osm.gz || { echo "data/Dallas.osm.gz not found"; exit 1; }
+	@test -f data/Dallas.osm.pbf || { echo "data/Dallas.osm.pbf not found"; exit 1; }
+	osmium cat data/Dallas.osm.gz -o data/Dallas.osm.bz2 --overwrite
+	@echo "data/Dallas.osm.bz2 ready."

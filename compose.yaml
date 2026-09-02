@@ -19,45 +19,43 @@ services:
       retries: 5
 
   # ─── OSM Data Server ───────────────────────────────────────────────────────
-  # Downloads the PBF once and serves it over HTTP so Nominatim and Overpass
-  # can import from the same local source instead of hitting the internet.
+  # Serves pre-downloaded local OSM files over HTTP so Nominatim and Overpass
+  # can import from the same source. Converts Dallas.osm.gz → Dallas.osm.bz2
+  # on first run (cached in data/ thereafter).
   osm-server:
     image: python:3.12-slim
     container_name: af-osm-server
     working_dir: /app
     environment:
-      OSM_PBF_URL: https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf
-      OSM_DATA_DIR: /data
-    command: bash -c "apt-get update -qq && apt-get install -y -q libexpat1 && pip install osmium --quiet && python3 /app/scripts/osm_prepare.py"
+      OSM_DATA_DIR: /app/data
+      OSM_PBF_FILENAME: Dallas.osm.pbf
+      OSM_GZ_FILENAME: Dallas.osm.gz
+    command: python3 /app/scripts/osm_prepare.py
     ports:
       - "8081:8080"
     volumes:
       - .:/app
-      - osm_data:/data
     healthcheck:
-      # Healthy as soon as the PBF is downloaded and being served; nominatim
-      # can start importing while the bz2 conversion continues in the background.
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/texas-latest.osm.pbf').close()"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/Dallas.osm.pbf').close()"]
       interval: 30s
       timeout: 10s
       retries: 10
       start_period: 120s
 
   # ─── OSM bz2 sentinel ──────────────────────────────────────────────────────
-  # Becomes healthy only after osm_prepare.py finishes the PBF→bz2 conversion.
-  # Overpass depends on this instead of osm-server so it waits for the right file.
+  # Becomes healthy only after osm_prepare.py finishes the gz→bz2 conversion.
   osm-bz2-ready:
     image: python:3.12-slim
     container_name: af-osm-bz2-ready
     volumes:
-      - osm_data:/data
+      - .:/app
     command:
       - python3
       - -c
       - |
         import time
         from pathlib import Path
-        p = Path('/data/texas-latest.osm.bz2')
+        p = Path('/app/data/Dallas.osm.bz2')
         while not p.exists():
             print('Waiting for bz2...', flush=True)
             time.sleep(30)
@@ -65,7 +63,7 @@ services:
         while True:
             time.sleep(3600)
     healthcheck:
-      test: ["CMD", "python3", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/data/texas-latest.osm.bz2').exists() else 1)"]
+      test: ["CMD", "python3", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/app/data/Dallas.osm.bz2').exists() else 1)"]
       interval: 30s
       timeout: 5s
       retries: 120
@@ -75,23 +73,24 @@ services:
   nominatim:
     image: mediagis/nominatim:4.4
     container_name: af-nominatim
-    shm_size: '3g'
+    shm_size: '1g'
     environment:
-      PBF_URL: http://osm-server:8080/texas-latest.osm.pbf
+      PBF_URL: http://osm-server:8080/Dallas.osm.pbf
       NOMINATIM_PASSWORD: nominatim
     ports:
       - "8082:8080"
     volumes:
       - nominatim_data:/var/lib/postgresql/14/main
+      - ./scripts/nominatim-postgres-import.conf:/etc/postgresql/14/main/conf.d/zz-override.conf:ro
     depends_on:
       osm-server:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/status"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/search?q=Dallas&format=json&limit=1"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 120s
+      retries: 20
+      start_period: 600s
 
   # ─── Overpass (POI Lookup) ─────────────────────────────────────────────────
   overpass:
@@ -100,7 +99,7 @@ services:
     environment:
       OVERPASS_META: "no"
       OVERPASS_MODE: init
-      OVERPASS_PLANET_URL: http://osm-server:8080/texas-latest.osm.bz2
+      OVERPASS_PLANET_URL: http://osm-server:8080/Dallas.osm.bz2
     ports:
       - "8083:80"
     volumes:
@@ -129,9 +128,7 @@ services:
       APP_PORT: 9022
       APP_LOG_LEVEL: info
 
-      # ─── LLM Backend (vLLM with external Qwen) ─
-      # For local vLLM on GPU, change to: http://localhost:8000/v1
-      # For Anthropic Claude, set LLM_BACKEND=claude and add ANTHROPIC_API_KEY
+      # ─── LLM Backend ───────────────────────────
       LLM_BACKEND: vllm
       LLM_BASE_URL: http://vllm:8000/v1
       LLM_API_KEY: EMPTY
@@ -175,7 +172,6 @@ services:
 
   # ─── vLLM (Optional: for local GPU inference) ──────────────────────────────
   # Uncomment if you have NVIDIA GPU and want to run Qwen locally.
-  # Requires: NVIDIA Container Runtime installed.
   #
   # vllm:
   #   image: vllm/vllm-openai:latest
@@ -207,7 +203,6 @@ services:
 
 volumes:
   postgres_data:
-  osm_data:
   nominatim_data:
   overpass_data:
   app_cache:
