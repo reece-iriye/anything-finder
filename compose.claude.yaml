@@ -98,7 +98,8 @@ services:
     container_name: af-overpass
     environment:
       OVERPASS_META: "no"
-      OVERPASS_MODE: init
+      # No OVERPASS_MODE: the image imports from OVERPASS_PLANET_URL on first boot
+      # (empty volume) and then serves; `init` would import and immediately exit.
       OVERPASS_PLANET_URL: http://osm-server:8080/Dallas.osm.bz2
     ports:
       - "8083:80"
@@ -120,7 +121,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: containerfile
     container_name: af-app
     environment:
       # ─── App ───────────────────────────────────
@@ -128,13 +129,12 @@ services:
       APP_PORT: 9022
       APP_LOG_LEVEL: info
 
-      # ─── LLM Backend ───────────────────────────
-      LLM_BACKEND: vllm
-      LLM_BASE_URL: http://vllm:8000/v1
-      LLM_API_KEY: EMPTY
-      LLM_MODEL: Qwen/Qwen3.8-27B
-      LLM_TEMPERATURE: "0.2"
-      LLM_TIMEOUT_SECONDS: "30"
+      # ─── LLM Backend (Claude / Anthropic API) ──
+      LLM_BACKEND: claude
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env or your shell}
+      LLM_MODEL_CLAUDE: ${LLM_MODEL_CLAUDE:-claude-sonnet-4-6}
+      LLM_TEMPERATURE: "0.3"
+      LLM_TIMEOUT_SECONDS: "60"
       LLM_MAX_RETRIES: "2"
 
       # ─── Agent Config ──────────────────────────
@@ -168,7 +168,9 @@ services:
         condition: service_healthy
       overpass:
         condition: service_healthy
-    command: python -m anything_finder
+    # Use the containerfile CMD (uvicorn src.main:app --host 0.0.0.0 --port 9022);
+    # there is no `anything_finder` module to run with `python -m`.
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9022"]
 
   # ─── vLLM (Optional: for local GPU inference) ──────────────────────────────
   # Uncomment if you have NVIDIA GPU and want to run Qwen locally.

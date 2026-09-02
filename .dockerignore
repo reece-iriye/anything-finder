@@ -1,0 +1,23 @@
+# Never copy the host virtualenv into the image — its script shebangs point at
+# host paths (/Users/...), which clobbers the venv built by `uv sync` in the
+# builder stage and makes `exec uvicorn` fail with "no such file or directory".
+.venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+.git/
+.gitignore
+
+# Large local OSM / runtime data — mounted or downloaded at runtime, not baked in
+data/
+
+.env
+.env.*
+!.env.example
+
+.claude/
+*.md
+!README.md
+compose*.yaml
