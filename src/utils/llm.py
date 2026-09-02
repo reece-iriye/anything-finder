@@ -18,6 +18,9 @@ _MAX_RETRIES: int = int(os.getenv("LLM_MAX_RETRIES", "2"))
 _DEFAULT_MODEL_CLAUDE: str = os.getenv("LLM_MODEL_CLAUDE", "claude-sonnet-4-6")
 
 
+_UNSET = object()
+
+
 def _role_env(role: str | None, suffix: str, default: str) -> str:
     """Read a role-scoped env var (e.g. LLM_MODEL_AGENT) then fall back to global."""
     if role:
@@ -25,6 +28,19 @@ def _role_env(role: str | None, suffix: str, default: str) -> str:
         if scoped is not None:
             return scoped
     return os.getenv(f"LLM_{suffix}", default)
+
+
+def _resolve_temperature(role: str | None, overrides: dict):
+    """Temperature only if explicitly set (override or env). Newer Claude models
+    (Sonnet 5, the 4.6+ family) reject the ``temperature`` param with a 400, so it
+    must be omittable rather than always defaulted."""
+    if "temperature" in overrides:
+        return overrides.pop("temperature")
+    if role and (scoped := os.getenv(f"LLM_TEMPERATURE_{role.upper()}")) is not None:
+        return float(scoped)
+    if (glob := os.getenv("LLM_TEMPERATURE")) is not None:
+        return float(glob)
+    return _UNSET
 
 
 def make_llm(role: str | None = None, **overrides) -> BaseChatModel:
@@ -43,9 +59,7 @@ def make_llm(role: str | None = None, **overrides) -> BaseChatModel:
     ``LLM_TEMPERATURE_AGENT``.
     """
     backend = os.getenv("LLM_BACKEND", "vllm").lower()
-    temperature = overrides.pop(
-        "temperature", float(_role_env(role, "TEMPERATURE", "0.2"))
-    )
+    temperature = _resolve_temperature(role, overrides)
 
     if backend == "claude":
         from langchain_anthropic import ChatAnthropic  # lazy: only needed for this path
@@ -53,9 +67,10 @@ def make_llm(role: str | None = None, **overrides) -> BaseChatModel:
         model = overrides.pop("model", None) or _role_env(
             role, "MODEL", _DEFAULT_MODEL_CLAUDE
         )
+        if temperature is not _UNSET:
+            overrides["temperature"] = temperature
         return ChatAnthropic(
             model=model,
-            temperature=temperature,
             timeout=_TIMEOUT,
             max_retries=_MAX_RETRIES,
             **overrides,
@@ -77,7 +92,7 @@ def make_llm(role: str | None = None, **overrides) -> BaseChatModel:
         model=model,
         base_url=_BASE_URL,
         api_key=_API_KEY,
-        temperature=temperature,
+        temperature=0.2 if temperature is _UNSET else temperature,
         timeout=_TIMEOUT,
         max_retries=_MAX_RETRIES,
         **overrides,

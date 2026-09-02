@@ -1,8 +1,14 @@
-.PHONY: add add-dev remove remove-dev update install dev trace osm-convert
+.PHONY: add add-dev remove remove-dev update install dev trace eval-queries eval-run eval-run-sonnet osm-convert
 
 TRACE_PORT ?= 7861
 AF_TRACE_DIR ?= telemetry
 AF_API_BASE ?= http://localhost:9022
+
+# Local geo services as published by compose.claude.yaml (nominatim 8082:8080,
+# overpass 8083:80). Override if you remapped the host ports.
+EVAL_NOMINATIM_URL ?= http://localhost:8082
+EVAL_OVERPASS_URL ?= http://localhost:8083
+EVAL_SONNET_MODEL ?= claude-sonnet-5
 
 # make add pkg=requests
 # make add pkg="requests>=2.28"
@@ -51,6 +57,31 @@ dev:
 trace:
 	@command -v open >/dev/null && ( sleep 3 && open "http://127.0.0.1:$(TRACE_PORT)" ) & \
 	AF_TRACE_DIR=$(AF_TRACE_DIR) AF_API_BASE=$(AF_API_BASE) TRACE_PORT=$(TRACE_PORT) uv run scripts/trace_ui.py
+
+# Regenerate the synthetic Dallas food-search eval set
+# (data/eval/dallas_food_queries.csv): 200 query + context_data rows for
+# LoRA training data and LLM-as-a-judge runs. Deterministic (fixed seed).
+eval-queries:
+	uv run scripts/gen_eval_queries.py
+
+# Execute every eval row through the restaurant workflow with Claude as the
+# inference engine -> data/eval/dallas_food_runs.jsonl (LoRA SFT + LLM-as-judge).
+# Needs ANTHROPIC_API_KEY and reachable Nominatim / Overpass — set
+# NOMINATIM_BASE_URL / OVERPASS_BASE_URL to your local containers, or export
+# NOMINATIM_USE_EXTERNAL_API=true OVERPASS_USE_EXTERNAL_API=true for the public
+# servers. Pass ARGS for flags, e.g. make eval-run ARGS="--limit 5 --resume".
+eval-run:
+	LLM_BACKEND=claude uv run scripts/run_eval_queries.py $(ARGS)
+
+# Same, pinned to Claude Sonnet and wired to the local compose geo services.
+# Needs ANTHROPIC_API_KEY and the compose stack up:
+#   docker compose -f compose.claude.yaml up -d nominatim overpass
+eval-run-sonnet:
+	LLM_BACKEND=claude \
+	LLM_MODEL_AGENT=$(EVAL_SONNET_MODEL) \
+	NOMINATIM_BASE_URL=$(EVAL_NOMINATIM_URL) \
+	OVERPASS_BASE_URL=$(EVAL_OVERPASS_URL) \
+	uv run scripts/run_eval_queries.py $(ARGS)
 
 osm-convert:
 	@test -f data/Dallas.osm.gz || { echo "data/Dallas.osm.gz not found"; exit 1; }

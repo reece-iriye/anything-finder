@@ -1,186 +1,297 @@
 # Anything Finder
 
-Experimenting with modern, novel tooling to find stuff to do near me in response to Google's AI search which makes searching for things to do near me much more difficult.
+Agentic search for things to do near you — a counter to general-web AI search that
+increasingly buries local results. The first capability is an **AI restaurant search**:
+send a natural-language request and an LLM agent geocodes the location, searches
+OpenStreetMap for matching eateries, and writes back a short, human recommendation.
 
-The first capability is an **AI restaurant search**: send a natural-language request
-(e.g. _"quiet sushi near Grandscape in The Colony, TX"_) and an agentic workflow geocodes
-the location, searches OpenStreetMap for matching eateries, ranks them, and writes back a
-human-readable recommendation.
+```
+POST /api/geo-search/restaurants/{user_id}
+{ "query": "quiet sushi in Deep Ellum, Dallas" }
+
+→ "Deep Ellum has a couple of solid quiet sushi options — try Deep Sushi for a
+   calm room and fresh nigiri, or …"
+```
+
+Everything the agent does is captured as a **telemetry trace** you can query and
+replay from a local console (`make trace`).
 
 ---
 
-## Infrastructure architecture
+## Quick start (full local stack)
 
-The app is a FastAPI service that depends on four external components. Every dependency is
-**reached over HTTP via an env-configurable URL**, so each one can be swapped between a local
-container, an in-cluster Kubernetes service, or a hosted/public API without code changes.
+The compose file brings up the API plus every dependency (Postgres, Nominatim,
+Overpass, an OSM file server) against a **Dallas** OpenStreetMap extract.
 
-```
-                         ┌──────────────────────────┐
-   natural-language ───► │   anything-finder (API)  │
-   request              │   FastAPI + LangGraph    │
-                         └───┬───────┬───────┬──────┘
-                             │       │       │
-        geocoding ┌──────────┘       │       └──────────┐ conversation state
-                  ▼                  ▼                  ▼
-            ┌───────────┐     ┌────────────┐     ┌────────────┐
-            │ Nominatim │     │  Overpass  │     │ PostgreSQL │
-            │ (geocode) │     │ (OSM POIs) │     │ checkpoint │
-            └───────────┘     └────────────┘     └────────────┘
-                  │
-                  ▼  inference (OpenAI-compatible)
-            ┌───────────┐
-            │   vLLM    │  self-hosted Qwen on a 16 GB GPU (e.g. RTX 5060 Ti)
-            └───────────┘
+```bash
+# 1. put the Dallas OSM extract in data/  (see scripts/osm_prepare.py + compose.claude.yaml)
+#    data/Dallas.osm.pbf and data/Dallas.osm.gz
+make osm-convert                       # gz → data/Dallas.osm.bz2 (Overpass import format)
+
+# 2. provide an Anthropic key  (compose.claude.yaml runs LLM_BACKEND=claude;
+#    put it in .env or export it — compose reads both)
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# 3. bring it up
+docker compose -f compose.claude.yaml up -d
+
+curl -fsS localhost:9022/health                     # {"status":"healthy"}
+curl -s localhost:9022/meta                         # {"backend":"claude","model":"…","mode":"claude",…}
 ```
 
-| Component | Purpose | What you can change |
+> First boot builds the Nominatim and Overpass databases from the extract — that
+> takes several minutes and needs headroom (give Docker/Colima ~8 GB RAM).
+
+Then query it:
+
+```bash
+curl -sS -X POST localhost:9022/api/geo-search/restaurants/00000000-0000-0000-0000-000000000001 \
+  -H 'content-type: application/json' \
+  -d '{"query":"date-night Italian in Uptown, Dallas"}'
+```
+
+Or use the console — `make trace` — to submit queries and inspect each run.
+
+---
+
+## The API
+
+### `POST /api/geo-search/restaurants/{user_id}`
+
+`user_id` is a UUID used only to load an optional preferences file
+(`data/preferences/<user_id>.md` — dietary restrictions, favourite cuisines,
+dislikes). It does not need to be unique per person.
+
+Request body (`GeoLocationRestaurantSearchRequest`):
+
+| field | type | notes |
 | --- | --- | --- |
-| **vLLM** | Serves the LLM behind an OpenAI-compatible API. Default model is a ~7B quantized Qwen (`Qwen/Qwen2.5-7B-Instruct-AWQ`) sized for a 16 GB GPU. | `LLM_BASE_URL`, `LLM_MODEL`, and per-role overrides (`LLM_MODEL_INTENT` / `LLM_MODEL_SEARCH` / `LLM_MODEL_SYNTHESIZE`). Swap in any model your GPU can serve, or point at a hosted OpenAI-compatible endpoint. |
-| **Nominatim** | Forward/reverse geocoding (place name ↔ coordinates). | `NOMINATIM_BASE_URL`, or the `NOMINATIM_USE_EXTERNAL_API` / `NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE` toggles to pick public vs. in-cluster defaults. |
-| **Overpass** | Queries OpenStreetMap for nearby eateries. | `OVERPASS_BASE_URL`, or the equivalent `OVERPASS_USE_*` toggles. |
-| **PostgreSQL** | LangGraph checkpointer — persists conversation/session state, shared across replicas. | `POSTGRES_DSN`. |
+| `query` | string, **required** | Natural-language request. Craving, vibe, and any location phrase are read from this text. |
+| `session_id` | string | Conversation id → checkpointer `thread_id` for multi-turn. Falls back to `user_id`. |
+| `city`, `state` | string | Location override. Coordinates are derived from them. Cannot be combined with `latitude`/`longitude`. |
+| `latitude`, `longitude` | float | Explicit coordinate override (both required together). Cannot be combined with `city`/`state`. |
+| `radius_m` | int | Starting search radius; a default is applied otherwise. |
+| `include_casual` | bool | Widen beyond sit-down restaurants to cafés, fast food, bars, pubs. Default `false`. |
 
-### Deployment expectations
+Response: `{ "response": "<recommendation text>" }`.
 
-- Designed for a **self-hosted Kubernetes cluster** where vLLM, Nominatim, Overpass, and
-  Postgres run as in-cluster services (the default URLs resolve `*.svc.cluster.local`).
-- Because state lives in Postgres (not in-process), the API is **horizontally scalable** —
-  run multiple replicas behind a service; a given `session_id` maps to a checkpointer
-  `thread_id` so conversations are consistent across pods.
-- The container image is built from `containerfile` (multistage, pipenv `--deploy`, non-root
-  user). `APP_IP`/`APP_PORT` default to `0.0.0.0:9022` in the image.
-- For **local development** you can flip the `*_USE_EXTERNAL_API` flags to `true` to hit the
-  public Nominatim/Overpass APIs and run Postgres + vLLM locally (or point `LLM_BASE_URL` at
-  any OpenAI-compatible server).
+If no location override is given, the agent extracts and geocodes the location
+from the `query` text. **The bundled data is Dallas-only** — queries must
+reference Dallas-area places (Deep Ellum, Uptown, Bishop Arts, …).
+
+### `GET /health` → `{"status":"healthy"}`
+### `GET /meta` → `{"backend","model","mode","trace_enabled"}` — which model stack is serving requests.
 
 ---
 
-## AI agent workflow architecture
+## Telemetry console — `make trace`
 
-A **hybrid LangGraph workflow** compiled once at startup: a deterministic backbone with a
-single bounded **deepagents** tool-loop for the open-ended search/widen step. The LLM is used
-at three points (intent extraction, the search loop, and final synthesis); geocoding, ranking,
-and bounding-box math stay deterministic for predictable latency and cost.
+A small FastAPI app (`scripts/trace_ui.py` + `trace_ui.html`, no extra deps) that
+**queries the agent and lets you drill into what happened**. Needs the API
+running (`make dev` or docker compose), which is where traces are written.
+
+```bash
+make dev                       # terminal 1 — API on :9022, AF_TRACE_DIR set
+make trace                     # terminal 2 — console on :7861
+```
+
+What it gives you:
+
+- **＋ New run** composer — submit a query; `session_id` auto-fills with a random
+  UUID (regenerate with ↻). While the agent runs, the trace streams in live.
+- **Runs sidebar** — every past run, grouped by **mode** (`claude` /
+  `raw-open-source` / `finetuned-open-source`), each card badged with the model
+  it used. Hover for an **×** to delete.
+- **Conversation view** — the run rebuilt as numbered steps. Each tool the model
+  calls is shown as a round-trip:
+
+  ```
+  ① arguments the model generated   →   ② your app runs the tool   →   ③ result handed back
+  ```
+
+  Argument values that came straight out of an earlier tool's result are tagged
+  `↑ from geocode_location (step 1)`, so the data flow is visible. A collapsible
+  primer explains that the model only emits tool *requests* — your app executes
+  them.
+- **Stats tab** — token bars (input / output / cache), cost estimate, calls per
+  run, per-mode aggregates.
+
+### Where traces are saved
+
+Set `AF_TRACE_DIR` on the **API** process and every agent run writes one JSON file:
+
+```
+<AF_TRACE_DIR>/<mode>/<YYYYMMDD-HHMMSS>-<trace_id>.json
+```
+
+`mode` comes from `AF_TRACE_MODE`, else derived from `LLM_BACKEND`
+(`claude` → `claude`, `vllm` → `raw-open-source`, `lora` →
+`finetuned-open-source`). Each file holds ordered spans (one per LLM call, one
+per tool call) with inputs, outputs, token usage, cost, timing, and the
+structured request. `make dev` and `compose.claude.yaml` set `AF_TRACE_DIR`
+automatically (`./telemetry/`, git-ignored). Implementation: `src/utils/telemetry.py`.
+
+---
+
+## Architecture
+
+### The agent
+
+A single **deepagents** tool-loop, compiled once at startup
+(`src/agents/geo_search/agent.py`), backed by the Postgres checkpointer for
+multi-turn state. The system prompt lives in `prompts/restaurant_agent.md` (never
+inline in source).
 
 ```mermaid
 flowchart LR
-    START([START]) --> PI[parse_intent]
-    PI --> RL[resolve_location]
-    RL --> S[search]
-    S --> R[rank]
-    R --> SY[synthesize]
-    SY --> END([END])
-
-    PI -. "LLM: structured output → CravingIntent" .-> PI
-    S  -. "deepagents loop: query Overpass, widen radius, retry (bounded)" .-> S
-    SY -. "LLM: human-readable answer" .-> SY
+    Q[query] --> M{{LLM}}
+    M -->|tool request| P[read_food_preferences]
+    M -->|tool request| G[geocode_location]
+    M -->|tool request| L[get_current_location]
+    M -->|tool request| S[search_restaurants]
+    P & G & L & S -->|result| M
+    M -->|no more tools| A[recommendation]
 ```
 
-| Node | Type | Responsibility |
-| --- | --- | --- |
-| `parse_intent` | LLM | Extracts a structured `CravingIntent` (craving, vibe, location phrase) from the raw query via `with_structured_output(method="json_schema")` (vLLM guided decoding). |
-| `resolve_location` | deterministic | Uses caller-supplied coordinates if present, otherwise forward-geocodes the location phrase through Nominatim. |
-| `search` | deepagents | A `create_deep_agent` tool-loop that calls Overpass, and **widens the radius and retries** when results are sparse — bounded by a recursion limit and a hard max radius. |
-| `rank` | deterministic | Scores candidates by category match + haversine proximity. |
-| `synthesize` | LLM | Writes the final recommendation from the ranked shortlist. |
-
-### Key design points
-
-- **Dependencies are closure-bound into node factories** (`make_*_node(...)`) at compile time,
-  never stored in graph state. The state is serialized by the Postgres checkpointer, so it
-  must stay JSON-serializable — clients and LLMs must not live in it.
-- **Per-role models**: each LLM node can be backed by a different served model, all from one
-  vLLM endpoint, configured purely through env vars.
-- **Prompts live in markdown** under `src/agents/geo_search/prompts/`, loaded via
-  `src/utils/prompts.py` — never inlined in source.
-
-### Relevant source
-
-| Path | Contents |
+| Tool | Does |
 | --- | --- |
-| `src/agents/geo_search/graph.py` | `compile_geo_graph(...)` — node wiring + checkpointer. |
-| `src/agents/geo_search/nodes.py` | The node factories and the deepagents search loop. |
-| `src/agents/geo_search/state.py` | `GeoSearchState` (the serialized graph state). |
-| `src/agents/geo_search/prompts/` | Markdown prompt templates. |
-| `src/utils/{llm,nominatim,overpass,prompts}.py` | Client factories + helpers. |
-| `src/routers/geo_search/restaurants.py` | The HTTP endpoint. |
+| `read_food_preferences` | Reads `data/preferences/<user_id>.md` if present. |
+| `geocode_location` | Place phrase → coordinates via **Nominatim**. |
+| `get_current_location` | Falls back to `HOME_CITY`/`HOME_STATE` (Dallas, TX) when no location is mentioned. |
+| `search_restaurants` | Queries **Overpass** for eateries near `(lat, lon)` within `radius_m`; the model widens the radius and retries when results are sparse (hard cap 16 km, 10 results). |
+
+`src/services/geo_search/restaurants.py` builds the agent input from the request,
+runs the loop, and extracts the final assistant message. Tools are
+closure-bound to their HTTP clients at compile time — never stored in graph
+state (the state is JSON-serialized by the checkpointer).
+
+### Infrastructure
+
+The API is a FastAPI service; every dependency is reached over HTTP at an
+**env-configurable URL**, so each can be a local container, an in-cluster
+Kubernetes service, or a hosted API without code changes.
+
+```
+   natural-language request
+             │
+             ▼
+   ┌──────────────────────┐      ┌───────────┐  place ↔ coords
+   │  anything-finder API │────► │ Nominatim │
+   │  FastAPI + deepagents│      └───────────┘
+   │                      │      ┌───────────┐  nearby OSM eateries
+   │                      │────► │  Overpass │
+   │                      │      └───────────┘
+   │                      │      ┌───────────┐  conversation state
+   │                      │────► │ PostgreSQL│  (LangGraph checkpointer)
+   │                      │      └───────────┘
+   │                      │      ┌───────────┐  inference
+   │                      │────► │ LLM backend│  vLLM / Anthropic / LoRA
+   └──────────────────────┘      └───────────┘
+```
+
+| Component | Purpose | Key env |
+| --- | --- | --- |
+| **LLM backend** | Inference. See below. | `LLM_BACKEND`, `LLM_MODEL*`, `LLM_BASE_URL`, `ANTHROPIC_API_KEY` |
+| **Nominatim** | Forward geocoding (place ↔ coordinates). | `NOMINATIM_BASE_URL`, or `NOMINATIM_USE_EXTERNAL_API` / `NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE` |
+| **Overpass** | OpenStreetMap POI queries. | `OVERPASS_BASE_URL`, or the matching `OVERPASS_USE_*` toggles |
+| **PostgreSQL** | LangGraph checkpointer — session state, shared across replicas. | `POSTGRES_DSN` |
+
+Because state lives in Postgres, the API is **horizontally scalable** — run
+several replicas behind a service; a `session_id` maps to a checkpointer
+`thread_id` so multi-turn conversations stay consistent across pods.
+
+### LLM backends
+
+`LLM_BACKEND` selects the provider (`src/utils/llm.py`); all read shared
+`LLM_TEMPERATURE`, `LLM_TIMEOUT_SECONDS`, `LLM_MAX_RETRIES` and support per-role
+overrides (`LLM_MODEL_AGENT`, `LLM_TEMPERATURE_AGENT`, …).
+
+| `LLM_BACKEND` | Uses | Needs |
+| --- | --- | --- |
+| `vllm` *(default)* | Self-hosted vLLM / any OpenAI-compatible server. | `LLM_BASE_URL`, `LLM_MODEL` (default a ~7B quantized Qwen for a 16 GB GPU), `LLM_API_KEY` |
+| `claude` | Anthropic API (`langchain-anthropic`). | `ANTHROPIC_API_KEY`, `LLM_MODEL_CLAUDE` (default `claude-sonnet-4-6`) |
+| `lora` | Same vLLM endpoint with a trained LoRA adapter. | `LLM_MODEL_LORA` (HF path of the adapter) |
 
 ---
 
-## Installation & startup
+## Local development
 
-### Requirements
-
-- Python **3.12**
-- [`pipenv`](https://pipenv.pypa.io/) for dependency management
-- Reachable **Postgres**, **Nominatim**, **Overpass**, and a **vLLM** (or other
-  OpenAI-compatible) endpoint — see the table above
-
-### Install
+Dependencies are managed with **[uv](https://docs.astral.sh/uv/)** (`uv.lock` is
+the lockfile; `pyproject.toml` holds the deps and the `dev` dependency-group).
 
 ```bash
-pipenv install --dev      # create the virtualenv and install deps
-cp .env.example .env       # then edit values for your environment
+uv sync                       # create .venv and install everything (incl. dev)
+cp .env.example .env          # then edit for your setup
+
+make dev                      # uvicorn --reload on 127.0.0.1:9022 (AF_TRACE_DIR=telemetry)
+# or: uv run python -m src.main
+
+uv add "some-package>=1.2"     # add a runtime dep
 ```
 
-Dependencies are managed in `Pipfile`; `pyproject.toml` is kept in sync via
-`scripts/sync_pyproject.py`. Use the Makefile rather than editing by hand:
+Config is entirely environment-driven; `.env.example` documents every variable.
+`make dev` reads a sourced `.env`; `docker compose` picks up `.env` automatically.
+The ones you'll touch first: `LLM_BACKEND` (+ its credentials), `POSTGRES_DSN`,
+`NOMINATIM_*` / `OVERPASS_*`.
+
+### Tests
+
+The default suite is **hermetic** — it stubs the LLM, mocks HTTP
+(`pytest-httpx`), and uses an in-memory checkpointer, so it needs no GPU,
+database, or network:
 
 ```bash
-make add pkg="some-package>=1.2"     # runtime dep (also syncs pyproject.toml)
-make add-dev pkg="pytest-cov"        # dev-only dep
-make remove pkg=some-package
-make install                         # pipenv install --deploy (CI/prod)
+uv run pytest                 # everything except @pytest.mark.live
+uv run pytest -m live         # opt-in: requires a real LLM endpoint + Postgres
 ```
 
-### Configure
+`tests/unit/` mirrors `src/` (and `tests/unit/scripts/` covers the console);
+`tests/regression/` holds schema-stability guards.
 
-All configuration is environment-driven; `.env.example` documents every variable. The ones
-you'll most likely change first:
+---
 
-- `LLM_BASE_URL` / `LLM_MODEL` — where your vLLM lives and which model it serves
-- `POSTGRES_DSN` — checkpointer database
-- `NOMINATIM_*` / `OVERPASS_*` — geocoding + POI endpoints (toggle external vs. in-cluster)
+## Container & deployment
 
-### Run
+The image is built from **`containerfile`** — multistage, `uv sync --frozen`,
+non-root user, `CMD` runs `uvicorn src.main:app` on `0.0.0.0:9022`.
 
 ```bash
-make dev                 # uvicorn with --reload on 127.0.0.1:9022
-# or directly:
-pipenv run python -m src.main
+docker build -t anything-finder -f containerfile .      # or: podman build
+docker run --env-file .env -p 9022:9022 anything-finder
 ```
 
-Health check and example request:
+- **`compose.claude.yaml`** — the full local stack (API + Postgres + Nominatim +
+  Overpass + OSM file server). A `.dockerignore` keeps the host `.venv`, `data/`,
+  and `telemetry/` out of the build context.
+- **`charts/anything-finder/`** — Helm chart with phased `values-*.yaml` for a
+  self-hosted Kubernetes deployment (default dependency URLs resolve
+  `*.svc.cluster.local`).
+- Optional GPU **vLLM** service is scaffolded (commented) in the compose file.
 
-```bash
-curl localhost:9022/health
-# {"status":"healthy"}
+---
 
-curl -X POST localhost:9022/api/geo-search/restaurants/user-123 \
-  -H 'content-type: application/json' \
-  -d '{"query":"quiet sushi near Grandscape in The Colony, TX","include_casual":false}'
+## Repo layout
+
 ```
-
-Pass `latitude`+`longitude` (or `city`+`state`) to override the location instead of letting
-the agent geocode the phrase from the query. Provide a `session_id` to continue a prior
-conversation (it maps to the checkpointer thread).
-
-### Test
-
-The default suite is **hermetic** — it stubs the LLM, mocks HTTP (`pytest-httpx`), and uses an
-in-memory checkpointer, so it needs no GPU, database, or network:
-
-```bash
-pipenv run pytest                 # runs everything except @pytest.mark.live
-pipenv run pytest -m live         # opt-in: requires a real vLLM + Postgres
-```
-
-Layout: `tests/unit/` mirrors `src/`, and `tests/regression/` holds schema-stability guards.
-
-### Container
-
-```bash
-podman build -t anything-finder -f containerfile .   # or docker build
-podman run --env-file .env -p 9022:9022 anything-finder
+src/
+  main.py                       FastAPI app, lifespan, /health, /meta
+  routers/geo_search/           HTTP endpoint
+  services/geo_search/          per-request orchestration (builds agent input, runs the loop)
+  agents/geo_search/
+    agent.py                    build_restaurant_agent — the deepagents loop
+    tools.py                    the 4 tool factories
+  utils/
+    llm.py                      make_llm — backend selection + per-role models
+    nominatim.py  overpass.py   HTTP client factories + query helpers
+    prompts.py                  load_prompt — markdown prompt loader
+    telemetry.py                JsonFileTracer — per-run trace capture
+  schemas/geo_search/           request / response models
+prompts/restaurant_agent.md     the agent's system prompt
+scripts/
+  trace_ui.py  trace_ui.html    the telemetry console (make trace)
+  osm_prepare.py                OSM file server used by compose
+  sync_pyproject.py             legacy pyproject sync helper
+charts/anything-finder/         Helm chart
+compose.claude.yaml             full local stack
+containerfile                   app image
 ```
