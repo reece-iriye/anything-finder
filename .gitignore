@@ -8,3 +8,6 @@
 
 # Env var
 **/.env
+
+# data
+**/data/
