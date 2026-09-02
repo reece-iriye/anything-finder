@@ -1,4 +1,6 @@
-.PHONY: add add-dev remove remove-dev update install dev osm-convert
+.PHONY: add add-dev remove remove-dev update install dev ui osm-convert
+
+AF_GRADIO_PORT ?= 7860
 
 # make add pkg=requests
 # make add pkg="requests>=2.28"
@@ -40,6 +42,12 @@ install:
 
 dev:
 	uvicorn src.main:app --host 127.0.0.1 --port 9022 --reload
+
+# Gradio query UI for the restaurant endpoint (talks to a running API over HTTP).
+# Override target API / port: make ui AF_API_BASE=http://localhost:9022 AF_GRADIO_PORT=7860
+ui:
+	@command -v open >/dev/null && ( sleep 4 && open "http://127.0.0.1:$(AF_GRADIO_PORT)" ) & \
+	AF_GRADIO_PORT=$(AF_GRADIO_PORT) uv run --with gradio --with httpx scripts/query_ui.py
 
 osm-convert:
 	@test -f data/Dallas.osm.gz || { echo "data/Dallas.osm.gz not found"; exit 1; }
