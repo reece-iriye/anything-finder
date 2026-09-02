@@ -11,3 +11,6 @@
 
 # data
 **/data/
+
+# local telemetry traces
+/telemetry/

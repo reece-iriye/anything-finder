@@ -142,6 +142,11 @@ services:
       HOME_CITY: Dallas
       HOME_STATE: TX
 
+      # ─── Telemetry ─────────────────────────────
+      # /workspace is the bind-mounted repo, so traces land in ./telemetry/.
+      # mode subdir is derived from LLM_BACKEND unless AF_TRACE_MODE is set.
+      AF_TRACE_DIR: /workspace/telemetry
+
       # ─── PostgreSQL (Checkpointer) ─────────────
       POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/anything_finder
 

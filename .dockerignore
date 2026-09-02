@@ -12,6 +12,7 @@
 
 # Large local OSM / runtime data — mounted or downloaded at runtime, not baked in
 data/
+telemetry/
 
 .env
 .env.*

@@ -11,6 +11,7 @@ from src.agents.geo_search.agent import build_restaurant_agent
 from src.utils.llm import make_llm
 from src.utils.nominatim import make_nominatim_client
 from src.utils.overpass import make_overpass_client
+from src.utils.telemetry import trace_mode
 
 
 @asynccontextmanager
@@ -29,6 +30,7 @@ async def lifespan(app: FastAPI):
 
         app.state.nominatim = nominatim
         app.state.overpass = overpass
+        app.state.llm = llm
         app.state.restaurant_agent = build_restaurant_agent(
             llm,
             nominatim,
@@ -57,6 +59,19 @@ app = FastAPI(
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.get("/meta")
+def meta():
+    """Which model stack is serving requests -- surfaced by the trace UI."""
+    llm = getattr(app.state, "llm", None)
+    model = getattr(llm, "model", None) or getattr(llm, "model_name", None)
+    return {
+        "backend": os.getenv("LLM_BACKEND", "vllm"),
+        "model": model,
+        "mode": trace_mode(),
+        "trace_enabled": bool(os.getenv("AF_TRACE_DIR")),
+    }
 
 
 app.include_router(src.routers.geo_search.restaurants_router)
