@@ -237,6 +237,15 @@ vllm-stop:
 	@test -n "$(BREV_HOST)" || { echo "Usage: make vllm-stop BREV_HOST=<ssh target>"; exit 1; }
 	BREV_HOST=$(BREV_HOST) BREV_DIR=$(BREV_DIR) bash scripts/brev_serve.sh --stop
 
+# Live loss dashboard while lora-train-remote is running (or after).
+lora-tensorboard:
+	@test -n "$(BREV_HOST)" || { echo "Usage: make lora-tensorboard BREV_HOST=<ssh target>"; exit 1; }
+	BREV_HOST=$(BREV_HOST) BREV_DIR=$(BREV_DIR) LORA_CONFIG=$(LORA_CONFIG) bash scripts/brev_tensorboard.sh
+
+lora-tensorboard-stop:
+	@test -n "$(BREV_HOST)" || { echo "Usage: make lora-tensorboard-stop BREV_HOST=<ssh target>"; exit 1; }
+	BREV_HOST=$(BREV_HOST) BREV_DIR=$(BREV_DIR) bash scripts/brev_tensorboard.sh --stop
+
 osm-convert:
 	@test -f data/Dallas.osm.gz || { echo "data/Dallas.osm.gz not found"; exit 1; }
 	@test -f data/Dallas.osm.pbf || { echo "data/Dallas.osm.pbf not found"; exit 1; }
