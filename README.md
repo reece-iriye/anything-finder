@@ -244,13 +244,28 @@ Skip this if you already know how LoRA works. Everything below uses the
 on `Qwen/Qwen2.5-7B-Instruct`), not a toy example.
 
 **Full fine-tuning** would update every weight matrix in the model directly.
-Each of Qwen2.5-7B's 28 decoder layers has 7 such matrices — `q_proj`,
-`k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` — for a
-total of **7.66 billion** parameters. Training all of them means an Adam
-optimizer state (a momentum and a variance term per parameter, both usually
-kept in fp32) on top of the weights and gradients themselves — three to four
-extra copies of a 7.66B-parameter model, which is why full fine-tuning
-normally needs multiple large GPUs.
+Where those 7.66 billion parameters actually live is worth being concrete
+about, since it's easy to assume the model is "one big matrix" — it isn't; the
+attention matrices (`q_proj`/`o_proj` at 3584×3584, `k_proj`/`v_proj`
+narrowed by grouped-query attention) are a minority of it:
+
+| Where | Params |
+| --- | --- |
+| `embed_tokens` (152,064-token vocabulary × 3584 hidden) | 544,997,376 |
+| `lm_head` (a separate matrix here — `tie_word_embeddings: false`) | 544,997,376 |
+| 28 decoder layers × 233,057,792 each (`q/k/v/o_proj` + `gate/up/down_proj` + norms/biases) | 6,525,618,176 |
+| final norm | 3,584 |
+| **Total** | **7,615,616,512** |
+
+Within one decoder layer, the 3-matrix MLP block
+(`gate_proj`/`up_proj`/`down_proj`, all sized against the 18944-wide
+`intermediate_size`) is **204M of the 233M**, versus ~29M for all four
+attention projections combined — the MLP, not attention, is where most of a
+transformer's parameters (and most of LoRA's targets) actually sit. Training
+all 7.66B directly means an Adam optimizer state (a momentum and a variance
+term per parameter, both usually kept in fp32) on top of the weights and
+gradients themselves — three to four extra copies of a 7.66B-parameter model,
+which is why full fine-tuning normally needs multiple large GPUs.
 
 **LoRA** ([Hu et al., 2021](https://arxiv.org/abs/2106.09685)) sidesteps this
 by **freezing every original weight matrix** and, for each one you want to
@@ -312,7 +327,7 @@ self_attn.v_proj.weight   [512, 3584]         self_attn.o_proj.weight  [3584, 35
 mlp.gate_proj.weight      [18944, 3584]       mlp.up_proj.weight       [18944, 3584]
 mlp.down_proj.weight      [3584, 18944]
 
-# adapter_model.safetensors, the SAME layer 0 — this is the entire trained delta
+# adapter_model.safetensors, layer 0's slice of the trained delta
 self_attn.q_proj.lora_A.weight  [16, 3584]    self_attn.q_proj.lora_B.weight  [3584, 16]
 self_attn.k_proj.lora_A.weight  [16, 3584]    self_attn.k_proj.lora_B.weight  [512, 16]
 self_attn.v_proj.lora_A.weight  [16, 3584]    self_attn.v_proj.lora_B.weight  [512, 16]
@@ -321,6 +336,23 @@ mlp.gate_proj.lora_A.weight     [16, 3584]    mlp.gate_proj.lora_B.weight     [1
 mlp.up_proj.lora_A.weight       [16, 3584]    mlp.up_proj.lora_B.weight       [18944, 16]
 mlp.down_proj.lora_A.weight     [16, 18944]   mlp.down_proj.lora_B.weight     [3584, 16]
 ```
+
+That's layer 0 shown once because all 28 layers are shaped identically — not
+because layer 0 is special. **Every one of the 28 decoder layers gets its own
+independent pair of `A`/`B` matrices for all 7 target modules** — layer 5's
+`q_proj.lora_A` is a different learned tensor from layer 20's, not a shared or
+copied one. `adapter_model.safetensors` for this run holds exactly
+`28 layers × 7 matrices × 2 (A and B) = 392` LoRA tensors in total, confirmed
+by listing the file's own keys — none skipped. That per-layer repetition is
+exactly where the `× 28` in the parameter count below comes from.
+
+Same shape, different values — not shared or tied. Loading layer 0's and
+layer 1's `q_proj.lora_A` (both `[16, 3584]`, same target module) and
+comparing them directly: `torch.equal(a0, a1)` is `False`, they sit at
+different memory addresses, and their mean absolute difference is `0.0112` —
+a real, substantial gap, not floating-point rounding noise. Training found 28
+separate rank-16 corrections for `q_proj`, one per layer, not one correction
+copied everywhere.
 
 Look at `q_proj` specifically: the frozen weight is `[3584, 3584]` — a full
 12.8M-parameter, full-rank matrix. `lora_A` is `[16, 3584]` and `lora_B` is
@@ -335,10 +367,15 @@ constrained to be low-rank — is the entire idea LoRA is named after.
 Summed across all 7 matrices × 28 layers, that's **40,370,176 trainable
 parameters out of 7,655,986,688 total — 0.53%.** (These are the exact numbers
 `train_lora.py` prints at the start of every real run via
-`model.print_trainable_parameters()` — not an estimate.) The "7,655,986,688
-total" is the *entire* 7B model, frozen weights included — it doesn't shrink
-or go anywhere; every one of those parameters still runs on every forward
-pass, exactly as pretrained. It's only the 40M `lora_A`/`lora_B` values layered
+`model.print_trainable_parameters()` — not an estimate. The base model alone
+is 7,615,616,512, per the breakdown above; `print_trainable_parameters()`
+reports the base model *plus* the LoRA adapter PEFT just attached to it —
+7,615,616,512 + 40,370,176 = 7,655,986,688 — which is why the two "total"
+figures in this doc differ by exactly the adapter's own size.) The
+"7,655,986,688 total" is the *entire* 7B model, frozen weights included — it
+doesn't shrink or go anywhere; every one of those parameters still runs on
+every forward pass, exactly as pretrained. It's only the 40M `lora_A`/`lora_B`
+values layered
 on top that receive gradients and get saved as the adapter. Everything else
 about the model — its weights, its knowledge, its general language
 ability — never moves, which is why
