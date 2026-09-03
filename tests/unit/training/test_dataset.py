@@ -62,7 +62,9 @@ def test_parallel_tool_calls_preserved():
     first_ai = rec["messages"][2]
     assert [tc["function"]["name"] for tc in first_ai["tool_calls"]] == [
         "read_food_preferences", "geocode_location"]
-    assert first_ai["tool_calls"][1]["function"]["arguments"] == '{"place": "Fair Park"}'
+    # a raw object, not a JSON string — Qwen's chat template does its own
+    # `| tojson`, so a pre-stringified value would get double-encoded.
+    assert first_ai["tool_calls"][1]["function"]["arguments"] == {"place": "Fair Park"}
 
 
 def test_thinking_blocks_stripped():

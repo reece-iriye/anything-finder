@@ -305,6 +305,15 @@ function resultColumn(mode, r, divergent){
     body.appendChild(d);
   }
 
+  const raw = el("details","drill");
+  raw.innerHTML = `<summary>${IC.eye} raw JSON — where these stats come from</summary>`;
+  raw.addEventListener("toggle", () => {
+    if (!raw.open || raw.dataset.built) return;
+    raw.dataset.built = "1";
+    raw.insertAdjacentHTML("beforeend", codeBlock(r));
+  });
+  body.appendChild(raw);
+
   c.appendChild(body);
   return c;
 }
@@ -322,7 +331,7 @@ function render(){
 $("#viewToggle").onclick = e => { const b=e.target.closest(".pill"); if(!b) return; V.view=b.dataset.view; render(); };
 
 if (DATA){
-  $("#stamp").textContent = `${DATA.queries.length} queries · ${DATA.modes.length} modes · generated ${new Date(DATA.generated_at).toLocaleString()}`;
+  $("#stamp").textContent = `${DATA.queries.length} queries · ${DATA.modes.length} modes`;
   render();
 } else {
   $("#main").innerHTML = `<div class="empty">No data was inlined into this file. Rebuild it with <b>make compare</b>.</div>`;

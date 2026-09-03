@@ -304,6 +304,52 @@ def build_dataset(
     }
 
 
+def filter_common_success(
+    dataset: dict[str, Any],
+    *,
+    common_run_only: bool = False,
+    common_success_only: bool = False,
+    max_queries: int | None = None,
+) -> dict[str, Any]:
+    """Trim the query rows for a focused report.
+
+    ``common_run_only`` keeps a row only when every mode in ``dataset["modes"]``
+    was actually attempted (has a result entry) — a query only claude ran, say,
+    is dropped everywhere, so the comparison never shows an empty column for a
+    mode that was simply never captured for that row. An attempt that errored
+    still counts as "ran" and is kept (and still shown as an error).
+
+    ``common_success_only`` is the stricter version: also requires that result
+    to have no error. ``max_queries`` caps the row count afterward, in the eval
+    set's own order.
+
+    Aggregates are recomputed over exactly the rows kept, so the leaderboard
+    numbers always match what the report actually shows underneath it.
+    """
+    modes = dataset["modes"]
+    rows = dataset["queries"]
+    if common_success_only:
+        rows = [
+            row
+            for row in rows
+            if all(
+                mode in row["results"] and row["results"][mode].get("error") is None
+                for mode in modes
+            )
+        ]
+    elif common_run_only:
+        rows = [
+            row for row in rows if all(mode in row["results"] for mode in modes)
+        ]
+    if max_queries is not None:
+        rows = rows[:max_queries]
+    return {
+        **dataset,
+        "aggregates": aggregate(modes, rows),
+        "queries": rows,
+    }
+
+
 def _mean(values: list[float]) -> float | None:
     return round(statistics.fmean(values), 2) if values else None
 
@@ -388,6 +434,28 @@ def main() -> None:
         action="store_true",
         help="keep per-span input_messages (much larger file)",
     )
+    parser.add_argument(
+        "--common-run-only",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="keep only queries every mode actually attempted (default: on) — "
+        "an error still counts as attempted and is shown; a mode that never "
+        "ran a query drops that query everywhere, so no column is ever blank "
+        "for 'not captured'. Pass --no-common-run-only to see every row a "
+        "single mode touched.",
+    )
+    parser.add_argument(
+        "--common-success-only",
+        action="store_true",
+        help="stricter than --common-run-only: also drop rows where any mode "
+        "errored, instead of showing the error",
+    )
+    parser.add_argument(
+        "--max-queries",
+        type=int,
+        default=None,
+        help="cap the number of query rows in the report, in eval-set order",
+    )
     args = parser.parse_args()
 
     queries = load_queries(Path(args.queries))
@@ -405,6 +473,13 @@ def main() -> None:
         raise SystemExit(2)
 
     dataset = build_dataset(queries, traces, runs, full=args.full)
+    if args.common_run_only or args.common_success_only or args.max_queries is not None:
+        dataset = filter_common_success(
+            dataset,
+            common_run_only=args.common_run_only,
+            common_success_only=args.common_success_only,
+            max_queries=args.max_queries,
+        )
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(render(dataset), encoding="utf-8")
