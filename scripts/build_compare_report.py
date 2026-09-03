@@ -121,6 +121,29 @@ def load_runs(root: Path) -> dict[str, dict[str, dict]]:
     return by_mode
 
 
+def restrict_modes(
+    traces: dict[str, list[dict]],
+    runs: dict[str, dict[str, dict]],
+    modes: Iterable[str],
+) -> tuple[dict[str, list[dict]], dict[str, dict[str, dict]]]:
+    """Keep only the given modes' captured data — a single-mode or head-to-head
+    report instead of every mode with any data. Raises if a requested mode has
+    no captured data at all (traces or runs), so a typo fails loudly rather
+    than silently producing an empty column.
+    """
+    wanted = {m.strip() for m in modes if m.strip()}
+    available = set(traces) | set(runs)
+    unknown = wanted - available
+    if unknown:
+        raise ValueError(
+            f"no captured data for {sorted(unknown)} — available: {sorted(available)}"
+        )
+    return (
+        {m: v for m, v in traces.items() if m in wanted},
+        {m: v for m, v in runs.items() if m in wanted},
+    )
+
+
 # ---------------------------------------------------------------------------
 # per-run derived facts
 # ---------------------------------------------------------------------------
@@ -435,6 +458,14 @@ def main() -> None:
         help="keep per-span input_messages (much larger file)",
     )
     parser.add_argument(
+        "--modes",
+        default=None,
+        help="comma-separated subset of modes to include, e.g. 'claude' or "
+        "'claude,raw-open-source' (default: every mode with any captured data). "
+        "Restricting to one mode gives a single-column report; two modes gives "
+        "a head-to-head without the third.",
+    )
+    parser.add_argument(
         "--common-run-only",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -461,6 +492,13 @@ def main() -> None:
     queries = load_queries(Path(args.queries))
     traces = load_traces(Path(args.trace_dir), Path(args.frozen_dir))
     runs = load_runs(REPO_ROOT)
+
+    if args.modes:
+        try:
+            traces, runs = restrict_modes(traces, runs, args.modes.split(","))
+        except ValueError as exc:
+            print(f"--modes: {exc}", file=sys.stderr)
+            raise SystemExit(2) from exc
 
     if not traces and not runs:
         print(

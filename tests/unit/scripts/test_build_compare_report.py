@@ -190,6 +190,34 @@ def test_no_flags_leaves_the_dataset_untouched(workspace):
     assert [q["id"] for q in same["queries"]] == [q["id"] for q in data["queries"]]
 
 
+# ── restricting to a subset of modes ────────────────────────────────────────
+
+
+def test_restrict_modes_to_a_single_mode(workspace):
+    tmp_path, queries, traces = workspace
+    t, r = bcr.restrict_modes(bcr.load_traces(traces, tmp_path / "no-frozen"), {}, ["claude"])
+    data = bcr.build_dataset(bcr.load_queries(queries), t, r)
+    assert data["modes"] == ["claude"]
+    q1 = next(q for q in data["queries"] if q["id"] == "q1")
+    assert set(q1["results"]) == {"claude"}
+
+
+def test_restrict_modes_to_two_of_three(workspace):
+    tmp_path, queries, traces = workspace
+    t, r = bcr.restrict_modes(
+        bcr.load_traces(traces, tmp_path / "no-frozen"), {}, ["claude", "raw-open-source"]
+    )
+    data = bcr.build_dataset(bcr.load_queries(queries), t, r)
+    assert data["modes"] == ["claude", "raw-open-source"]
+    assert "finetuned-open-source" not in {m for q in data["queries"] for m in q["results"]}
+
+
+def test_restrict_modes_rejects_an_unknown_mode(workspace):
+    tmp_path, queries, traces = workspace
+    with pytest.raises(ValueError, match="nonexistent-mode"):
+        bcr.restrict_modes(bcr.load_traces(traces, tmp_path / "no-frozen"), {}, ["nonexistent-mode"])
+
+
 def test_trace_falls_back_to_session_id(tmp_path):
     """Traces captured before eval_id existed still join, via session_id."""
     doc = _trace("q1", "claude")

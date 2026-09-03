@@ -660,6 +660,14 @@ from disk and can be attached to a PR or a Slack message as-is.
   see every row a single mode touched, `--common-success-only` to additionally
   hide rows where any mode errored, or `--max-queries N` to cap the row count;
   all three go through `make compare ARGS="..."`.
+- `--modes claude` or `--modes claude,raw-open-source` restricts the report to
+  a subset — a single-column report, or a head-to-head without the third mode.
+  Useful for a presentation that wants to build up the comparison one model at
+  a time — `make compare ARGS="--modes claude --max-queries 25 --out
+  data/compare/report-claude.html"`, then add `--modes claude,raw-open-source`
+  for a second file, then the full three-way. `--max-queries 25` on every
+  invocation keeps the query set identical across all of them (the eval CSV's
+  file order is deterministic, so the same `N` always selects the same rows).
 
 `make traces-freeze` packs the scratch `telemetry/` tree into committed
 `data/traces/<mode>.jsonl.gz` bundles (merging, not clobbering) — that's what
