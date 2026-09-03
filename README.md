@@ -14,7 +14,9 @@ POST /api/geo-search/restaurants/{user_id}
 ```
 
 Everything the agent does is captured as a **telemetry trace** you can query and
-replay from a local console (`make trace`).
+replay from a local console (`make trace`) — and the same traces drive a
+three-way comparison (`make compare`) between Claude, a raw open-source Qwen,
+and that Qwen fine-tuned on Claude's own trajectories.
 
 ---
 
@@ -24,6 +26,9 @@ The compose file brings up the API plus every dependency (Postgres, Nominatim,
 Overpass, an OSM file server) against a **Dallas** OpenStreetMap extract.
 
 ```bash
+# 0. install deps
+make install                           # uv sync   (make dev-install adds the test group)
+
 # 1. put the Dallas OSM extract in data/  (see scripts/osm_prepare.py + compose.claude.yaml)
 #    data/Dallas.osm.pbf and data/Dallas.osm.gz
 make osm-convert                       # gz → data/Dallas.osm.bz2 (Overpass import format)
@@ -32,8 +37,8 @@ make osm-convert                       # gz → data/Dallas.osm.bz2 (Overpass im
 #    put it in .env or export it — compose reads both)
 export ANTHROPIC_API_KEY=sk-ant-...
 
-# 3. bring it up
-docker compose -f compose.claude.yaml up -d
+# 3. bring up the geo services and wait for them to be healthy
+make up                                # or: docker compose -f compose.claude.yaml up -d
 
 curl -fsS localhost:9022/health                     # {"status":"healthy"}
 curl -s localhost:9022/meta                         # {"backend":"claude","model":"…","mode":"claude",…}
@@ -214,51 +219,135 @@ overrides (`LLM_MODEL_AGENT`, `LLM_TEMPERATURE_AGENT`, …).
 
 ---
 
-## Fine-tuning on brev.dev
+## The experiment: Claude vs Qwen vs Qwen + LoRA
 
-Distil the captured Claude tool-calling trajectories
-(`data/eval/*_runs.jsonl`, produced by `make eval-run`) into a LoRA adapter for
-`Qwen/Qwen3.8-27B`, then serve it on the FP8 repo in vLLM.
-
-The torch-free pipeline logic lives in `src/training/` (hermetically tested under
-`tests/unit/training/`); `scripts/` holds the thin CLIs. The training stack is a
-separate dependency group, kept out of the container:
+The whole point of capturing traces is to answer one question: **how much of
+Claude's behaviour can a small open model learn from Claude's own
+trajectories?** The loop below produces the data, the adapter, and the report
+that answers it.
 
 ```bash
-# 1. Build the SFT dataset (hermetic, no GPU):
-make lora-data                       # -> data/lora/{train,val}.jsonl + tool_schemas.json
-make lora-smoke                      # dry-run: inspect the masked example (system/user/
-                                     # tool spans masked; every assistant turn trained)
+make up                       # 1. geo stack (Nominatim + Overpass), waits for healthy
+make data                     # 2. eval-queries -> eval-run-sonnet -> lora-data
+make lora-train-remote BREV_HOST=my-box HF_REPO=me/anything-finder-qwen25-7b-lora
+make lora-logs BREV_HOST=my-box                          # 3. watch it train
 
-# 2. On a GPU box (>= 48 GB VRAM for the 27B QLoRA run):
-git clone <repo> && cd anything-finder
-HF_TOKEN=hf_... bash scripts/brev_setup.sh     # nvidia-smi check, uv, uv sync --group training
-uv run scripts/train_lora.py --config configs/lora/smoke.yaml    # cheap GPU-path check first
-make lora-train                                                  # the real run
-#   overrides: make lora-train ARGS="--set train.learning_rate=5e-5"
-#   multi-GPU: accelerate launch scripts/train_lora.py --config configs/lora/qwen3_8-27b-qlora.yaml
+make vllm-remote BREV_HOST=my-box LORA_DIR=data/lora/runs/qwen25-7b-restaurant-react-lora
+ssh -N -L 8000:localhost:8000 my-box &                   # 4. serve base + adapter
+
+make compare-run COMPARE_LIMIT=25                        # 5. same 25 queries x 3 backends
+make traces-freeze                                       # 6. bundle traces for git
+make compare                                             # 7. -> data/compare/report.html
 ```
 
-Notes:
+### 1–2. Data
 
-- **Base-model constraint.** `Qwen/Qwen3.8-27B-FP8` cannot be LoRA-trained (no
-  backprop through FP8 block-quantized weights). Train on the BF16 repo with
-  4-bit QLoRA; serve the adapter on the FP8 repo. vLLM keeps adapters in BF16 and
-  supports this — there is a small train/serve distribution mismatch; serving
-  `Qwen/Qwen3.8-27B` (one-line `VLLM_MODEL` change) removes it at the cost of VRAM.
-- The 27B is multimodal; `configs/lora/*.yaml` `lora.exclude_modules` keeps the
-  vision tower frozen. `scripts/train_lora.py` logs the adapted module list after
-  `get_peft_model` so an exclude-pattern miss is visible immediately.
-- Only 70 of the 86 captured runs are usable (16 carry geocoding errors). To grow
-  the set: bring the compose geo stack up so Nominatim has the full Dallas import,
-  then `make eval-run-sonnet ARGS="--resume"` across all 200 rows
-  (`scripts/gen_eval_queries.py` takes `--rows` / `--seed`). `make lora-data`
-  takes a repeatable `--input` glob so new run files merge in.
-- **Serve:** uncomment the `vllm` service in `compose.claude.yaml`, then
-  `LLM_BACKEND=lora LLM_MODEL_LORA=af-lora LLM_BASE_URL=http://vllm:8000/v1`.
-  `GET /meta` reports `{"backend":"lora","mode":"finetuned-open-source"}`;
-  `make trace` files the run under `finetuned-open-source/` for a span-for-span
-  comparison against `claude/`.
+`make data` chains three steps: `gen_eval_queries.py` writes 200 deterministic
+Dallas food queries with ground-truth `target_neighborhood` / `target_cuisine` /
+`target_vibe` labels; `run_eval_queries.py` runs each one through the *real*
+agent with Claude driving; `prepare_lora_data.py` turns the captured transcripts
+into an SFT set. The current capture is **406 runs, 370 usable** (36 carry
+geocoding errors) → `data/lora/train.jsonl` (333) + `val.jsonl` (37).
+
+Only the `transcript` field is trusted for training — the flat
+`messages`/`prompt`/`completion` fields collapse the whole trajectory into a
+single assistant turn. See `src/training/dataset.py`.
+
+### 3. Training
+
+Torch-free pipeline logic lives in `src/training/` (hermetically tested under
+`tests/unit/training/`); `scripts/` holds the thin CLIs. The training stack is a
+separate dependency group, kept out of the container.
+
+```bash
+make lora-smoke               # no GPU: renders one masked example — system/user/tool
+                              # spans masked with ·, every assistant turn trained
+make lora-train-remote BREV_HOST=my-box     # rsync + brev_setup.sh + nohup, returns at once
+make lora-logs   BREV_HOST=my-box           # tail the remote log
+make lora-fetch  BREV_HOST=my-box           # pull the adapter into data/lora/runs/
+```
+
+`lora-train-remote` exists because a Mac has no CUDA. It syncs the repo (minus
+the OSM blobs and the venv), runs `scripts/brev_setup.sh` on first use, then
+launches `make lora-train` under `nohup` so the run survives the SSH session.
+To train directly on the box instead: `make lora-train` there.
+
+**Configs.** `configs/lora/qwen2_5-7b-qlora.yaml` is the default: `r=16` QLoRA
+on `Qwen/Qwen2.5-7B-Instruct`, the same family as the raw baseline, so the
+report's "base" and "+ LoRA" columns differ only by the adapter — and one vLLM
+process can serve both at once. `configs/lora/qwen3_8-27b-qlora.yaml` is the
+bigger run (`make lora-train LORA_CONFIG=…`); it needs ≥ 48 GB VRAM, trains on
+the BF16 repo because FP8 block-quantized weights cannot be back-propagated
+through, and keeps the vision tower frozen via `lora.exclude_modules`.
+
+### Pushing the adapter to Hugging Face
+
+Set `HF_REPO` on the training command and the finished adapter is pushed
+automatically, with a model card generated from the resolved config
+(`src/training/model_card.py` — base model, data provenance, hyperparameters,
+the assistant-only-masking and `enable_thinking: false` caveats, and the vLLM
+serve command). To publish a run you already have:
+
+```bash
+make lora-push HF_REPO=<user>/anything-finder-qwen25-7b-lora
+uv run scripts/push_lora.py --repo <user>/<repo> --dry-run   # render the card, upload nothing
+```
+
+`HF_TOKEN` comes from the environment or `.env`.
+
+### 4–5. Capture
+
+`make compare-run` replays the **same** `COMPARE_LIMIT` eval rows through each
+backend with `AF_TRACE_DIR` set, so every run leaves a full trace:
+
+| Target | `LLM_BACKEND` | trace mode | runs → |
+| --- | --- | --- | --- |
+| `compare-run-sonnet` | `claude` | `claude/` | `data/eval/runs/claude.jsonl` |
+| `compare-run-qwen` | `vllm` | `raw-open-source/` | `data/eval/runs/raw-open-source.jsonl` |
+| `compare-run-lora` | `lora` | `finetuned-open-source/` | `data/eval/runs/finetuned-open-source.jsonl` |
+
+The eval CSV is deterministic and read in file order, so `--limit N` is the same
+N queries every time — that identity is what makes it a comparison. Student
+captures deliberately avoid `data/eval/*_runs.jsonl`, which
+`prepare_lora_data.py` globs for the teacher's SFT set.
+
+### 6–7. The report — `make compare`
+
+One self-contained `data/compare/report.html`: no server, no CDN, no fetch. It
+opens from disk and can be attached to a PR.
+
+- **Leaderboard** — per mode: runs, error rate, LLM calls / run, tools / run,
+  tokens / run, p50 latency, estimated cost, plus two behavioural rates —
+  *grounded* (resolved a location before searching) and *named area* (the answer
+  mentions the query's target neighbourhood). Best and worst per column are
+  tinted. Below it, the distribution of tool paths each mode actually took.
+- **Side by side** — pick a query, get one column per mode: the final
+  recommendation, the tool chain with divergent steps highlighted, the token /
+  latency / cost strip, and the pass/fail flags.
+- **Drill-in** — every column expands into the same numbered-step conversation
+  view the live console uses (`scripts/ui_common.js` is shared by both), so a
+  disagreement can be traced to the exact tool call that caused it.
+
+`make traces-freeze` packs the scratch `telemetry/` tree into committed
+`data/traces/<mode>.jsonl.gz` bundles (merging, not clobbering). That is what
+makes the report reproducible from a fresh clone with no GPU and no API key —
+`make compare` reads either the live tree or the frozen bundles.
+
+### What is committed
+
+`.gitignore` allow-lists the experiment's record and keeps the blobs out:
+`data/eval/*.csv` + `*.jsonl`, `data/lora/{train,val}.jsonl`,
+`data/traces/*.jsonl.gz`, and `data/compare/report.html` are tracked; the
+47–114 MB OSM extracts, the scratch `telemetry/` tree, and trained adapters
+(`data/lora/runs/`, which live on the Hub) are not.
+
+### Serving
+
+Uncomment the `vllm` service in `compose.claude.yaml`, or use
+`make vllm-remote`. Then `LLM_BACKEND=lora LLM_MODEL_LORA=af-lora
+LLM_BASE_URL=…`; `GET /meta` reports
+`{"backend":"lora","mode":"finetuned-open-source"}` and `make trace` files the
+run under `finetuned-open-source/`.
 
 ---
 
@@ -268,10 +357,12 @@ Dependencies are managed with **[uv](https://docs.astral.sh/uv/)** (`uv.lock` is
 the lockfile; `pyproject.toml` holds the deps and the `dev` dependency-group).
 
 ```bash
-uv sync                       # create .venv and install everything (incl. dev)
+make install                  # uv sync — create .venv and install runtime deps
+make dev-install              # uv sync --group dev — adds the test stack
 cp .env.example .env          # then edit for your setup
 
 make dev                      # uvicorn --reload on 127.0.0.1:9022 (AF_TRACE_DIR=telemetry)
+make test                     # uv run pytest
 # or: uv run python -m src.main
 
 uv add "some-package>=1.2"     # add a runtime dep
@@ -332,17 +423,31 @@ src/
     llm.py                      make_llm — backend selection + per-role models
     nominatim.py  overpass.py   HTTP client factories + query helpers
     prompts.py                  load_prompt — markdown prompt loader
-    telemetry.py                JsonFileTracer — per-run trace capture
+    telemetry.py                JsonFileTracer + run_config — per-run trace capture
   schemas/geo_search/           request / response models
-  training/                     torch-free LoRA pipeline: config, dataset, tool_schemas, masking
+  training/                     torch-free LoRA pipeline: config, dataset, tool_schemas,
+                                masking, model_card, hub
 prompts/restaurant_agent.md     the agent's system prompt
 scripts/
-  trace_ui.py  trace_ui.html    the telemetry console (make trace)
+  ui_common.css  ui_common.js   shared styling + the conversation renderer (inlined by both UIs)
+  trace_ui.py  trace_ui.html    the live telemetry console (make trace)
+  build_compare_report.py       joins traces + runs + labels -> report.html (make compare)
+  compare_report.html           the report template
+  freeze_traces.py              telemetry/ -> data/traces/*.jsonl.gz (make traces-freeze)
+  gen_eval_queries.py           the synthetic Dallas query set (make eval-queries)
+  run_eval_queries.py           replay the eval set on any backend, traced (make compare-run)
   osm_prepare.py                OSM file server used by compose
   prepare_lora_data.py          transcripts -> data/lora/{train,val}.jsonl (make lora-data)
   train_lora.py                 PEFT + TRL trainer, --dry-run (make lora-train / lora-smoke)
+  push_lora.py                  publish a finished adapter + card to HF (make lora-push)
   brev_setup.sh                 one-command brev.dev GPU bootstrap
+  brev_train.sh  brev_serve.sh  remote training / vLLM launch (make lora-train-remote, vllm-remote)
   sync_pyproject.py             legacy pyproject sync helper
+data/
+  eval/                         query set + captured runs per mode        (committed)
+  lora/                         train.jsonl, val.jsonl, tool_schemas.json (committed)
+  traces/                       frozen telemetry bundles                  (committed)
+  compare/report.html           the generated comparison report           (committed)
 configs/lora/                   qwen3_8-27b-qlora.yaml (real run) + smoke.yaml
 charts/anything-finder/         Helm chart
 compose.claude.yaml             full local stack

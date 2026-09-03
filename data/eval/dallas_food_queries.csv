@@ -1,0 +1,2241 @@
+id,user_id,session_id,query,context_data,city,state,target_neighborhood,target_cuisine,target_vibe
+q-7b05526972,eval-user-001,eval-session-001,"Quick a gastropub with craft beer fix in Greenville Avenue — cheap eats, under $15 a person. Looking for lunch tomorrow.","# Food Preferences for eval-user-001
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,,"cheap eats, under $15 a person"
+q-a643e30de9,eval-user-002,eval-session-002,"Best Gulf seafood in Oak Cliff? Prefer cheap eats, under $15 a person. Walking distance only.","# Food Preferences for eval-user-002
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Oak Cliff,seafood,"cheap eats, under $15 a person"
+q-46cdec591d,eval-user-003,eval-session-003,"I'll be around Casa Linda later — need Neapolitan pizza, somewhere quiet for a date night. We're going tonight around 8pm.","# Food Preferences for eval-user-003
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Casa Linda,pizza,somewhere quiet for a date night
+q-ac82b64b76,eval-user-004,eval-session-004,"Where should I go for Indian butter chicken near Lakewood? Ideally upscale, dress-up kind of place. Looking for lunch tomorrow.","# Food Preferences for eval-user-004
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** None
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Lakewood,indian,"upscale, dress-up kind of place"
+q-c1c189903a,eval-user-005,eval-session-005,Best Thai curry in Uptown Dallas? Prefer a rooftop or patio with a view. Walking distance only.,"# Food Preferences for eval-user-005
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Uptown Dallas,thai,a rooftop or patio with a view
+q-3eccb4e1be,eval-user-006,eval-session-006,"Where should I go for wood-fired pizza near Downtown Dallas? Ideally casual, no reservations needed. Need something open late, after 11pm.","# Food Preferences for eval-user-006
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Downtown Dallas,pizza,"casual, no reservations needed"
+q-1c05a0e0e3,eval-user-007,eval-session-007,We're in Deep Ellum and craving Ethiopian food. Somewhere a counter-service spot I can get in and out of would be perfect. We're going tonight around 8pm. Walking distance only.,"# Food Preferences for eval-user-007
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Deep Ellum,ethiopian,a counter-service spot I can get in and out of
+q-681d709183,eval-user-008,eval-session-008,"I'll be around Bryan Place later — need smash burgers, a rooftop or patio with a view. It's for Saturday brunch.","# Food Preferences for eval-user-008
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Bryan Place,burger,a rooftop or patio with a view
+q-04d7e27afe,eval-user-009,eval-session-009,Find me a gastropub with craft beer in Exposition Park near Fair Park. I want somewhere quiet for a date night. We're going tonight around 8pm. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-009
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Exposition Park near Fair Park,,somewhere quiet for a date night
+q-fb0c132712,eval-user-010,eval-session-010,Group dinner near the Katy Trail. Everyone wants tacos. Somewhere I can bring my laptop and work. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-010
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Katy Trail,mexican,somewhere I can bring my laptop and work
+q-43e6eb3f98,eval-user-011,eval-session-011,Where should I go for Texas barbecue brisket near Oak Cliff? Ideally good for a big group of 8.,"# Food Preferences for eval-user-011
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Oak Cliff,barbecue,good for a big group of 8
+q-400ffbbc6e,eval-user-012,eval-session-012,Find me Texas barbecue brisket in the Katy Trail. I want dog-friendly outdoor seating. Looking for lunch tomorrow. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-012
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Katy Trail,barbecue,dog-friendly outdoor seating
+q-c607b8b3cc,eval-user-013,eval-session-013,"Date night in Oak Cliff, thinking late-night eats. Want a rooftop or patio with a view. We're going tonight around 8pm.","# Food Preferences for eval-user-013
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Oak Cliff,,a rooftop or patio with a view
+q-5496a0d07b,eval-user-014,eval-session-014,We're in Cedar Springs and craving dim sum. Somewhere somewhere quiet for a date night would be perfect. Looking for lunch tomorrow. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-014
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Cedar Springs,chinese,somewhere quiet for a date night
+q-d8222787b7,eval-user-015,eval-session-015,"Recommend brunch in Deep Ellum. Cozy and dim, good for conversation. Need something open late, after 11pm. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-015
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,american,"cozy and dim, good for conversation"
+q-680995647f,eval-user-016,eval-session-016,Where should I go for dosa and South Indian food near the Bishop Arts strip on 7th Street? Ideally a rooftop or patio with a view. Looking for lunch tomorrow.,"# Food Preferences for eval-user-016
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Bishop Arts strip on 7th Street,indian,a rooftop or patio with a view
+q-f4f6c8cb9a,eval-user-017,eval-session-017,Recommend a great burger in Oak Cliff. A counter-service spot I can get in and out of. Looking for lunch tomorrow. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-017
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** None
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Oak Cliff,burger,a counter-service spot I can get in and out of
+q-b797b1f277,eval-user-018,eval-session-018,We're in Deep Ellum and craving banh mi. Somewhere somewhere quiet for a date night would be perfect. We're going tonight around 8pm. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-018
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,vietnamese,somewhere quiet for a date night
+q-d468d250e0,eval-user-019,eval-session-019,We're in Bryan Place and craving Sichuan hot pot. Somewhere somewhere I can bring my laptop and work would be perfect. It's for Saturday brunch. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-019
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Bryan Place,chinese,somewhere I can bring my laptop and work
+q-50cc40267b,eval-user-020,eval-session-020,"Date night in the Katy Trail, thinking tacos. Want cozy and dim, good for conversation. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-020
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Katy Trail,mexican,"cozy and dim, good for conversation"
+q-cdfe2e7425,eval-user-021,eval-session-021,Best drunken noodles in Knox-Henderson? Prefer dog-friendly outdoor seating.,"# Food Preferences for eval-user-021
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegan
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Knox-Henderson,thai,dog-friendly outdoor seating
+q-db49d53af9,eval-user-022,eval-session-022,"Quick Korean fried chicken fix in the Design District — cozy and dim, good for conversation. We're going tonight around 8pm.","# Food Preferences for eval-user-022
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Design District,korean,"cozy and dim, good for conversation"
+q-fc9054a3c0,eval-user-023,eval-session-023,"Date night in Oak Lawn, thinking Indian butter chicken. Want upscale, dress-up kind of place. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-023
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Lawn,indian,"upscale, dress-up kind of place"
+q-6b9f763481,eval-user-024,eval-session-024,"Quick omakase sushi fix in Casa Linda — casual, no reservations needed. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-024
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Casa Linda,sushi,"casual, no reservations needed"
+q-703e9f9be0,eval-user-025,eval-session-025,"Date night in the Bishop Arts strip on 7th Street, thinking tacos. Want a chef-driven place worth the splurge. Need something open late, after 11pm.","# Food Preferences for eval-user-025
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Bishop Arts strip on 7th Street,mexican,a chef-driven place worth the splurge
+q-e55e82ca42,eval-user-026,eval-session-026,Looking for family-friendly with room for kids around Deep Ellum that does Texas barbecue brisket. It's for Saturday brunch.,"# Food Preferences for eval-user-026
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Deep Ellum,barbecue,family-friendly with room for kids
+q-0fa4e989c6,eval-user-027,eval-session-027,Quick dim sum fix in the Bishop Arts strip on 7th Street — a hole-in-the-wall the locals love. Looking for lunch tomorrow.,"# Food Preferences for eval-user-027
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Bishop Arts strip on 7th Street,chinese,a hole-in-the-wall the locals love
+q-f647d28951,eval-user-028,eval-session-028,Best birria tacos in Casa Linda? Prefer a hole-in-the-wall the locals love. Walking distance only.,"# Food Preferences for eval-user-028
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Casa Linda,mexican,a hole-in-the-wall the locals love
+q-161e25dc16,eval-user-029,eval-session-029,"Recommend Southern comfort food in Uptown Dallas. Cheap eats, under $15 a person. Need something open late, after 11pm. Walking distance only.","# Food Preferences for eval-user-029
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Uptown Dallas,american,"cheap eats, under $15 a person"
+q-47554ea146,eval-user-030,eval-session-030,Looking for somewhere I can bring my laptop and work around Exposition Park near Fair Park that does banh mi. Looking for lunch tomorrow.,"# Food Preferences for eval-user-030
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Exposition Park near Fair Park,vietnamese,somewhere I can bring my laptop and work
+q-dc0fd080b6,eval-user-031,eval-session-031,"I'll be around Junius Heights later — need Indian butter chicken, upscale, dress-up kind of place. It's for Saturday brunch.","# Food Preferences for eval-user-031
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Junius Heights,indian,"upscale, dress-up kind of place"
+q-847874a97b,eval-user-032,eval-session-032,"Recommend birria tacos in the Harwood District. Dog-friendly outdoor seating. Sunday afternoon, nothing too formal. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-032
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Harwood District,mexican,dog-friendly outdoor seating
+q-f1f89bf046,eval-user-033,eval-session-033,Looking for a bar-forward place with good cocktails around Trinity Groves that does Sichuan hot pot. Looking for lunch tomorrow.,"# Food Preferences for eval-user-033
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Trinity Groves,chinese,a bar-forward place with good cocktails
+q-611868ea65,eval-user-034,eval-session-034,Best smash burgers in the Harwood District? Prefer family-friendly with room for kids. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-034
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Harwood District,burger,family-friendly with room for kids
+q-c4d6ba6a62,eval-user-035,eval-session-035,"I'll be around Henderson Avenue later — need coffee and pastries, cheap eats, under $15 a person. Need something open late, after 11pm.","# Food Preferences for eval-user-035
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Vegan
+**Dislikes:** Fast-food chains
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Henderson Avenue,cafe,"cheap eats, under $15 a person"
+q-d19e0bc8a1,eval-user-036,eval-session-036,Group dinner near Greenville Avenue. Everyone wants smoked ribs. A rooftop or patio with a view. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-036
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Greenville Avenue,barbecue,a rooftop or patio with a view
+q-a7573f2614,eval-user-037,eval-session-037,"Where should I go for Korean fried chicken near Mockingbird Station? Ideally upscale, dress-up kind of place. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-037
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Mockingbird Station,korean,"upscale, dress-up kind of place"
+q-985857ba91,eval-user-038,eval-session-038,"We're in Klyde Warren Park and craving Sichuan hot pot. Somewhere a counter-service spot I can get in and out of would be perfect. Sunday afternoon, nothing too formal. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-038
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Klyde Warren Park,chinese,a counter-service spot I can get in and out of
+q-d2e9dbca7c,eval-user-039,eval-session-039,"Quick ramen fix in the Bishop Arts strip on 7th Street — casual, no reservations needed. We're going tonight around 8pm.","# Food Preferences for eval-user-039
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Bishop Arts strip on 7th Street,ramen,"casual, no reservations needed"
+q-52cb738755,eval-user-040,eval-session-040,Quick Korean BBQ fix in Deep Ellum — dog-friendly outdoor seating. We're going tonight around 8pm.,"# Food Preferences for eval-user-040
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Deep Ellum,korean,dog-friendly outdoor seating
+q-487d4058e6,eval-user-041,eval-session-041,Where should I go for Tex-Mex and margaritas near the Dallas Farmers Market? Ideally a counter-service spot I can get in and out of. It's for Saturday brunch.,"# Food Preferences for eval-user-041
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Dallas Farmers Market,mexican,a counter-service spot I can get in and out of
+q-4b3c7bae96,eval-user-042,eval-session-042,"Find me Tex-Mex and margaritas in Mockingbird Station. I want somewhere I can bring my laptop and work. Need something open late, after 11pm.","# Food Preferences for eval-user-042
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** None
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Mockingbird Station,mexican,somewhere I can bring my laptop and work
+q-a819f911fc,eval-user-043,eval-session-043,"Looking for cozy and dim, good for conversation around Greenville Avenue that does hand-pulled noodles. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-043
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** None
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,chinese,"cozy and dim, good for conversation"
+q-4198a22f28,eval-user-044,eval-session-044,"Quick sushi fix in Casa Linda — casual, no reservations needed. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-044
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Casa Linda,sushi,"casual, no reservations needed"
+q-70cc347b1a,eval-user-045,eval-session-045,"Group dinner near Oak Lawn. Everyone wants Sichuan hot pot. Cheap eats, under $15 a person.","# Food Preferences for eval-user-045
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Lawn,chinese,"cheap eats, under $15 a person"
+q-3a94f82f61,eval-user-046,eval-session-046,"Best tacos in the Design District? Prefer cozy and dim, good for conversation. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-046
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,mexican,"cozy and dim, good for conversation"
+q-ad2293ebeb,eval-user-047,eval-session-047,Group dinner near Downtown Dallas. Everyone wants Southern comfort food. A lively spot with a patio. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-047
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Downtown Dallas,american,a lively spot with a patio
+q-c1de125dde,eval-user-048,eval-session-048,"Find me drunken noodles in Junius Heights. I want a hole-in-the-wall the locals love. Early dinner, we like to eat by 5:30. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-048
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** None
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Junius Heights,thai,a hole-in-the-wall the locals love
+q-80f72d280a,eval-user-049,eval-session-049,"I'll be around Mockingbird Station later — need Mediterranean mezze, a lively spot with a patio. It's for Saturday brunch.","# Food Preferences for eval-user-049
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Mockingbird Station,mediterranean,a lively spot with a patio
+q-66d2f3f1f6,eval-user-050,eval-session-050,"Best Tex-Mex and margaritas in Bryan Place? Prefer casual, no reservations needed. Walking distance only.","# Food Preferences for eval-user-050
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Bryan Place,mexican,"casual, no reservations needed"
+q-03c731073f,eval-user-051,eval-session-051,Quick chicken and waffles fix in the Dallas Farmers Market — a hole-in-the-wall the locals love.,"# Food Preferences for eval-user-051
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Dallas Farmers Market,american,a hole-in-the-wall the locals love
+q-a7acc00865,eval-user-052,eval-session-052,Looking for family-friendly with room for kids around the Katy Trail that does Korean BBQ. We're going tonight around 8pm.,"# Food Preferences for eval-user-052
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Katy Trail,korean,family-friendly with room for kids
+q-f9160679b5,eval-user-053,eval-session-053,Group dinner near Mockingbird Station. Everyone wants wood-fired pizza. A chef-driven place worth the splurge. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-053
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Vegan
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Mockingbird Station,pizza,a chef-driven place worth the splurge
+q-d82c9f1b14,eval-user-054,eval-session-054,Best Italian pasta in the Bishop Arts strip on 7th Street? Prefer dog-friendly outdoor seating.,"# Food Preferences for eval-user-054
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Bishop Arts strip on 7th Street,italian,dog-friendly outdoor seating
+q-02c11188c1,eval-user-055,eval-session-055,"Date night in Knox-Henderson, thinking Korean fried chicken. Want a hole-in-the-wall the locals love. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-055
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Knox-Henderson,korean,a hole-in-the-wall the locals love
+q-185e2f29c8,eval-user-056,eval-session-056,"Best Vietnamese pho in Deep Ellum? Prefer upscale, dress-up kind of place. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-056
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Deep Ellum,vietnamese,"upscale, dress-up kind of place"
+q-238282cf16,eval-user-057,eval-session-057,Best late-night eats in Cedar Springs? Prefer a hole-in-the-wall the locals love. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-057
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Cedar Springs,,a hole-in-the-wall the locals love
+q-077ebc6eea,eval-user-058,eval-session-058,We're in Downtown Dallas and craving Korean fried chicken. Somewhere a rooftop or patio with a view would be perfect. We're going tonight around 8pm. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-058
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Downtown Dallas,korean,a rooftop or patio with a view
+q-ad17077bb7,eval-user-059,eval-session-059,"Date night in Deep Ellum, thinking dim sum. Want family-friendly with room for kids. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-059
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Deep Ellum,chinese,family-friendly with room for kids
+q-e4d4d8b468,eval-user-060,eval-session-060,"Looking for upscale, dress-up kind of place around the Katy Trail that does wood-fired pizza. We're going tonight around 8pm.","# Food Preferences for eval-user-060
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Katy Trail,pizza,"upscale, dress-up kind of place"
+q-1f232f6209,eval-user-061,eval-session-061,"Looking for cozy and dim, good for conversation around Casa Linda that does Southern comfort food. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-061
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Casa Linda,american,"cozy and dim, good for conversation"
+q-1aa6545ad6,eval-user-062,eval-session-062,"Recommend Tex-Mex and margaritas in the Design District. Somewhere quiet for a date night. Early dinner, we like to eat by 5:30. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-062
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,mexican,somewhere quiet for a date night
+q-058b2a9f3d,eval-user-063,eval-session-063,Quick birria tacos fix in Deep Ellum — a hole-in-the-wall the locals love.,"# Food Preferences for eval-user-063
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegan
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,mexican,a hole-in-the-wall the locals love
+q-7a91f7359a,eval-user-064,eval-session-064,"I'll be around the Design District later — need coffee and pastries, family-friendly with room for kids. Need something open late, after 11pm.","# Food Preferences for eval-user-064
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Design District,cafe,family-friendly with room for kids
+q-7dcd413c97,eval-user-065,eval-session-065,Best a gastropub with craft beer in the Katy Trail? Prefer a lively spot with a patio. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-065
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Katy Trail,,a lively spot with a patio
+q-0f387b287e,eval-user-066,eval-session-066,"Date night in Oak Cliff, thinking shawarma. Want somewhere I can bring my laptop and work. Looking for lunch tomorrow.","# Food Preferences for eval-user-066
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Oak Cliff,mediterranean,somewhere I can bring my laptop and work
+q-32e41dad04,eval-user-067,eval-session-067,Where should I go for sushi near Casa Linda? Ideally a hole-in-the-wall the locals love. We're going tonight around 8pm.,"# Food Preferences for eval-user-067
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegan
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Casa Linda,sushi,a hole-in-the-wall the locals love
+q-c5fc8ca3e9,eval-user-068,eval-session-068,"Date night in Klyde Warren Park, thinking a raw bar and oysters. Want casual, no reservations needed. Looking for lunch tomorrow.","# Food Preferences for eval-user-068
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Klyde Warren Park,seafood,"casual, no reservations needed"
+q-14c560fe42,eval-user-069,eval-session-069,"Date night in the Design District, thinking Ethiopian food. Want a hole-in-the-wall the locals love.","# Food Preferences for eval-user-069
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,ethiopian,a hole-in-the-wall the locals love
+q-d59aa932af,eval-user-070,eval-session-070,"Date night in Downtown Dallas, thinking drunken noodles. Want a chef-driven place worth the splurge. Need something open late, after 11pm.","# Food Preferences for eval-user-070
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** No pork
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Downtown Dallas,thai,a chef-driven place worth the splurge
+q-214a8e7ee5,eval-user-071,eval-session-071,"We're in Greenville Avenue and craving Sichuan hot pot. Somewhere somewhere quiet for a date night would be perfect. Early dinner, we like to eat by 5:30. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-071
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,chinese,somewhere quiet for a date night
+q-596c1fa4ac,eval-user-072,eval-session-072,"Date night in the Design District, thinking a raw bar and oysters. Want upscale, dress-up kind of place. Need something open late, after 11pm.","# Food Preferences for eval-user-072
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Design District,seafood,"upscale, dress-up kind of place"
+q-959085f0dc,eval-user-073,eval-session-073,Find me Korean fried chicken in the Bishop Arts strip on 7th Street. I want family-friendly with room for kids. We're going tonight around 8pm. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-073
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Bishop Arts strip on 7th Street,korean,family-friendly with room for kids
+q-ec04cbaa6e,eval-user-074,eval-session-074,"Looking for a bar-forward place with good cocktails around the Katy Trail that does Korean fried chicken. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-074
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Katy Trail,korean,a bar-forward place with good cocktails
+q-892439c413,eval-user-075,eval-session-075,"Find me Texas barbecue brisket in Uptown Dallas. I want cheap eats, under $15 a person. We're going tonight around 8pm. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-075
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** No pork
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Uptown Dallas,barbecue,"cheap eats, under $15 a person"
+q-1c7277ca6f,eval-user-076,eval-session-076,"Where should I go for brunch near Downtown Dallas? Ideally a bar-forward place with good cocktails. Need something open late, after 11pm.","# Food Preferences for eval-user-076
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Downtown Dallas,american,a bar-forward place with good cocktails
+q-013cdfed8c,eval-user-077,eval-session-077,"Quick birria tacos fix in Uptown Dallas — cozy and dim, good for conversation.","# Food Preferences for eval-user-077
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Uptown Dallas,mexican,"cozy and dim, good for conversation"
+q-e7da528360,eval-user-078,eval-session-078,"Looking for a bar-forward place with good cocktails around the Design District that does New American tasting menu. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-078
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,american,a bar-forward place with good cocktails
+q-e1432755e9,eval-user-079,eval-session-079,"Best brunch in Uptown Dallas? Prefer cheap eats, under $15 a person. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-079
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Uptown Dallas,american,"cheap eats, under $15 a person"
+q-441a8eeee4,eval-user-080,eval-session-080,"Date night in Oak Cliff, thinking a good vegan spot. Want a lively spot with a patio. It's for Saturday brunch.","# Food Preferences for eval-user-080
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** None
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Cliff,vegan,a lively spot with a patio
+q-470be0345b,eval-user-081,eval-session-081,"I'll be around the Design District later — need banh mi, a lively spot with a patio. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-081
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,vietnamese,a lively spot with a patio
+q-6342e841a7,eval-user-082,eval-session-082,"Date night in Greenville Avenue, thinking drunken noodles. Want cheap eats, under $15 a person. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-082
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Fast-food chains
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Greenville Avenue,thai,"cheap eats, under $15 a person"
+q-df4eb5a6f6,eval-user-083,eval-session-083,"Where should I go for banh mi near Henderson Avenue? Ideally a hole-in-the-wall the locals love. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-083
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Henderson Avenue,vietnamese,a hole-in-the-wall the locals love
+q-c552783458,eval-user-084,eval-session-084,Group dinner near the Design District. Everyone wants Ethiopian food. A chef-driven place worth the splurge.,"# Food Preferences for eval-user-084
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,ethiopian,a chef-driven place worth the splurge
+q-725e9c2f2a,eval-user-085,eval-session-085,"Where should I go for Sichuan hot pot near the Design District? Ideally cheap eats, under $15 a person. Looking for lunch tomorrow.","# Food Preferences for eval-user-085
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Design District,chinese,"cheap eats, under $15 a person"
+q-12eab305c7,eval-user-086,eval-session-086,"We're in Mockingbird Station and craving a great burger. Somewhere casual, no reservations needed would be perfect. Looking for lunch tomorrow. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-086
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Mockingbird Station,burger,"casual, no reservations needed"
+q-9b131f6709,eval-user-087,eval-session-087,"We're in Klyde Warren Park and craving late-night eats. Somewhere cheap eats, under $15 a person would be perfect. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-087
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Klyde Warren Park,,"cheap eats, under $15 a person"
+q-1dec1e7af6,eval-user-088,eval-session-088,Best Gulf seafood in the Bishop Arts strip on 7th Street? Prefer a hole-in-the-wall the locals love. Walking distance only.,"# Food Preferences for eval-user-088
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Bishop Arts strip on 7th Street,seafood,a hole-in-the-wall the locals love
+q-099621a7c2,eval-user-089,eval-session-089,"Date night in Trinity Groves, thinking Indian butter chicken. Want cozy and dim, good for conversation.","# Food Preferences for eval-user-089
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Trinity Groves,indian,"cozy and dim, good for conversation"
+q-037caf818a,eval-user-090,eval-session-090,Recommend Ethiopian food in Greenville Avenue. A counter-service spot I can get in and out of. It's for Saturday brunch. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-090
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Greenville Avenue,ethiopian,a counter-service spot I can get in and out of
+q-27b42b7852,eval-user-091,eval-session-091,"Find me vegetarian food in Knox-Henderson. I want somewhere quiet for a date night. Early dinner, we like to eat by 5:30. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-091
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Knox-Henderson,vegetarian,somewhere quiet for a date night
+q-2939d6906c,eval-user-092,eval-session-092,"We're in Oak Cliff and craving Mediterranean mezze. Somewhere somewhere I can bring my laptop and work would be perfect. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-092
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Oak Cliff,mediterranean,somewhere I can bring my laptop and work
+q-566cdc1875,eval-user-093,eval-session-093,"Date night in Klyde Warren Park, thinking dim sum. Want good for a big group of 8. Looking for lunch tomorrow.","# Food Preferences for eval-user-093
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Klyde Warren Park,chinese,good for a big group of 8
+q-8eabfd79a0,eval-user-094,eval-session-094,"Date night in Trinity Groves, thinking Mediterranean mezze. Want a lively spot with a patio. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-094
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Trinity Groves,mediterranean,a lively spot with a patio
+q-3a064314c9,eval-user-095,eval-session-095,"Date night in Oak Cliff, thinking birria tacos. Want casual, no reservations needed. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-095
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Oak Cliff,mexican,"casual, no reservations needed"
+q-a3e2911ad7,eval-user-096,eval-session-096,Best vegetarian food in the Design District? Prefer a lively spot with a patio.,"# Food Preferences for eval-user-096
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Design District,vegetarian,a lively spot with a patio
+q-c11ee9a325,eval-user-097,eval-session-097,"Where should I go for New American tasting menu near Klyde Warren Park? Ideally dog-friendly outdoor seating. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-097
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Klyde Warren Park,american,dog-friendly outdoor seating
+q-7cf2e6d133,eval-user-098,eval-session-098,Where should I go for ramen near Uptown Dallas? Ideally a counter-service spot I can get in and out of.,"# Food Preferences for eval-user-098
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Uptown Dallas,ramen,a counter-service spot I can get in and out of
+q-21e8f2bb5b,eval-user-099,eval-session-099,"Recommend shawarma in Deep Ellum. Family-friendly with room for kids. Early dinner, we like to eat by 5:30. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-099
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** None
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Deep Ellum,mediterranean,family-friendly with room for kids
+q-890357ec54,eval-user-100,eval-session-100,Looking for a bar-forward place with good cocktails around Lakewood that does Neapolitan pizza.,"# Food Preferences for eval-user-100
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Lakewood,pizza,a bar-forward place with good cocktails
+q-0789676cec,eval-user-101,eval-session-101,"I'll be around the Katy Trail later — need Vietnamese pho, family-friendly with room for kids. We're going tonight around 8pm.","# Food Preferences for eval-user-101
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Katy Trail,vietnamese,family-friendly with room for kids
+q-19a5c1649a,eval-user-102,eval-session-102,Best Southern comfort food in the Katy Trail? Prefer somewhere quiet for a date night. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-102
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Katy Trail,american,somewhere quiet for a date night
+q-faa5cfbbaf,eval-user-103,eval-session-103,Where should I go for New American tasting menu near Casa Linda? Ideally a counter-service spot I can get in and out of. We're going tonight around 8pm.,"# Food Preferences for eval-user-103
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Casa Linda,american,a counter-service spot I can get in and out of
+q-ca38cfdde6,eval-user-104,eval-session-104,Group dinner near Greenville Avenue. Everyone wants Korean fried chicken. A counter-service spot I can get in and out of. Walking distance only.,"# Food Preferences for eval-user-104
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,korean,a counter-service spot I can get in and out of
+q-99ff44b3e3,eval-user-105,eval-session-105,"I'll be around Bishop Arts District later — need Neapolitan pizza, a chef-driven place worth the splurge. We're going tonight around 8pm.","# Food Preferences for eval-user-105
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Bishop Arts District,pizza,a chef-driven place worth the splurge
+q-5a90bce5f8,eval-user-106,eval-session-106,Where should I go for dosa and South Indian food near the Bishop Arts strip on 7th Street? Ideally good for a big group of 8. Looking for lunch tomorrow.,"# Food Preferences for eval-user-106
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Bishop Arts strip on 7th Street,indian,good for a big group of 8
+q-11abe51b7f,eval-user-107,eval-session-107,"Recommend coffee and pastries in the Harwood District. A rooftop or patio with a view. Sunday afternoon, nothing too formal. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-107
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Harwood District,cafe,a rooftop or patio with a view
+q-93f1be2d8d,eval-user-108,eval-session-108,Where should I go for chicken and waffles near Mockingbird Station? Ideally a bar-forward place with good cocktails.,"# Food Preferences for eval-user-108
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** None
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Mockingbird Station,american,a bar-forward place with good cocktails
+q-2419a1241d,eval-user-109,eval-session-109,Looking for a lively spot with a patio around the Katy Trail that does tacos. Looking for lunch tomorrow.,"# Food Preferences for eval-user-109
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** None
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Katy Trail,mexican,a lively spot with a patio
+q-55a7541354,eval-user-110,eval-session-110,Best Mediterranean mezze in Lakewood? Prefer somewhere quiet for a date night. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-110
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** No pork
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Lakewood,mediterranean,somewhere quiet for a date night
+q-83df4e3a9c,eval-user-111,eval-session-111,Recommend Ethiopian food in the Design District. Dog-friendly outdoor seating. It's for Saturday brunch. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-111
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** No pork
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Design District,ethiopian,dog-friendly outdoor seating
+q-55c9bced9e,eval-user-112,eval-session-112,"Quick Gulf seafood fix in the Bishop Arts strip on 7th Street — casual, no reservations needed. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-112
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Bishop Arts strip on 7th Street,seafood,"casual, no reservations needed"
+q-bfcfb49240,eval-user-113,eval-session-113,"Quick Tex-Mex and margaritas fix in Uptown Dallas — upscale, dress-up kind of place. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-113
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Uptown Dallas,mexican,"upscale, dress-up kind of place"
+q-6a87303d55,eval-user-114,eval-session-114,"Find me drunken noodles in Trinity Groves. I want cozy and dim, good for conversation. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-114
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Trinity Groves,thai,"cozy and dim, good for conversation"
+q-14c85c5982,eval-user-115,eval-session-115,"Date night in Deep Ellum, thinking coffee and pastries. Want cozy and dim, good for conversation. It's for Saturday brunch.","# Food Preferences for eval-user-115
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** None
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Deep Ellum,cafe,"cozy and dim, good for conversation"
+q-fac511ffcb,eval-user-116,eval-session-116,"Where should I go for chicken and waffles near Cedar Springs? Ideally a counter-service spot I can get in and out of. Need something open late, after 11pm.","# Food Preferences for eval-user-116
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Cedar Springs,american,a counter-service spot I can get in and out of
+q-90f39260d3,eval-user-117,eval-session-117,Group dinner near Oak Cliff. Everyone wants late-night eats. Dog-friendly outdoor seating.,"# Food Preferences for eval-user-117
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Oak Cliff,,dog-friendly outdoor seating
+q-623a9dbc66,eval-user-118,eval-session-118,Quick drunken noodles fix in Oak Cliff — a rooftop or patio with a view.,"# Food Preferences for eval-user-118
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Oak Cliff,thai,a rooftop or patio with a view
+q-6e9703d52f,eval-user-119,eval-session-119,"Find me Ethiopian food in Henderson Avenue. I want a lively spot with a patio. Need something open late, after 11pm. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-119
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Henderson Avenue,ethiopian,a lively spot with a patio
+q-3c05e13689,eval-user-120,eval-session-120,Group dinner near Downtown Dallas. Everyone wants a raw bar and oysters. Somewhere I can bring my laptop and work. Walking distance only.,"# Food Preferences for eval-user-120
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Downtown Dallas,seafood,somewhere I can bring my laptop and work
+q-e7451f3ca1,eval-user-121,eval-session-121,"I'll be around Casa Linda later — need Italian pasta, cozy and dim, good for conversation. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-121
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Casa Linda,italian,"cozy and dim, good for conversation"
+q-2c264e31f6,eval-user-122,eval-session-122,"Date night in the Harwood District, thinking shawarma. Want good for a big group of 8. Need something open late, after 11pm.","# Food Preferences for eval-user-122
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Harwood District,mediterranean,good for a big group of 8
+q-279c7d0fa5,eval-user-123,eval-session-123,Recommend omakase sushi in Bryan Place. A bar-forward place with good cocktails. Walking distance only.,"# Food Preferences for eval-user-123
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Bryan Place,sushi,a bar-forward place with good cocktails
+q-4cdaa1fc4e,eval-user-124,eval-session-124,Best Korean fried chicken in Bryan Place? Prefer a lively spot with a patio. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-124
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegan
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Bryan Place,korean,a lively spot with a patio
+q-ff3b9adc15,eval-user-125,eval-session-125,"We're in Greenville Avenue and craving vegetarian food. Somewhere a counter-service spot I can get in and out of would be perfect. Early dinner, we like to eat by 5:30. Walking distance only.","# Food Preferences for eval-user-125
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Greenville Avenue,vegetarian,a counter-service spot I can get in and out of
+q-87fb9be320,eval-user-126,eval-session-126,"I'll be around Bishop Arts District later — need omakase sushi, a rooftop or patio with a view. Need something open late, after 11pm.","# Food Preferences for eval-user-126
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Bishop Arts District,sushi,a rooftop or patio with a view
+q-3cd824d2b9,eval-user-127,eval-session-127,Group dinner near Uptown Dallas. Everyone wants Ethiopian food. Somewhere I can bring my laptop and work. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-127
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Uptown Dallas,ethiopian,somewhere I can bring my laptop and work
+q-472b847ddd,eval-user-128,eval-session-128,"Looking for a rooftop or patio with a view around Casa Linda that does farm-to-table dinner. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-128
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Casa Linda,american,a rooftop or patio with a view
+q-6a7539f5a7,eval-user-129,eval-session-129,"Date night in Henderson Avenue, thinking a gastropub with craft beer. Want a lively spot with a patio. It's for Saturday brunch.","# Food Preferences for eval-user-129
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Henderson Avenue,,a lively spot with a patio
+q-3bd0016d4c,eval-user-130,eval-session-130,"Group dinner near the Bishop Arts strip on 7th Street. Everyone wants ramen. Cozy and dim, good for conversation. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-130
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Bishop Arts strip on 7th Street,ramen,"cozy and dim, good for conversation"
+q-4e0ce5e7ed,eval-user-131,eval-session-131,"Looking for cozy and dim, good for conversation around Cedar Springs that does Italian pasta. Need something open late, after 11pm.","# Food Preferences for eval-user-131
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Cedar Springs,italian,"cozy and dim, good for conversation"
+q-fb56d88936,eval-user-132,eval-session-132,"Where should I go for Italian pasta near Casa Linda? Ideally cheap eats, under $15 a person. Looking for lunch tomorrow.","# Food Preferences for eval-user-132
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Casa Linda,italian,"cheap eats, under $15 a person"
+q-89d6052c06,eval-user-133,eval-session-133,Group dinner near Klyde Warren Park. Everyone wants Tex-Mex and margaritas. Family-friendly with room for kids. Walking distance only.,"# Food Preferences for eval-user-133
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Klyde Warren Park,mexican,family-friendly with room for kids
+q-05b97e6088,eval-user-134,eval-session-134,"Where should I go for a good vegan spot near Exposition Park near Fair Park? Ideally cheap eats, under $15 a person. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-134
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Exposition Park near Fair Park,vegan,"cheap eats, under $15 a person"
+q-86e182e60b,eval-user-135,eval-session-135,Best Ethiopian food in Bishop Arts District? Prefer a chef-driven place worth the splurge.,"# Food Preferences for eval-user-135
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Bishop Arts District,ethiopian,a chef-driven place worth the splurge
+q-06bbef03ca,eval-user-136,eval-session-136,"Best drunken noodles in the Design District? Prefer casual, no reservations needed. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-136
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Design District,thai,"casual, no reservations needed"
+q-89beba9b9b,eval-user-137,eval-session-137,Best a gastropub with craft beer in Greenville Avenue? Prefer a counter-service spot I can get in and out of. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-137
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Greenville Avenue,,a counter-service spot I can get in and out of
+q-dc24f281cb,eval-user-138,eval-session-138,"Quick Thai curry fix in the Bishop Arts strip on 7th Street — casual, no reservations needed. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-138
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Bishop Arts strip on 7th Street,thai,"casual, no reservations needed"
+q-93490b9010,eval-user-139,eval-session-139,"Where should I go for banh mi near Henderson Avenue? Ideally somewhere I can bring my laptop and work. Need something open late, after 11pm.","# Food Preferences for eval-user-139
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Henderson Avenue,vietnamese,somewhere I can bring my laptop and work
+q-b534963bdb,eval-user-140,eval-session-140,"I'll be around Downtown Dallas later — need Korean BBQ, a hole-in-the-wall the locals love.","# Food Preferences for eval-user-140
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Downtown Dallas,korean,a hole-in-the-wall the locals love
+q-40aa9b9814,eval-user-141,eval-session-141,Group dinner near the Bishop Arts strip on 7th Street. Everyone wants omakase sushi. Good for a big group of 8. Walking distance only.,"# Food Preferences for eval-user-141
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Fast-food chains
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Bishop Arts strip on 7th Street,sushi,good for a big group of 8
+q-a47d41ff3f,eval-user-142,eval-session-142,"I'll be around Oak Lawn later — need birria tacos, cheap eats, under $15 a person. We're going tonight around 8pm.","# Food Preferences for eval-user-142
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Oak Lawn,mexican,"cheap eats, under $15 a person"
+q-f3031adcaf,eval-user-143,eval-session-143,Recommend Mediterranean mezze in the Dallas Farmers Market. A chef-driven place worth the splurge.,"# Food Preferences for eval-user-143
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Dallas Farmers Market,mediterranean,a chef-driven place worth the splurge
+q-a64869453e,eval-user-144,eval-session-144,"Where should I go for birria tacos near Mockingbird Station? Ideally a rooftop or patio with a view. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-144
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Mockingbird Station,mexican,a rooftop or patio with a view
+q-7ee9bfa91a,eval-user-145,eval-session-145,"I'll be around Klyde Warren Park later — need shawarma, cozy and dim, good for conversation. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-145
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Klyde Warren Park,mediterranean,"cozy and dim, good for conversation"
+q-93deb8d7a8,eval-user-146,eval-session-146,We're in the Design District and craving wood-fired pizza. Somewhere good for a big group of 8 would be perfect. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-146
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Design District,pizza,good for a big group of 8
+q-9092a6beff,eval-user-147,eval-session-147,Best Thai curry in Bryan Place? Prefer a counter-service spot I can get in and out of.,"# Food Preferences for eval-user-147
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Bryan Place,thai,a counter-service spot I can get in and out of
+q-1bdc8ef440,eval-user-148,eval-session-148,"Recommend late-night eats in Cedar Springs. Cheap eats, under $15 a person. It's for Saturday brunch. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-148
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Cedar Springs,,"cheap eats, under $15 a person"
+q-71e3b81895,eval-user-149,eval-session-149,"Where should I go for French bistro fare near Exposition Park near Fair Park? Ideally upscale, dress-up kind of place. Looking for lunch tomorrow.","# Food Preferences for eval-user-149
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Exposition Park near Fair Park,french,"upscale, dress-up kind of place"
+q-db4204e9fe,eval-user-150,eval-session-150,"I'll be around Greenville Avenue later — need Texas barbecue brisket, dog-friendly outdoor seating.","# Food Preferences for eval-user-150
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,barbecue,dog-friendly outdoor seating
+q-fe3f849ee9,eval-user-151,eval-session-151,"Where should I go for Indian butter chicken near Knox-Henderson? Ideally upscale, dress-up kind of place.","# Food Preferences for eval-user-151
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Knox-Henderson,indian,"upscale, dress-up kind of place"
+q-c5fac7ae19,eval-user-152,eval-session-152,"Date night in the Katy Trail, thinking Thai curry. Want upscale, dress-up kind of place. We're going tonight around 8pm.","# Food Preferences for eval-user-152
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Katy Trail,thai,"upscale, dress-up kind of place"
+q-c465d2eb45,eval-user-153,eval-session-153,"Recommend brunch in Henderson Avenue. Somewhere I can bring my laptop and work. Early dinner, we like to eat by 5:30. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-153
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** No pork
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Henderson Avenue,american,somewhere I can bring my laptop and work
+q-92c71bed79,eval-user-154,eval-session-154,"I'll be around Knox-Henderson later — need birria tacos, a rooftop or patio with a view. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-154
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Knox-Henderson,mexican,a rooftop or patio with a view
+q-1e6a0b06ea,eval-user-155,eval-session-155,"Date night in the Bishop Arts strip on 7th Street, thinking hand-pulled noodles. Want a bar-forward place with good cocktails. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-155
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Bishop Arts strip on 7th Street,chinese,a bar-forward place with good cocktails
+q-c46a43f61d,eval-user-156,eval-session-156,Looking for a bar-forward place with good cocktails around the Design District that does smoked ribs.,"# Food Preferences for eval-user-156
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,barbecue,a bar-forward place with good cocktails
+q-09d77e3cb2,eval-user-157,eval-session-157,"Looking for a lively spot with a patio around Cedar Springs that does Tex-Mex and margaritas. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-157
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Cedar Springs,mexican,a lively spot with a patio
+q-1f0b8cc5ec,eval-user-158,eval-session-158,"Quick a raw bar and oysters fix in Knox-Henderson — a chef-driven place worth the splurge. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-158
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Knox-Henderson,seafood,a chef-driven place worth the splurge
+q-b52aafb259,eval-user-159,eval-session-159,"Recommend a great burger in Mockingbird Station. A rooftop or patio with a view. Early dinner, we like to eat by 5:30. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-159
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Mockingbird Station,burger,a rooftop or patio with a view
+q-f7dc757599,eval-user-160,eval-session-160,"We're in Lakewood and craving coffee and pastries. Somewhere casual, no reservations needed would be perfect. It's for Saturday brunch. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-160
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Lakewood,cafe,"casual, no reservations needed"
+q-e56fb2d61d,eval-user-161,eval-session-161,"Date night in Junius Heights, thinking Sichuan hot pot. Want a hole-in-the-wall the locals love. It's for Saturday brunch.","# Food Preferences for eval-user-161
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Junius Heights,chinese,a hole-in-the-wall the locals love
+q-d7139470b9,eval-user-162,eval-session-162,Group dinner near Mockingbird Station. Everyone wants a raw bar and oysters. A chef-driven place worth the splurge. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-162
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Mockingbird Station,seafood,a chef-driven place worth the splurge
+q-d630498fdf,eval-user-163,eval-session-163,"Where should I go for a raw bar and oysters near Deep Ellum? Ideally cheap eats, under $15 a person. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-163
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Deep Ellum,seafood,"cheap eats, under $15 a person"
+q-1283aec5dc,eval-user-164,eval-session-164,Looking for good for a big group of 8 around the Dallas Farmers Market that does a gastropub with craft beer. Looking for lunch tomorrow.,"# Food Preferences for eval-user-164
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Dallas Farmers Market,,good for a big group of 8
+q-2e3ab5db93,eval-user-165,eval-session-165,Quick Neapolitan pizza fix in the Bishop Arts strip on 7th Street — dog-friendly outdoor seating. Looking for lunch tomorrow.,"# Food Preferences for eval-user-165
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Bishop Arts strip on 7th Street,pizza,dog-friendly outdoor seating
+q-d3cc6f9b94,eval-user-166,eval-session-166,Where should I go for coffee and pastries near Mockingbird Station? Ideally good for a big group of 8. It's for Saturday brunch.,"# Food Preferences for eval-user-166
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Mockingbird Station,cafe,good for a big group of 8
+q-6eb1a569e4,eval-user-167,eval-session-167,Looking for somewhere quiet for a date night around Klyde Warren Park that does smoked ribs.,"# Food Preferences for eval-user-167
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Klyde Warren Park,barbecue,somewhere quiet for a date night
+q-616ed4b6bd,eval-user-168,eval-session-168,"I'll be around the Dallas Farmers Market later — need Indian butter chicken, dog-friendly outdoor seating. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-168
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Dallas Farmers Market,indian,dog-friendly outdoor seating
+q-35c8635bd7,eval-user-169,eval-session-169,Where should I go for farm-to-table dinner near Uptown Dallas? Ideally a bar-forward place with good cocktails.,"# Food Preferences for eval-user-169
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Uptown Dallas,american,a bar-forward place with good cocktails
+q-88c1384b0d,eval-user-170,eval-session-170,Recommend French bistro fare in Trinity Groves. Good for a big group of 8. Looking for lunch tomorrow. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-170
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Trinity Groves,french,good for a big group of 8
+q-2d16423286,eval-user-171,eval-session-171,Where should I go for coffee and pastries near Lakewood? Ideally dog-friendly outdoor seating. It's for Saturday brunch.,"# Food Preferences for eval-user-171
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Lakewood,cafe,dog-friendly outdoor seating
+q-5c2a8536c7,eval-user-172,eval-session-172,We're in Bryan Place and craving smoked ribs. Somewhere a hole-in-the-wall the locals love would be perfect. It's for Saturday brunch. Walking distance only.,"# Food Preferences for eval-user-172
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Bryan Place,barbecue,a hole-in-the-wall the locals love
+q-52ffbd1b6b,eval-user-173,eval-session-173,"Date night in Exposition Park near Fair Park, thinking chicken and waffles. Want a chef-driven place worth the splurge. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-173
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Exposition Park near Fair Park,american,a chef-driven place worth the splurge
+q-3cac1ce4bc,eval-user-174,eval-session-174,Where should I go for smoked ribs near Trinity Groves? Ideally somewhere quiet for a date night. Looking for lunch tomorrow.,"# Food Preferences for eval-user-174
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Trinity Groves,barbecue,somewhere quiet for a date night
+q-168f1219eb,eval-user-175,eval-session-175,Find me a raw bar and oysters in Bryan Place. I want somewhere quiet for a date night. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-175
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Bryan Place,seafood,somewhere quiet for a date night
+q-788243db58,eval-user-176,eval-session-176,"Quick hand-pulled noodles fix in Klyde Warren Park — cozy and dim, good for conversation. It's for Saturday brunch.","# Food Preferences for eval-user-176
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Klyde Warren Park,chinese,"cozy and dim, good for conversation"
+q-84f0429634,eval-user-177,eval-session-177,Looking for a rooftop or patio with a view around Trinity Groves that does late-night eats. Looking for lunch tomorrow.,"# Food Preferences for eval-user-177
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Trinity Groves,,a rooftop or patio with a view
+q-ca9b4cee18,eval-user-178,eval-session-178,"Date night in Lakewood, thinking Southern comfort food. Want good for a big group of 8. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-178
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Lakewood,american,good for a big group of 8
+q-c77b9b1560,eval-user-179,eval-session-179,Group dinner near the Harwood District. Everyone wants smash burgers. A lively spot with a patio. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-179
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Harwood District,burger,a lively spot with a patio
+q-314960c201,eval-user-180,eval-session-180,"Recommend Tex-Mex and margaritas in Oak Cliff. Casual, no reservations needed. Sunday afternoon, nothing too formal. Walking distance only.","# Food Preferences for eval-user-180
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Cliff,mexican,"casual, no reservations needed"
+q-a4ab78a8d2,eval-user-181,eval-session-181,Quick New American tasting menu fix in the Katy Trail — a chef-driven place worth the splurge.,"# Food Preferences for eval-user-181
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Katy Trail,american,a chef-driven place worth the splurge
+q-92f5f46268,eval-user-182,eval-session-182,"We're in Exposition Park near Fair Park and craving a raw bar and oysters. Somewhere upscale, dress-up kind of place would be perfect. Early dinner, we like to eat by 5:30. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-182
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegan
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Exposition Park near Fair Park,seafood,"upscale, dress-up kind of place"
+q-cb0594c6e0,eval-user-183,eval-session-183,"Looking for a counter-service spot I can get in and out of around Greenville Avenue that does a raw bar and oysters. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-183
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Greenville Avenue,seafood,a counter-service spot I can get in and out of
+q-c4cc81df03,eval-user-184,eval-session-184,Best French bistro fare in the Dallas Farmers Market? Prefer a lively spot with a patio.,"# Food Preferences for eval-user-184
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Dallas Farmers Market,french,a lively spot with a patio
+q-ce15a9853e,eval-user-185,eval-session-185,"Quick omakase sushi fix in Cedar Springs — upscale, dress-up kind of place. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-185
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Cedar Springs,sushi,"upscale, dress-up kind of place"
+q-d81c32e6fc,eval-user-186,eval-session-186,"Date night in the Harwood District, thinking Italian pasta. Want a rooftop or patio with a view. It's for Saturday brunch.","# Food Preferences for eval-user-186
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Harwood District,italian,a rooftop or patio with a view
+q-1ba2b9d782,eval-user-187,eval-session-187,"Date night in the Katy Trail, thinking dim sum. Want somewhere quiet for a date night. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-187
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Katy Trail,chinese,somewhere quiet for a date night
+q-c8cbcfb712,eval-user-188,eval-session-188,"I'll be around Oak Cliff later — need coffee and pastries, family-friendly with room for kids.","# Food Preferences for eval-user-188
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Oak Cliff,cafe,family-friendly with room for kids
+q-6003634177,eval-user-189,eval-session-189,We're in Mockingbird Station and craving shawarma. Somewhere a counter-service spot I can get in and out of would be perfect. It's for Saturday brunch. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-189
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Mockingbird Station,mediterranean,a counter-service spot I can get in and out of
+q-1e5b403781,eval-user-190,eval-session-190,Recommend Korean fried chicken in Oak Lawn. Dog-friendly outdoor seating. Looking for lunch tomorrow. Walking distance only.,"# Food Preferences for eval-user-190
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Oak Lawn,korean,dog-friendly outdoor seating
+q-c36662b927,eval-user-191,eval-session-191,"I'll be around the Bishop Arts strip on 7th Street later — need shawarma, a rooftop or patio with a view. We're going tonight around 8pm.","# Food Preferences for eval-user-191
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Bishop Arts strip on 7th Street,mediterranean,a rooftop or patio with a view
+q-1b921b080d,eval-user-192,eval-session-192,Recommend Gulf seafood in Bryan Place. Somewhere quiet for a date night. We're going tonight around 8pm. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-192
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Bryan Place,seafood,somewhere quiet for a date night
+q-602a8ad7ed,eval-user-193,eval-session-193,Group dinner near Klyde Warren Park. Everyone wants Indian butter chicken. A counter-service spot I can get in and out of. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-193
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Klyde Warren Park,indian,a counter-service spot I can get in and out of
+q-c8a0de04fd,eval-user-194,eval-session-194,"Recommend shawarma in Oak Lawn. Casual, no reservations needed. Sunday afternoon, nothing too formal. Walking distance only.","# Food Preferences for eval-user-194
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Oak Lawn,mediterranean,"casual, no reservations needed"
+q-be280c0bbb,eval-user-195,eval-session-195,"I'll be around the Design District later — need Korean fried chicken, a hole-in-the-wall the locals love. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-195
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Design District,korean,a hole-in-the-wall the locals love
+q-b60b1d0238,eval-user-196,eval-session-196,Recommend smoked ribs in Bishop Arts District. A counter-service spot I can get in and out of. It's for Saturday brunch.,"# Food Preferences for eval-user-196
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Bishop Arts District,barbecue,a counter-service spot I can get in and out of
+q-f73b0cbd84,eval-user-197,eval-session-197,Best chicken and waffles in Lakewood? Prefer a counter-service spot I can get in and out of.,"# Food Preferences for eval-user-197
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Lakewood,american,a counter-service spot I can get in and out of
+q-3498f3287d,eval-user-198,eval-session-198,"Quick Indian butter chicken fix in Casa Linda — casual, no reservations needed.","# Food Preferences for eval-user-198
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Casa Linda,indian,"casual, no reservations needed"
+q-faaeede14c,eval-user-199,eval-session-199,"Group dinner near Downtown Dallas. Everyone wants wood-fired pizza. Cheap eats, under $15 a person. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-199
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Downtown Dallas,pizza,"cheap eats, under $15 a person"
+q-a642e82adc,eval-user-200,eval-session-200,"Recommend banh mi in Casa Linda. Upscale, dress-up kind of place. We're going tonight around 8pm. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-200
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Casa Linda,vietnamese,"upscale, dress-up kind of place"
+q-9f5b25821b,eval-user-201,eval-session-201,Quick banh mi fix in the Design District — somewhere I can bring my laptop and work.,"# Food Preferences for eval-user-201
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Design District,vietnamese,somewhere I can bring my laptop and work
+q-14f9500a03,eval-user-202,eval-session-202,Find me dosa and South Indian food in the Design District. I want a hole-in-the-wall the locals love. Looking for lunch tomorrow. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-202
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Design District,indian,a hole-in-the-wall the locals love
+q-ba2742ca41,eval-user-203,eval-session-203,"Find me a raw bar and oysters in Knox-Henderson. I want a rooftop or patio with a view. Early dinner, we like to eat by 5:30. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-203
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Knox-Henderson,seafood,a rooftop or patio with a view
+q-2d397d0917,eval-user-204,eval-session-204,"I'll be around Klyde Warren Park later — need wood-fired pizza, a counter-service spot I can get in and out of.","# Food Preferences for eval-user-204
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Klyde Warren Park,pizza,a counter-service spot I can get in and out of
+q-4411d72f7b,eval-user-205,eval-session-205,"Date night in Knox-Henderson, thinking omakase sushi. Want cheap eats, under $15 a person.","# Food Preferences for eval-user-205
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Knox-Henderson,sushi,"cheap eats, under $15 a person"
+q-beb24c4593,eval-user-206,eval-session-206,"Date night in the Design District, thinking French bistro fare. Want family-friendly with room for kids. We're going tonight around 8pm.","# Food Preferences for eval-user-206
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Design District,french,family-friendly with room for kids
+q-6591489b08,eval-user-207,eval-session-207,"Date night in Lakewood, thinking Sichuan hot pot. Want a chef-driven place worth the splurge. Looking for lunch tomorrow.","# Food Preferences for eval-user-207
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Lakewood,chinese,a chef-driven place worth the splurge
+q-9245189a8f,eval-user-208,eval-session-208,Group dinner near Bryan Place. Everyone wants Gulf seafood. A lively spot with a patio. Walking distance only.,"# Food Preferences for eval-user-208
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Bryan Place,seafood,a lively spot with a patio
+q-029e6b3664,eval-user-209,eval-session-209,"Recommend birria tacos in Exposition Park near Fair Park. Somewhere I can bring my laptop and work. Sunday afternoon, nothing too formal. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-209
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Exposition Park near Fair Park,mexican,somewhere I can bring my laptop and work
+q-0d32251a7f,eval-user-210,eval-session-210,Looking for dog-friendly outdoor seating around Junius Heights that does banh mi. It's for Saturday brunch.,"# Food Preferences for eval-user-210
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Junius Heights,vietnamese,dog-friendly outdoor seating
+q-ead9218d53,eval-user-211,eval-session-211,"I'll be around the Harwood District later — need brunch, casual, no reservations needed.","# Food Preferences for eval-user-211
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Harwood District,american,"casual, no reservations needed"
+q-d4acf2f7eb,eval-user-212,eval-session-212,Quick a gastropub with craft beer fix in Uptown Dallas — family-friendly with room for kids. We're going tonight around 8pm.,"# Food Preferences for eval-user-212
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Uptown Dallas,,family-friendly with room for kids
+q-bdf216797c,eval-user-213,eval-session-213,"Looking for cozy and dim, good for conversation around Greenville Avenue that does a gastropub with craft beer. We're going tonight around 8pm.","# Food Preferences for eval-user-213
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,,"cozy and dim, good for conversation"
+q-8e6bf909dd,eval-user-214,eval-session-214,Where should I go for sushi near the Katy Trail? Ideally somewhere I can bring my laptop and work. We're going tonight around 8pm.,"# Food Preferences for eval-user-214
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Katy Trail,sushi,somewhere I can bring my laptop and work
+q-4bf661858b,eval-user-215,eval-session-215,Looking for a hole-in-the-wall the locals love around the Dallas Farmers Market that does Tex-Mex and margaritas.,"# Food Preferences for eval-user-215
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Dallas Farmers Market,mexican,a hole-in-the-wall the locals love
+q-fb50b1993b,eval-user-216,eval-session-216,"Looking for upscale, dress-up kind of place around Lakewood that does banh mi. We're going tonight around 8pm.","# Food Preferences for eval-user-216
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Lakewood,vietnamese,"upscale, dress-up kind of place"
+q-207bca5b0a,eval-user-217,eval-session-217,Best dosa and South Indian food in Mockingbird Station? Prefer good for a big group of 8. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-217
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Mockingbird Station,indian,good for a big group of 8
+q-7bd46fda9b,eval-user-218,eval-session-218,"Looking for somewhere I can bring my laptop and work around Bryan Place that does drunken noodles. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-218
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Bryan Place,thai,somewhere I can bring my laptop and work
+q-6e2c8be3b6,eval-user-219,eval-session-219,Best dosa and South Indian food in the Design District? Prefer good for a big group of 8. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-219
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Design District,indian,good for a big group of 8
+q-70c08141e0,eval-user-220,eval-session-220,"Date night in Deep Ellum, thinking Korean fried chicken. Want somewhere quiet for a date night. It's for Saturday brunch.","# Food Preferences for eval-user-220
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Deep Ellum,korean,somewhere quiet for a date night
+q-385086c99b,eval-user-221,eval-session-221,"We're in the Harwood District and craving Thai curry. Somewhere a rooftop or patio with a view would be perfect. Early dinner, we like to eat by 5:30. Walking distance only.","# Food Preferences for eval-user-221
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Harwood District,thai,a rooftop or patio with a view
+q-ac465d4c9b,eval-user-222,eval-session-222,We're in Trinity Groves and craving a raw bar and oysters. Somewhere a counter-service spot I can get in and out of would be perfect. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-222
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Trinity Groves,seafood,a counter-service spot I can get in and out of
+q-45c1448504,eval-user-223,eval-session-223,"Best banh mi in Uptown Dallas? Prefer casual, no reservations needed. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-223
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Uptown Dallas,vietnamese,"casual, no reservations needed"
+q-bc10d4c093,eval-user-224,eval-session-224,"Date night in Greenville Avenue, thinking a gastropub with craft beer. Want a lively spot with a patio. We're going tonight around 8pm.","# Food Preferences for eval-user-224
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,,a lively spot with a patio
+q-49588ce8b1,eval-user-225,eval-session-225,Find me smash burgers in the Dallas Farmers Market. I want a bar-forward place with good cocktails.,"# Food Preferences for eval-user-225
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** None
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Dallas Farmers Market,burger,a bar-forward place with good cocktails
+q-9edc83ee1d,eval-user-226,eval-session-226,Group dinner near Henderson Avenue. Everyone wants Ethiopian food. Somewhere quiet for a date night. Walking distance only.,"# Food Preferences for eval-user-226
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** No pork
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Henderson Avenue,ethiopian,somewhere quiet for a date night
+q-8e09a8361d,eval-user-227,eval-session-227,"I'll be around Greenville Avenue later — need Tex-Mex and margaritas, a bar-forward place with good cocktails. It's for Saturday brunch.","# Food Preferences for eval-user-227
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,mexican,a bar-forward place with good cocktails
+q-cab5f8ee2a,eval-user-228,eval-session-228,Recommend Mediterranean mezze in the Dallas Farmers Market. A lively spot with a patio. It's for Saturday brunch. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-228
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Dallas Farmers Market,mediterranean,a lively spot with a patio
+q-c97d386beb,eval-user-229,eval-session-229,"I'll be around Downtown Dallas later — need ramen, a counter-service spot I can get in and out of. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-229
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Downtown Dallas,ramen,a counter-service spot I can get in and out of
+q-d5f088c622,eval-user-230,eval-session-230,Looking for good for a big group of 8 around Bryan Place that does a good vegan spot. We're going tonight around 8pm.,"# Food Preferences for eval-user-230
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Fast-food chains
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Bryan Place,vegan,good for a big group of 8
+q-7d8773046a,eval-user-231,eval-session-231,Best vegetarian food in Downtown Dallas? Prefer family-friendly with room for kids.,"# Food Preferences for eval-user-231
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Downtown Dallas,vegetarian,family-friendly with room for kids
+q-f5c655b75b,eval-user-232,eval-session-232,"I'll be around Bishop Arts District later — need a raw bar and oysters, upscale, dress-up kind of place. Looking for lunch tomorrow.","# Food Preferences for eval-user-232
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Bishop Arts District,seafood,"upscale, dress-up kind of place"
+q-f2a3f3863e,eval-user-233,eval-session-233,Find me Ethiopian food in the Bishop Arts strip on 7th Street. I want a bar-forward place with good cocktails. It's for Saturday brunch. Anywhere within a couple miles is fine.,"# Food Preferences for eval-user-233
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Vegan
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Bishop Arts strip on 7th Street,ethiopian,a bar-forward place with good cocktails
+q-e1ded28012,eval-user-234,eval-session-234,"I'll be around Deep Ellum later — need dosa and South Indian food, a bar-forward place with good cocktails. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-234
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Deep Ellum,indian,a bar-forward place with good cocktails
+q-6fd6762428,eval-user-235,eval-session-235,"We're in Mockingbird Station and craving farm-to-table dinner. Somewhere casual, no reservations needed would be perfect. Walking distance only.","# Food Preferences for eval-user-235
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Mockingbird Station,american,"casual, no reservations needed"
+q-355e2f663b,eval-user-236,eval-session-236,"I'll be around Uptown Dallas later — need dosa and South Indian food, cozy and dim, good for conversation. We're going tonight around 8pm.","# Food Preferences for eval-user-236
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Uptown Dallas,indian,"cozy and dim, good for conversation"
+q-b87b52a4e9,eval-user-237,eval-session-237,Where should I go for vegetarian food near Bryan Place? Ideally a counter-service spot I can get in and out of. We're going tonight around 8pm.,"# Food Preferences for eval-user-237
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** No pork
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Bryan Place,vegetarian,a counter-service spot I can get in and out of
+q-b18c2a55d8,eval-user-238,eval-session-238,Where should I go for late-night eats near the Harwood District? Ideally a counter-service spot I can get in and out of. Looking for lunch tomorrow.,"# Food Preferences for eval-user-238
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Harwood District,,a counter-service spot I can get in and out of
+q-d1a9f04e1b,eval-user-239,eval-session-239,"Find me a great burger in Greenville Avenue. I want a lively spot with a patio. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-239
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Greenville Avenue,burger,a lively spot with a patio
+q-c084bb6cef,eval-user-240,eval-session-240,"Recommend shawarma in the Harwood District. Upscale, dress-up kind of place. Looking for lunch tomorrow. Walking distance only.","# Food Preferences for eval-user-240
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Fast-food chains
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Harwood District,mediterranean,"upscale, dress-up kind of place"
+q-224bd04b36,eval-user-241,eval-session-241,"Looking for a counter-service spot I can get in and out of around Casa Linda that does farm-to-table dinner. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-241
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Loud sports bars
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Casa Linda,american,a counter-service spot I can get in and out of
+q-ea28b5883c,eval-user-242,eval-session-242,Where should I go for Korean fried chicken near Klyde Warren Park? Ideally somewhere I can bring my laptop and work. We're going tonight around 8pm.,"# Food Preferences for eval-user-242
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Klyde Warren Park,korean,somewhere I can bring my laptop and work
+q-ef5f8aea20,eval-user-243,eval-session-243,"I'll be around Deep Ellum later — need brunch, a hole-in-the-wall the locals love. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-243
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,american,a hole-in-the-wall the locals love
+q-cb6917cba1,eval-user-244,eval-session-244,"Recommend hand-pulled noodles in the Katy Trail. A bar-forward place with good cocktails. Early dinner, we like to eat by 5:30. Walking distance only.","# Food Preferences for eval-user-244
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Katy Trail,chinese,a bar-forward place with good cocktails
+q-e140912fee,eval-user-245,eval-session-245,We're in Oak Lawn and craving dosa and South Indian food. Somewhere a lively spot with a patio would be perfect. We're going tonight around 8pm. Walking distance only.,"# Food Preferences for eval-user-245
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Oak Lawn,indian,a lively spot with a patio
+q-d1b0d62f75,eval-user-246,eval-session-246,"We're in Klyde Warren Park and craving shawarma. Somewhere a counter-service spot I can get in and out of would be perfect. Need something open late, after 11pm. Walking distance only.","# Food Preferences for eval-user-246
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Vegan
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Klyde Warren Park,mediterranean,a counter-service spot I can get in and out of
+q-b3ec78bb00,eval-user-247,eval-session-247,"We're in Junius Heights and craving Vietnamese pho. Somewhere family-friendly with room for kids would be perfect. Need something open late, after 11pm. Willing to drive up to 15 minutes.","# Food Preferences for eval-user-247
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** None
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Junius Heights,vietnamese,family-friendly with room for kids
+q-c042407c06,eval-user-248,eval-session-248,Best dim sum in Oak Cliff? Prefer a chef-driven place worth the splurge. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-248
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** No pork
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Oak Cliff,chinese,a chef-driven place worth the splurge
+q-b19c650244,eval-user-249,eval-session-249,"Find me shawarma in Bryan Place. I want cheap eats, under $15 a person. Need something open late, after 11pm.","# Food Preferences for eval-user-249
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Bryan Place,mediterranean,"cheap eats, under $15 a person"
+q-1df185320d,eval-user-250,eval-session-250,Group dinner near the Design District. Everyone wants Korean fried chicken. Dog-friendly outdoor seating. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-250
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Design District,korean,dog-friendly outdoor seating
+q-7b6f31eac2,eval-user-251,eval-session-251,We're in Mockingbird Station and craving hand-pulled noodles. Somewhere somewhere quiet for a date night would be perfect. It's for Saturday brunch.,"# Food Preferences for eval-user-251
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Mockingbird Station,chinese,somewhere quiet for a date night
+q-9491e397dd,eval-user-252,eval-session-252,Best coffee and pastries in Oak Lawn? Prefer a bar-forward place with good cocktails. Walking distance only.,"# Food Preferences for eval-user-252
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Oak Lawn,cafe,a bar-forward place with good cocktails
+q-5e2d95ef65,eval-user-253,eval-session-253,Where should I go for smash burgers near Oak Cliff? Ideally good for a big group of 8. Looking for lunch tomorrow.,"# Food Preferences for eval-user-253
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Oak Cliff,burger,good for a big group of 8
+q-16044c8476,eval-user-254,eval-session-254,"Group dinner near the Design District. Everyone wants Southern comfort food. Cozy and dim, good for conversation. Walking distance only.","# Food Preferences for eval-user-254
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Design District,american,"cozy and dim, good for conversation"
+q-1e90bc2ba7,eval-user-255,eval-session-255,Group dinner near Lakewood. Everyone wants sushi. Family-friendly with room for kids. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-255
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Lakewood,sushi,family-friendly with room for kids
+q-d4860fb0ef,eval-user-256,eval-session-256,"Group dinner near Casa Linda. Everyone wants omakase sushi. Cozy and dim, good for conversation. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-256
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Casa Linda,sushi,"cozy and dim, good for conversation"
+q-cb178beb3a,eval-user-257,eval-session-257,Recommend Sichuan hot pot in Oak Lawn. A hole-in-the-wall the locals love. It's for Saturday brunch. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-257
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Oak Lawn,chinese,a hole-in-the-wall the locals love
+q-9e10af4224,eval-user-258,eval-session-258,"Find me dim sum in Oak Cliff. I want cheap eats, under $15 a person. Need something open late, after 11pm. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-258
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Cliff,chinese,"cheap eats, under $15 a person"
+q-d839d942dc,eval-user-259,eval-session-259,Best a raw bar and oysters in Henderson Avenue? Prefer good for a big group of 8. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-259
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Henderson Avenue,seafood,good for a big group of 8
+q-33017b3c6f,eval-user-260,eval-session-260,Looking for somewhere quiet for a date night around Downtown Dallas that does Texas barbecue brisket.,"# Food Preferences for eval-user-260
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Downtown Dallas,barbecue,somewhere quiet for a date night
+q-74cdfc74c4,eval-user-261,eval-session-261,"Group dinner near Cedar Springs. Everyone wants Sichuan hot pot. Casual, no reservations needed. Walking distance only.","# Food Preferences for eval-user-261
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Cedar Springs,chinese,"casual, no reservations needed"
+q-9c7937d78f,eval-user-262,eval-session-262,"Find me a raw bar and oysters in Lakewood. I want casual, no reservations needed. Looking for lunch tomorrow. Walking distance only.","# Food Preferences for eval-user-262
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Lakewood,seafood,"casual, no reservations needed"
+q-5f2c4d981f,eval-user-263,eval-session-263,"Looking for a hole-in-the-wall the locals love around Mockingbird Station that does Mediterranean mezze. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-263
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Mockingbird Station,mediterranean,a hole-in-the-wall the locals love
+q-90f4ec8f57,eval-user-264,eval-session-264,Where should I go for a good vegan spot near Exposition Park near Fair Park? Ideally a lively spot with a patio.,"# Food Preferences for eval-user-264
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** mild
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Exposition Park near Fair Park,vegan,a lively spot with a patio
+q-a9e2c39045,eval-user-265,eval-session-265,Find me Southern comfort food in Junius Heights. I want a counter-service spot I can get in and out of. Looking for lunch tomorrow. Walking distance only.,"# Food Preferences for eval-user-265
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Junius Heights,american,a counter-service spot I can get in and out of
+q-276748e5e7,eval-user-266,eval-session-266,"Group dinner near the Dallas Farmers Market. Everyone wants Mediterranean mezze. Cheap eats, under $15 a person.","# Food Preferences for eval-user-266
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Dallas Farmers Market,mediterranean,"cheap eats, under $15 a person"
+q-0031fc216a,eval-user-267,eval-session-267,"Looking for a chef-driven place worth the splurge around the Dallas Farmers Market that does Italian pasta. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-267
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Dallas Farmers Market,italian,a chef-driven place worth the splurge
+q-0df0f56784,eval-user-268,eval-session-268,"Quick birria tacos fix in the Harwood District — a chef-driven place worth the splurge. Need something open late, after 11pm.","# Food Preferences for eval-user-268
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Harwood District,mexican,a chef-driven place worth the splurge
+q-cfefc79f59,eval-user-269,eval-session-269,Group dinner near the Design District. Everyone wants shawarma. Good for a big group of 8. I'd rather not walk more than a few blocks.,"# Food Preferences for eval-user-269
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Design District,mediterranean,good for a big group of 8
+q-e7c30a24ce,eval-user-270,eval-session-270,"I'll be around Downtown Dallas later — need Southern comfort food, upscale, dress-up kind of place. It's for Saturday brunch.","# Food Preferences for eval-user-270
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Downtown Dallas,american,"upscale, dress-up kind of place"
+q-42caf9ba55,eval-user-271,eval-session-271,"Date night in Lakewood, thinking Italian pasta. Want a rooftop or patio with a view. Looking for lunch tomorrow.","# Food Preferences for eval-user-271
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Lakewood,italian,a rooftop or patio with a view
+q-e7eb03debe,eval-user-272,eval-session-272,Where should I go for shawarma near Exposition Park near Fair Park? Ideally a rooftop or patio with a view.,"# Food Preferences for eval-user-272
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Exposition Park near Fair Park,mediterranean,a rooftop or patio with a view
+q-040bc43182,eval-user-273,eval-session-273,"I'll be around the Design District later — need tacos, a hole-in-the-wall the locals love. It's for Saturday brunch.","# Food Preferences for eval-user-273
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Design District,mexican,a hole-in-the-wall the locals love
+q-5c3aad1af6,eval-user-274,eval-session-274,"Date night in Lakewood, thinking smoked ribs. Want a hole-in-the-wall the locals love.","# Food Preferences for eval-user-274
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Lakewood,barbecue,a hole-in-the-wall the locals love
+q-706faccf0f,eval-user-275,eval-session-275,Recommend Vietnamese pho in Junius Heights. Somewhere I can bring my laptop and work. It's for Saturday brunch.,"# Food Preferences for eval-user-275
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Junius Heights,vietnamese,somewhere I can bring my laptop and work
+q-841c574919,eval-user-276,eval-session-276,Where should I go for Southern comfort food near Deep Ellum? Ideally good for a big group of 8. We're going tonight around 8pm.,"# Food Preferences for eval-user-276
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,american,good for a big group of 8
+q-96acc3b67c,eval-user-277,eval-session-277,"Where should I go for banh mi near Knox-Henderson? Ideally cozy and dim, good for conversation. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-277
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Knox-Henderson,vietnamese,"cozy and dim, good for conversation"
+q-b13a89c569,eval-user-278,eval-session-278,"Date night in Casa Linda, thinking Sichuan hot pot. Want a counter-service spot I can get in and out of.","# Food Preferences for eval-user-278
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Casa Linda,chinese,a counter-service spot I can get in and out of
+q-cd84ccac3d,eval-user-279,eval-session-279,Group dinner near the Katy Trail. Everyone wants ramen. Somewhere quiet for a date night. Walking distance only.,"# Food Preferences for eval-user-279
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Fast-food chains
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Katy Trail,ramen,somewhere quiet for a date night
+q-d6caf66184,eval-user-280,eval-session-280,"Where should I go for a great burger near the Design District? Ideally good for a big group of 8. Need something open late, after 11pm.","# Food Preferences for eval-user-280
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Design District,burger,good for a big group of 8
+q-a46870255d,eval-user-281,eval-session-281,"Where should I go for smash burgers near the Bishop Arts strip on 7th Street? Ideally family-friendly with room for kids. Need something open late, after 11pm.","# Food Preferences for eval-user-281
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,the Bishop Arts strip on 7th Street,burger,family-friendly with room for kids
+q-3a65e24277,eval-user-282,eval-session-282,Best chicken and waffles in Deep Ellum? Prefer somewhere I can bring my laptop and work. Walking distance only.,"# Food Preferences for eval-user-282
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Loud sports bars
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Deep Ellum,american,somewhere I can bring my laptop and work
+q-d4cd4543b7,eval-user-283,eval-session-283,Recommend Sichuan hot pot in Lakewood. Family-friendly with room for kids. It's for Saturday brunch.,"# Food Preferences for eval-user-283
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Lakewood,chinese,family-friendly with room for kids
+q-945a82239e,eval-user-284,eval-session-284,"Where should I go for tacos near Mockingbird Station? Ideally cheap eats, under $15 a person. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-284
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Mockingbird Station,mexican,"cheap eats, under $15 a person"
+q-ceed641929,eval-user-285,eval-session-285,We're in Knox-Henderson and craving late-night eats. Somewhere a counter-service spot I can get in and out of would be perfect. Looking for lunch tomorrow. Walking distance only.,"# Food Preferences for eval-user-285
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Knox-Henderson,,a counter-service spot I can get in and out of
+q-b77f30b4b2,eval-user-286,eval-session-286,Group dinner near Knox-Henderson. Everyone wants farm-to-table dinner. Good for a big group of 8.,"# Food Preferences for eval-user-286
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Knox-Henderson,american,good for a big group of 8
+q-cd10201ba8,eval-user-287,eval-session-287,"Quick Mediterranean mezze fix in Lakewood — casual, no reservations needed.","# Food Preferences for eval-user-287
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Places that are all hype
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Lakewood,mediterranean,"casual, no reservations needed"
+q-c094617328,eval-user-288,eval-session-288,"Find me Neapolitan pizza in Oak Lawn. I want good for a big group of 8. Sunday afternoon, nothing too formal. Walking distance only.","# Food Preferences for eval-user-288
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Oak Lawn,pizza,good for a big group of 8
+q-73a7885f3c,eval-user-289,eval-session-289,"Where should I go for Italian pasta near the Bishop Arts strip on 7th Street? Ideally cheap eats, under $15 a person. It's for Saturday brunch.","# Food Preferences for eval-user-289
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,the Bishop Arts strip on 7th Street,italian,"cheap eats, under $15 a person"
+q-c0e679dcca,eval-user-290,eval-session-290,"Group dinner near Junius Heights. Everyone wants Thai curry. Cheap eats, under $15 a person. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-290
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Junius Heights,thai,"cheap eats, under $15 a person"
+q-18548cfb02,eval-user-291,eval-session-291,"Date night in Greenville Avenue, thinking Mediterranean mezze. Want a bar-forward place with good cocktails. We're going tonight around 8pm.","# Food Preferences for eval-user-291
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** None
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Greenville Avenue,mediterranean,a bar-forward place with good cocktails
+q-1087496754,eval-user-292,eval-session-292,"We're in Oak Lawn and craving smoked ribs. Somewhere upscale, dress-up kind of place would be perfect. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-292
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Buffets
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Oak Lawn,barbecue,"upscale, dress-up kind of place"
+q-acd61f1678,eval-user-293,eval-session-293,"Quick brunch fix in Junius Heights — upscale, dress-up kind of place. We're going tonight around 8pm.","# Food Preferences for eval-user-293
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** mild
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Junius Heights,american,"upscale, dress-up kind of place"
+q-743355e3d6,eval-user-294,eval-session-294,We're in Exposition Park near Fair Park and craving Sichuan hot pot. Somewhere somewhere I can bring my laptop and work would be perfect. We're going tonight around 8pm.,"# Food Preferences for eval-user-294
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** None
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Exposition Park near Fair Park,chinese,somewhere I can bring my laptop and work
+q-8a084890de,eval-user-295,eval-session-295,"I'll be around Exposition Park near Fair Park later — need Neapolitan pizza, a hole-in-the-wall the locals love. We're going tonight around 8pm.","# Food Preferences for eval-user-295
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Exposition Park near Fair Park,pizza,a hole-in-the-wall the locals love
+q-60a4a28581,eval-user-296,eval-session-296,"I'll be around Lakewood later — need banh mi, upscale, dress-up kind of place.","# Food Preferences for eval-user-296
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Lakewood,vietnamese,"upscale, dress-up kind of place"
+q-a28a0fb696,eval-user-297,eval-session-297,"Quick omakase sushi fix in the Design District — dog-friendly outdoor seating. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-297
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Design District,sushi,dog-friendly outdoor seating
+q-8090b55071,eval-user-298,eval-session-298,"Recommend Italian pasta in the Design District. Cheap eats, under $15 a person. Need something open late, after 11pm. Anywhere within a couple miles is fine.","# Food Preferences for eval-user-298
+
+**Favourite cuisines:** Farm-to-table, seasonal tasting menus
+**Dietary restrictions:** None
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,the Design District,italian,"cheap eats, under $15 a person"
+q-aeb7d4133b,eval-user-299,eval-session-299,"Looking for cozy and dim, good for conversation around Oak Lawn that does vegetarian food. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-299
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Buffets
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Oak Lawn,vegetarian,"cozy and dim, good for conversation"
+q-4a6c11e972,eval-user-300,eval-session-300,"Looking for dog-friendly outdoor seating around the Dallas Farmers Market that does a good vegan spot. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-300
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,the Dallas Farmers Market,vegan,dog-friendly outdoor seating
+q-48e220da59,eval-user-301,eval-session-301,Best tacos in Oak Lawn? Prefer a lively spot with a patio. Walking distance only.,"# Food Preferences for eval-user-301
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Vegetarian
+**Dislikes:** Places that are all hype
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Lively rooms with a bar scene",Dallas,TX,Oak Lawn,mexican,a lively spot with a patio
+q-d7190a9823,eval-user-302,eval-session-302,We're in Trinity Groves and craving Sichuan hot pot. Somewhere a lively spot with a patio would be perfect. Looking for lunch tomorrow. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-302
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Trinity Groves,chinese,a lively spot with a patio
+q-eb05b156ac,eval-user-303,eval-session-303,"Looking for dog-friendly outdoor seating around Trinity Groves that does a good vegan spot. Need something open late, after 11pm.","# Food Preferences for eval-user-303
+
+**Favourite cuisines:** Mexican, Tex-Mex, Southwestern
+**Dietary restrictions:** Dairy-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Trinity Groves,vegan,dog-friendly outdoor seating
+q-f4a49429f8,eval-user-304,eval-session-304,"Looking for a lively spot with a patio around Oak Lawn that does sushi. Need something open late, after 11pm.","# Food Preferences for eval-user-304
+
+**Favourite cuisines:** Seafood, raw bars, coastal
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Oak Lawn,sushi,a lively spot with a patio
+q-d8b7e2ad68,eval-user-305,eval-session-305,Group dinner near Oak Lawn. Everyone wants birria tacos. Dog-friendly outdoor seating.,"# Food Preferences for eval-user-305
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Nut allergy
+**Dislikes:** Chain steakhouses
+**Spice tolerance:** medium
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Oak Lawn,mexican,dog-friendly outdoor seating
+q-10b2df9bc1,eval-user-306,eval-session-306,Best sushi in the Dallas Farmers Market? Prefer dog-friendly outdoor seating. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-306
+
+**Favourite cuisines:** Mediterranean, Greek, Lebanese
+**Dietary restrictions:** No pork
+**Dislikes:** Loud sports bars
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,the Dallas Farmers Market,sushi,dog-friendly outdoor seating
+q-bef52884b9,eval-user-307,eval-session-307,Group dinner near Deep Ellum. Everyone wants New American tasting menu. Somewhere I can bring my laptop and work. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-307
+
+**Favourite cuisines:** Indian, Ethiopian, Middle Eastern
+**Dietary restrictions:** No pork
+**Dislikes:** Buffets
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Deep Ellum,american,somewhere I can bring my laptop and work
+q-408c67b13e,eval-user-308,eval-session-308,"Date night in Casa Linda, thinking Neapolitan pizza. Want a counter-service spot I can get in and out of.","# Food Preferences for eval-user-308
+
+**Favourite cuisines:** Italian, French, New American
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,Casa Linda,pizza,a counter-service spot I can get in and out of
+q-ae92039b30,eval-user-309,eval-session-309,Quick a great burger fix in Mockingbird Station — somewhere I can bring my laptop and work. It's for Saturday brunch.,"# Food Preferences for eval-user-309
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Cilantro-heavy dishes
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Mockingbird Station,burger,somewhere I can bring my laptop and work
+q-4e4866960a,eval-user-310,eval-session-310,Where should I go for Vietnamese pho near Greenville Avenue? Ideally a hole-in-the-wall the locals love. It's for Saturday brunch.,"# Food Preferences for eval-user-310
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Pescatarian
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Greenville Avenue,vietnamese,a hole-in-the-wall the locals love
+q-f90d3d046d,eval-user-311,eval-session-311,Group dinner near Downtown Dallas. Everyone wants Tex-Mex and margaritas. A chef-driven place worth the splurge. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-311
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** Vegan
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** mild
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Downtown Dallas,mexican,a chef-driven place worth the splurge
+q-cffeedd7af,eval-user-312,eval-session-312,"Looking for cozy and dim, good for conversation around Casa Linda that does coffee and pastries. Looking for lunch tomorrow.","# Food Preferences for eval-user-312
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Quiet, intimate spaces for conversation",Dallas,TX,Casa Linda,cafe,"cozy and dim, good for conversation"
+q-8b608b83c7,eval-user-313,eval-session-313,"Where should I go for Neapolitan pizza near Casa Linda? Ideally a chef-driven place worth the splurge. Early dinner, we like to eat by 5:30.","# Food Preferences for eval-user-313
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** medium
+**Vibe preferences:** Happy to splurge for a standout meal",Dallas,TX,Casa Linda,pizza,a chef-driven place worth the splurge
+q-847e1600f3,eval-user-314,eval-session-314,"Quick French bistro fare fix in Bryan Place — cozy and dim, good for conversation. We're going tonight around 8pm.","# Food Preferences for eval-user-314
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Vegan
+**Dislikes:** Long waits without reservations
+**Spice tolerance:** no strong preference
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,Bryan Place,french,"cozy and dim, good for conversation"
+q-8a53d23c65,eval-user-315,eval-session-315,We're in Henderson Avenue and craving Ethiopian food. Somewhere somewhere I can bring my laptop and work would be perfect. Looking for lunch tomorrow. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-315
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** Gluten-free
+**Dislikes:** Loud sports bars
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Budget-conscious, looks for value",Dallas,TX,Henderson Avenue,ethiopian,somewhere I can bring my laptop and work
+q-420e3c2564,eval-user-316,eval-session-316,Group dinner near the Katy Trail. Everyone wants tacos. Dog-friendly outdoor seating. Willing to drive up to 15 minutes.,"# Food Preferences for eval-user-316
+
+**Favourite cuisines:** Vietnamese, Korean, Sichuan
+**Dietary restrictions:** Vegan
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Katy Trail,mexican,dog-friendly outdoor seating
+q-49acfd659b,eval-user-317,eval-session-317,Quick late-night eats fix in the Katy Trail — a lively spot with a patio. We're going tonight around 8pm.,"# Food Preferences for eval-user-317
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** None
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Patios and outdoor seating whenever possible",Dallas,TX,the Katy Trail,,a lively spot with a patio
+q-110bbc7d6b,eval-user-318,eval-session-318,"Looking for casual, no reservations needed around Deep Ellum that does a good vegan spot. Looking for lunch tomorrow.","# Food Preferences for eval-user-318
+
+**Favourite cuisines:** American comfort food, burgers, diners
+**Dietary restrictions:** Vegan
+**Dislikes:** Overly sweet sauces
+**Spice tolerance:** medium
+**Vibe preferences:** Counter-service and casual is fine",Dallas,TX,Deep Ellum,vegan,"casual, no reservations needed"
+q-caa66a8b08,eval-user-319,eval-session-319,"Date night in the Dallas Farmers Market, thinking Southern comfort food. Want a hole-in-the-wall the locals love. Sunday afternoon, nothing too formal.","# Food Preferences for eval-user-319
+
+**Favourite cuisines:** Japanese (sushi, ramen), Thai, Neapolitan pizza
+**Dietary restrictions:** No pork
+**Dislikes:** Places that are all hype
+**Spice tolerance:** medium
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Dallas Farmers Market,american,a hole-in-the-wall the locals love
+q-3bc66b5118,eval-user-320,eval-session-320,"Recommend a gastropub with craft beer in the Dallas Farmers Market. Somewhere quiet for a date night. Sunday afternoon, nothing too formal. I'd rather not walk more than a few blocks.","# Food Preferences for eval-user-320
+
+**Favourite cuisines:** Barbecue, Southern, Cajun
+**Dietary restrictions:** No pork
+**Dislikes:** Buffets
+**Spice tolerance:** loves it hot
+**Vibe preferences:** Hole-in-the-walls preferred over giant chains",Dallas,TX,the Dallas Farmers Market,,somewhere quiet for a date night

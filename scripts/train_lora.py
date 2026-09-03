@@ -62,6 +62,15 @@ def _load_records(path: Path) -> list[dict]:
     return [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+def _last_metric(trainer, key: str):
+    """Most recent value of ``key`` in the trainer's log history, or None."""
+    history = getattr(getattr(trainer, "state", None), "log_history", None) or []
+    for entry in reversed(history):
+        if key in entry:
+            return round(float(entry[key]), 4)
+    return None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
@@ -75,6 +84,7 @@ def main() -> None:
     _load_dotenv(REPO_ROOT / ".env")
 
     from src.training.config import config_to_dict, load_config
+    from src.training.hub import upload_run_artifacts, write_run_artifacts
 
     cfg = load_config(args.config, args.overrides)
     print(f"run_name={cfg.run_name} base_model={cfg.model.base_model}")
@@ -265,11 +275,20 @@ def main() -> None:
     (Path(output_dir) / "resolved_config.json").write_text(
         json.dumps(config_to_dict(cfg), indent=2), encoding="utf-8"
     )
-    print(f"saved adapter + tokenizer + resolved_config.json -> {output_dir}")
+
+    stats = {
+        "train_examples": len(train_enc),
+        "eval_examples": len(eval_enc),
+        "final_loss": _last_metric(trainer, "loss"),
+        "eval_loss": _last_metric(trainer, "eval_loss"),
+    }
+    write_run_artifacts(Path(output_dir), cfg, stats)
+    print(f"saved adapter + tokenizer + README.md + resolved_config.json -> {output_dir}")
 
     if cfg.hub.push_to_hub:
         model.push_to_hub(cfg.hub.hub_model_id, private=cfg.hub.hub_private_repo)
         tok.push_to_hub(cfg.hub.hub_model_id, private=cfg.hub.hub_private_repo)
+        upload_run_artifacts(Path(output_dir), cfg.hub.hub_model_id, cfg.hub.hub_private_repo)
         print(f"pushed -> {cfg.hub.hub_model_id}")
 
 

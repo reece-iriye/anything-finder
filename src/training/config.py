@@ -210,5 +210,16 @@ def load_config(
     return _build(LoraTrainingConfig, raw).validate()
 
 
+def config_from_dict(data: dict[str, Any]) -> LoraTrainingConfig:
+    """Rebuild a config from its ``config_to_dict`` output.
+
+    Round-trips a run's ``resolved_config.json`` so a finished adapter can be
+    re-published (``scripts/push_lora.py``) without the original YAML.
+    """
+    if not isinstance(data, dict):
+        raise ConfigError("config_from_dict expects a mapping")
+    return _build(LoraTrainingConfig, data).validate()
+
+
 def config_to_dict(cfg: LoraTrainingConfig) -> dict[str, Any]:
     return dataclasses.asdict(cfg)

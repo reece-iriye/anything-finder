@@ -10,9 +10,25 @@
 **/.env
 
 # data
+# Ignored by default, then allow-listed: the datasets and captured runs are the
+# experiment's record and belong in git; the OSM extracts (47-114 MB) do not.
 **/data/**/*
 !**/data/lora/
 !**/data/lora/**/*
+!data/eval/
+!data/eval/**/*.csv
+!data/eval/**/*.jsonl
+!data/traces/
+!data/traces/**/*.jsonl.gz
+!data/compare/
+!data/compare/**/*.html
 
-# local telemetry traces
+# Trained adapters live on the GPU box / Hugging Face, not in git.
+data/lora/runs/
+
+# OSM extracts — re-download with scripts/osm_prepare.py.
+data/*.osm*
+
+# local telemetry traces (scratch; `make traces-freeze` bundles them into
+# data/traces/<mode>.jsonl.gz, which IS committed)
 /telemetry/

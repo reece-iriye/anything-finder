@@ -12,9 +12,11 @@ usage and timing, plus rolled-up totals and (for ``claude``) an approximate
 cost. The file is rewritten after every span, so a killed process still leaves a
 readable partial trace.
 
-Attach the tracer per invocation via ``RunnableConfig`` callbacks
-(see ``src/services/geo_search/restaurants.py``); it is a no-op unless
-``AF_TRACE_DIR`` is set. Browse the output with ``make trace``.
+Build the per-invocation ``RunnableConfig`` with ``run_config()`` -- it attaches
+the tracer callback and is a no-op unless ``AF_TRACE_DIR`` is set. Used by both
+the API path (``src/services/geo_search/restaurants.py``) and the offline capture
+path (``scripts/run_eval_queries.py``). Browse the output with ``make trace``;
+compare modes with ``make compare``.
 """
 
 from __future__ import annotations
@@ -85,6 +87,44 @@ def get_tracer() -> JsonFileTracer | None:
         if _tracer is None or _tracer.root != Path(root):
             _tracer = JsonFileTracer(Path(root))
     return _tracer
+
+
+def run_config(
+    *,
+    thread_id: str,
+    user_id: str,
+    query: str,
+    request: dict[str, Any] | None = None,
+    eval_id: str | None = None,
+) -> dict[str, Any]:
+    """Build the ``RunnableConfig`` for one agent invocation.
+
+    Always carries the checkpointer ``thread_id`` and ``user_id``; attaches the
+    tracer callback and the metadata it reads only when ``AF_TRACE_DIR`` is set,
+    so callers get identical agent behaviour with telemetry off.
+
+    ``eval_id`` ties a run to a row of the eval set (see
+    ``scripts/run_eval_queries.py``) so a trace can be joined back to its query
+    even when ``session_id`` repeats across capture runs.
+    """
+    config: dict[str, Any] = {
+        "configurable": {"thread_id": thread_id, "user_id": user_id}
+    }
+    tracer = get_tracer()
+    if tracer is None:
+        return config
+    config["callbacks"] = [tracer]
+    metadata: dict[str, Any] = {
+        "thread_id": thread_id,
+        "user_id": user_id,
+        "af_query": query,
+    }
+    if request is not None:
+        metadata["af_request"] = request
+    if eval_id is not None:
+        metadata["af_eval_id"] = eval_id
+    config["metadata"] = metadata
+    return config
 
 
 def _jsonable(value: Any) -> Any:
@@ -217,6 +257,7 @@ class JsonFileTracer(BaseCallbackHandler):
                 "ended_at": None,
                 "session_id": md.get("thread_id") or md.get("session_id"),
                 "user_id": md.get("user_id"),
+                "eval_id": md.get("af_eval_id"),
                 "query": md.get("af_query"),
                 "request": md.get("af_request"),
                 "models": [],
@@ -229,6 +270,7 @@ class JsonFileTracer(BaseCallbackHandler):
             for key, src in (
                 ("session_id", "thread_id"),
                 ("user_id", "user_id"),
+                ("eval_id", "af_eval_id"),
                 ("query", "af_query"),
                 ("request", "af_request"),
             ):

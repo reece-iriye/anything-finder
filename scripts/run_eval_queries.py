@@ -1,11 +1,11 @@
-"""Execute every synthetic eval row through the restaurant-search workflow with
-Claude as the inference engine.
+"""Execute every synthetic eval row through the restaurant-search workflow on
+whichever LLM backend the environment selects.
 
 Reads ``data/eval/dallas_food_queries.csv`` (see ``scripts/gen_eval_queries.py``),
 runs each ``query`` + ``context_data`` pair through the *real* compiled deep agent
 from ``src.agents.geo_search`` — same system prompt, same tools (Nominatim +
-Overpass), same input formatting as the FastAPI route — and writes one JSONL
-record per row to ``data/eval/dallas_food_runs.jsonl``.
+Overpass), same input formatting and same telemetry wiring as the FastAPI route —
+and writes one JSONL record per row to ``--out``.
 
 Each record carries:
   * ``prompt`` / ``completion``      — flat pair for LoRA supervised fine-tuning.
@@ -14,16 +14,26 @@ Each record carries:
   * ``transcript``                   — full agent message log incl. tool calls and
                                        tool results, for judging tool use / grounding.
   * ``target_*``                     — ground-truth intent labels for LLM-as-a-judge.
+  * ``backend`` / ``model`` / ``mode`` — which stack produced it.
   * ``error``                        — set instead of a completion when the run failed.
 
-Backend: forces ``LLM_BACKEND=claude`` unless already set. Needs ``ANTHROPIC_API_KEY``
-and reachable Nominatim / Overpass (honours the same env vars as ``make dev``:
-``NOMINATIM_BASE_URL`` / ``OVERPASS_BASE_URL`` or the ``*_USE_EXTERNAL_API`` flags).
+Backend comes from ``LLM_BACKEND`` (``claude`` | ``vllm`` | ``lora``); the Makefile
+targets set it. ``claude`` additionally needs ``ANTHROPIC_API_KEY``. Nominatim /
+Overpass are reached via the same env vars as ``make dev`` (``NOMINATIM_BASE_URL`` /
+``OVERPASS_BASE_URL`` or the ``*_USE_EXTERNAL_API`` flags).
+
+Set ``AF_TRACE_DIR`` to also capture a full telemetry trace per row under
+``<AF_TRACE_DIR>/<mode>/`` — that is what ``make compare`` reads.
+
+Note on ``--out``: ``scripts/prepare_lora_data.py`` globs ``data/eval/*_runs.jsonl``
+for the SFT set, so only *teacher* (Claude) captures belong there. Student captures
+go to ``data/eval/runs/<mode>.jsonl``.
 
 Usage:
     uv run scripts/run_eval_queries.py
     uv run scripts/run_eval_queries.py --limit 5 --concurrency 2
     uv run scripts/run_eval_queries.py --resume            # skip ids already written
+    uv run scripts/run_eval_queries.py --out data/eval/runs/raw-open-source.jsonl
 """
 
 from __future__ import annotations
@@ -42,8 +52,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.utils.telemetry import run_config, trace_mode  # noqa: E402 (needs sys.path above)
+
 IN_PATH = REPO_ROOT / "data" / "eval" / "dallas_food_queries.csv"
-OUT_PATH = REPO_ROOT / "data" / "eval" / "dallas_food_runs.jsonl"
+DEFAULT_OUT_PATH = REPO_ROOT / "data" / "eval" / "dallas_food_runs.jsonl"
 
 SYSTEM_PROMPT_NAME = "restaurant_agent"
 
@@ -71,6 +83,18 @@ def _mask(secret: str) -> str:
     if not secret:
         return "MISSING"
     return f"set ({secret[:8]}…{secret[-4:]}, len {len(secret)})"
+
+
+def _active_model() -> str:
+    """The model id this process will actually send to, per src/utils/llm.py."""
+    backend = os.environ.get("LLM_BACKEND", "vllm").lower()
+    if role := os.environ.get("LLM_MODEL_AGENT"):
+        return role
+    if backend == "claude":
+        return os.environ.get("LLM_MODEL_CLAUDE", "claude-sonnet-4-6")
+    if backend == "lora":
+        return os.environ.get("LLM_MODEL_LORA", "")
+    return os.environ.get("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct-AWQ")
 
 
 def _load_rows(limit: int | None) -> list[dict[str, str]]:
@@ -112,12 +136,14 @@ async def _run_row(
     (prefs_dir / f"{user_id}.md").write_text(row["context_data"], encoding="utf-8")
 
     human_msg = _build_human_message(row["query"])
-    config = {
-        "configurable": {
-            "thread_id": row["session_id"],
-            "user_id": user_id,
-        }
-    }
+    # Same helper the FastAPI route uses, so a captured run and a live request
+    # produce byte-identical trace documents.
+    config = run_config(
+        thread_id=row["session_id"],
+        user_id=user_id,
+        query=row["query"],
+        eval_id=row["id"],
+    )
 
     record: dict = {
         "id": row["id"],
@@ -128,10 +154,10 @@ async def _run_row(
         "target_neighborhood": row.get("target_neighborhood", ""),
         "target_cuisine": row.get("target_cuisine", ""),
         "target_vibe": row.get("target_vibe", ""),
+        "session_id": row["session_id"],
         "backend": os.environ.get("LLM_BACKEND", "vllm"),
-        "model": os.environ.get("LLM_MODEL_AGENT")
-        or os.environ.get("LLM_MODEL_CLAUDE")
-        or os.environ.get("LLM_MODEL", ""),
+        "mode": trace_mode(),
+        "model": _active_model(),
     }
 
     async with sem:
@@ -189,11 +215,13 @@ async def _main_async(args: argparse.Namespace) -> int:
     loaded = _load_dotenv(REPO_ROOT / ".env")
     if loaded:
         print(f".env: loaded {', '.join(sorted(loaded))}")
-    os.environ.setdefault("LLM_BACKEND", "claude")
-    print(f"ANTHROPIC_API_KEY: {_mask(os.environ.get('ANTHROPIC_API_KEY', ''))}")
+    backend = os.environ.setdefault("LLM_BACKEND", "claude").lower()
+    out_path = Path(args.out) if args.out else DEFAULT_OUT_PATH
+    if backend == "claude":
+        print(f"ANTHROPIC_API_KEY: {_mask(os.environ.get('ANTHROPIC_API_KEY', ''))}")
     print(
-        f"backend={os.environ['LLM_BACKEND']}  "
-        f"model={os.environ.get('LLM_MODEL_AGENT') or os.environ.get('LLM_MODEL_CLAUDE') or '(default)'}"
+        f"backend={backend}  mode={trace_mode()}  model={_active_model() or '(unset)'}\n"
+        f"out={out_path}  trace_dir={os.environ.get('AF_TRACE_DIR') or '(off)'}"
     )
 
     from src.agents.geo_search.agent import build_restaurant_agent
@@ -208,8 +236,8 @@ async def _main_async(args: argparse.Namespace) -> int:
 
     rows = _load_rows(args.limit)
     done: set[str] = set()
-    if args.resume and OUT_PATH.exists():
-        with OUT_PATH.open(encoding="utf-8") as fh:
+    if args.resume and out_path.exists():
+        with out_path.open(encoding="utf-8") as fh:
             for line in fh:
                 line = line.strip()
                 if line:
@@ -221,8 +249,15 @@ async def _main_async(args: argparse.Namespace) -> int:
         print("nothing to run")
         return 0
 
-    if os.environ["LLM_BACKEND"] == "claude" and not os.environ.get("ANTHROPIC_API_KEY"):
+    if backend == "claude" and not os.environ.get("ANTHROPIC_API_KEY"):
         print("ERROR: LLM_BACKEND=claude but ANTHROPIC_API_KEY is not set", file=sys.stderr)
+        return 2
+    if backend == "lora" and not os.environ.get("LLM_MODEL_LORA"):
+        print(
+            "ERROR: LLM_BACKEND=lora but LLM_MODEL_LORA is not set (the adapter name "
+            "served by vLLM, e.g. af-lora)",
+            file=sys.stderr,
+        )
         return 2
 
     nominatim = make_nominatim_client()
@@ -262,13 +297,13 @@ async def _main_async(args: argparse.Namespace) -> int:
     )
 
     sem = asyncio.Semaphore(args.concurrency)
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     write_lock = asyncio.Lock()
     counter = {"ok": 0, "err": 0}
     total = len(rows)
 
-    mode = "a" if (args.resume and OUT_PATH.exists()) else "w"
-    with OUT_PATH.open(mode, encoding="utf-8") as out_fh:
+    write_mode = "a" if (args.resume and out_path.exists()) else "w"
+    with out_path.open(write_mode, encoding="utf-8") as out_fh:
 
         async def _worker(row: dict[str, str]) -> None:
             rec = await _run_row(
@@ -293,13 +328,21 @@ async def _main_async(args: argparse.Namespace) -> int:
             await nominatim.aclose()
             await overpass.aclose()
 
-    print(f"\ndone: {counter['ok']} ok, {counter['err']} errors -> {OUT_PATH}")
+    print(f"\ndone: {counter['ok']} ok, {counter['err']} errors -> {out_path}")
     return 1 if counter["err"] and not counter["ok"] else 0
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=None, help="run only the first N rows")
+    parser.add_argument(
+        "--out",
+        default=None,
+        help=(
+            "output jsonl (default data/eval/dallas_food_runs.jsonl). Keep non-Claude "
+            "captures out of data/eval/*_runs.jsonl — prepare_lora_data.py globs that."
+        ),
+    )
     parser.add_argument(
         "--concurrency", type=int, default=4, help="max in-flight agent runs (default 4)"
     )

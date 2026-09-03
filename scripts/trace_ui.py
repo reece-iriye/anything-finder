@@ -30,6 +30,7 @@ TRACE_DIR = Path(os.environ.get("AF_TRACE_DIR", "telemetry")).resolve()
 API_BASE = os.environ.get("AF_API_BASE", "http://localhost:9022").rstrip("/")
 DEFAULT_USER_ID = os.environ.get("AF_USER_ID", "00000000-0000-0000-0000-000000000001")
 _INDEX = Path(__file__).with_name("trace_ui.html")
+_ASSET_DIR = Path(__file__).parent
 
 app = FastAPI(title="Anything Finder — Telemetry", docs_url=None, redoc_url=None)
 
@@ -74,9 +75,24 @@ def _summaries(mode: str) -> list[dict[str, Any]]:
     return sorted(out, key=lambda d: d.get("started_at") or "", reverse=True)
 
 
+def inline_assets(html: str, asset_dir: Path = _ASSET_DIR) -> str:
+    """Replace ``/*@include <file>*/`` markers with that file's contents.
+
+    The console and the generated comparison report share ``ui_common.css`` /
+    ``ui_common.js``; both inline them rather than linking, so the report stays
+    a single file that opens from disk. An unknown filename is left in place —
+    a visible marker beats a silently half-rendered page.
+    """
+    for name in ("ui_common.css", "ui_common.js"):
+        marker = f"/*@include {name}*/"
+        if marker in html:
+            html = html.replace(marker, (asset_dir / name).read_text(encoding="utf-8"))
+    return html
+
+
 @app.get("/", response_class=HTMLResponse)
 def index() -> str:
-    return _INDEX.read_text(encoding="utf-8")
+    return inline_assets(_INDEX.read_text(encoding="utf-8"))
 
 
 @app.get("/api/config")

@@ -42,6 +42,67 @@ def test_get_tracer_singleton(tmp_path, monkeypatch):
     assert tele.get_tracer() is tele.get_tracer()
 
 
+# ── run_config ─────────────────────────────────────────────────────────────
+
+
+def test_run_config_without_trace_dir_is_plain():
+    cfg = tele.run_config(thread_id="t-1", user_id="u-1", query="sushi")
+    assert cfg == {"configurable": {"thread_id": "t-1", "user_id": "u-1"}}
+    assert "callbacks" not in cfg and "metadata" not in cfg
+
+
+def test_run_config_attaches_tracer_and_metadata(tmp_path, monkeypatch):
+    monkeypatch.setenv("AF_TRACE_DIR", str(tmp_path))
+    cfg = tele.run_config(
+        thread_id="t-1",
+        user_id="u-1",
+        query="sushi",
+        request={"query": "sushi", "radius_m": 800},
+        eval_id="row-7",
+    )
+    assert cfg["configurable"] == {"thread_id": "t-1", "user_id": "u-1"}
+    assert cfg["callbacks"] == [tele.get_tracer()]
+    assert cfg["metadata"] == {
+        "thread_id": "t-1",
+        "user_id": "u-1",
+        "af_query": "sushi",
+        "af_request": {"query": "sushi", "radius_m": 800},
+        "af_eval_id": "row-7",
+    }
+
+
+def test_run_config_omits_absent_optionals(tmp_path, monkeypatch):
+    monkeypatch.setenv("AF_TRACE_DIR", str(tmp_path))
+    md = tele.run_config(thread_id="t", user_id="u", query="q")["metadata"]
+    assert "af_request" not in md and "af_eval_id" not in md
+
+
+def test_eval_id_lands_in_trace(tmp_path, monkeypatch):
+    """The eval row id is the join key between a trace and its query."""
+    monkeypatch.setenv("AF_TRACE_DIR", str(tmp_path))
+    tracer = tele.get_tracer()
+    root = uuid4()
+    cfg = tele.run_config(thread_id="sess-9", user_id="u-1", query="tacos", eval_id="row-7")
+    tracer.on_chain_start({}, {}, run_id=root, parent_run_id=None, metadata=cfg["metadata"])
+    tracer.on_chain_end({}, run_id=root)
+
+    doc = json.loads(next((tmp_path / "raw-open-source").glob("*.json")).read_text())
+    assert doc["eval_id"] == "row-7"
+    assert doc["session_id"] == "sess-9"
+    assert doc["query"] == "tacos"
+
+
+def test_eval_id_backfilled_when_first_span_lacked_it(tmp_path, monkeypatch):
+    """A span can open the trace before the metadata-carrying chain start."""
+    monkeypatch.setenv("AF_TRACE_DIR", str(tmp_path))
+    tracer = tele.JsonFileTracer(tmp_path)
+    root, tool = uuid4(), uuid4()
+    tracer.on_tool_start({"name": "t"}, "x", run_id=tool, parent_run_id=root, metadata={})
+    tracer.on_tool_end("y", run_id=tool)
+    tracer._ensure_trace(root, {"af_eval_id": "row-3", "af_query": "pho"})
+    assert tracer._traces[root]["eval_id"] == "row-3"
+
+
 # ── end-to-end span capture ────────────────────────────────────────────────
 
 

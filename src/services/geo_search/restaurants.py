@@ -5,7 +5,7 @@ from langchain_core.messages import AIMessage
 from langgraph.graph.state import CompiledStateGraph
 
 from src.utils.nominatim import Coordinates
-from src.utils.telemetry import get_tracer
+from src.utils.telemetry import run_config
 
 
 class RestaurantSearch:
@@ -70,28 +70,22 @@ class RestaurantSearch:
         human_msg = "\n".join(parts)
 
         thread_id = self.session_id or str(self.user_id)
-        config = {
-            "configurable": {"thread_id": thread_id, "user_id": str(self.user_id)}
-        }
-        tracer = get_tracer()
-        if tracer is not None:
-            config["callbacks"] = [tracer]
-            config["metadata"] = {
-                "thread_id": thread_id,
-                "user_id": str(self.user_id),
-                "af_query": self.raw_query,
-                "af_request": {
-                    "query": self.raw_query,
-                    "session_id": self.session_id,
-                    "location": (
-                        {"lat": self.location.lat, "lon": self.location.lon}
-                        if self.location
-                        else None
-                    ),
-                    "radius_m": self.radius_m,
-                    "include_casual": self.include_casual,
-                },
-            }
+        config = run_config(
+            thread_id=thread_id,
+            user_id=str(self.user_id),
+            query=self.raw_query,
+            request={
+                "query": self.raw_query,
+                "session_id": self.session_id,
+                "location": (
+                    {"lat": self.location.lat, "lon": self.location.lon}
+                    if self.location
+                    else None
+                ),
+                "radius_m": self.radius_m,
+                "include_casual": self.include_casual,
+            },
+        )
         try:
             result = await self.restaurant_agent.ainvoke(
                 {"messages": [("human", human_msg)]},
