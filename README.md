@@ -219,118 +219,302 @@ overrides (`LLM_MODEL_AGENT`, `LLM_TEMPERATURE_AGENT`, …).
 
 ---
 
-## The experiment: Claude vs Qwen vs Qwen + LoRA
+## Fine-tuning walkthrough: Claude vs Qwen vs Qwen + LoRA
 
-The whole point of capturing traces is to answer one question: **how much of
-Claude's behaviour can a small open model learn from Claude's own
-trajectories?** The loop below produces the data, the adapter, and the report
-that answers it.
+This section is written for someone who has never fine-tuned a model before.
+The question it answers: **how much of Claude's tool-calling behaviour can a
+small open model learn from Claude's own trajectories, via LoRA?** Every
+command below was run start-to-finish to validate this walkthrough; the
+[Troubleshooting](#troubleshooting) subsection at the end documents every real
+failure hit along the way and why the fix is what it is — read it before
+filing an issue.
 
-```bash
-make up                       # 1. geo stack (Nominatim + Overpass), waits for healthy
-make data                     # 2. eval-queries -> eval-run-sonnet -> lora-data
-make lora-train-remote BREV_HOST=my-box HF_REPO=me/anything-finder-qwen25-7b-lora
-make lora-logs BREV_HOST=my-box                          # 3. watch it train
+**The shape of the experiment:** capture ~400 real agent runs where Claude
+solved the restaurant-search task (tool calls, tool results, final answer);
+turn those into a supervised fine-tuning (SFT) set; LoRA-train a small
+open-weight model (Qwen2.5-7B) on it; then replay the *same* held-out queries
+through three backends — Claude, the untouched Qwen, and Qwen+LoRA — and
+render a report that shows whether the small model actually learned the
+teacher's behaviour.
 
-make vllm-remote BREV_HOST=my-box LORA_DIR=data/lora/runs/qwen25-7b-restaurant-react-lora
-ssh -N -L 8000:localhost:8000 my-box &                   # 4. serve base + adapter
+### Prerequisites
 
-make compare-run COMPARE_LIMIT=25                        # 5. same 25 queries x 3 backends
-make traces-freeze                                       # 6. bundle traces for git
-make compare                                             # 7. -> data/compare/report.html
-```
+| What | Why | Where to get it |
+| --- | --- | --- |
+| An Anthropic API key | Captures the teacher trajectories. | `ANTHROPIC_API_KEY` in `.env` |
+| A CUDA GPU box, ≥16 GB VRAM | Training needs CUDA; a Mac (arm64) or CPU-only box cannot run it. This repo trains on a rented [brev.dev](https://brev.dev) box, but any SSH-reachable CUDA machine works the same way. | `brev ls` if using brev.dev, or your own box's SSH details |
+| A Hugging Face account + write token | Publishes the finished adapter. Optional — training works without it, you just won't get a shareable repo. | `HF_TOKEN` in `.env`, from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) |
+| Docker or Colima, ~8 GB RAM headroom | Runs the local geo stack (Nominatim + Overpass) the agent needs for every capture. | Already on most dev machines |
 
-### 1–2. Data
-
-`make data` chains three steps: `gen_eval_queries.py` writes 200 deterministic
-Dallas food queries with ground-truth `target_neighborhood` / `target_cuisine` /
-`target_vibe` labels; `run_eval_queries.py` runs each one through the *real*
-agent with Claude driving; `prepare_lora_data.py` turns the captured transcripts
-into an SFT set. The current capture is **406 runs, 370 usable** (36 carry
-geocoding errors) → `data/lora/train.jsonl` (333) + `val.jsonl` (37).
-
-Only the `transcript` field is trusted for training — the flat
-`messages`/`prompt`/`completion` fields collapse the whole trajectory into a
-single assistant turn. See `src/training/dataset.py`.
-
-### 3. Training
-
-Torch-free pipeline logic lives in `src/training/` (hermetically tested under
-`tests/unit/training/`); `scripts/` holds the thin CLIs. The training stack is a
-separate dependency group, kept out of the container.
+**GPU driver check — do this before anything else.** The exact CUDA version
+your GPU box's driver supports determines which `torch` build will actually
+run on it, and getting this wrong is the single most common way this whole
+pipeline breaks. SSH in and check:
 
 ```bash
-make lora-smoke               # no GPU: renders one masked example — system/user/tool
-                              # spans masked with ·, every assistant turn trained
-make lora-train-remote BREV_HOST=my-box     # rsync + brev_setup.sh + nohup, returns at once
-make lora-logs   BREV_HOST=my-box           # tail the remote log
-make lora-fetch  BREV_HOST=my-box           # pull the adapter into data/lora/runs/
+ssh <your-gpu-box> nvidia-smi
 ```
 
-`lora-train-remote` exists because a Mac has no CUDA. It syncs the repo (minus
-the OSM blobs and the venv), runs `scripts/brev_setup.sh` on first use, then
-launches `make lora-train` under `nohup` so the run survives the SSH session.
-To train directly on the box instead: `make lora-train` there.
+Look at the top-right of the header line: `CUDA Version: 12.2` (for example).
+That is the **maximum** CUDA *runtime* the driver supports — not the CUDA
+toolkit installed, and unrelated to what `torch` you happen to `pip install`.
+`pyproject.toml`'s `training` dependency group already pins `torch` to a
+CUDA-12.1 build for exactly this reason (see the comment right above it) —
+if your box reports `CUDA Version: 12.2` or lower, you need nothing further,
+the pin already fits. If it reports `12.4` or higher, you *can* drop to the
+newer default PyPI wheels for a modest speed bump, but the pinned build works
+regardless — a lower-CUDA wheel always runs on a newer driver, never the other
+way around, so there is no reason to change anything unless you want the
+extra performance.
 
-**Configs.** `configs/lora/qwen2_5-7b-qlora.yaml` is the default: `r=16` QLoRA
-on `Qwen/Qwen2.5-7B-Instruct`, the same family as the raw baseline, so the
-report's "base" and "+ LoRA" columns differ only by the adapter — and one vLLM
-process can serve both at once. `configs/lora/qwen3_8-27b-qlora.yaml` is the
-bigger run (`make lora-train LORA_CONFIG=…`); it needs ≥ 48 GB VRAM, trains on
-the BF16 repo because FP8 block-quantized weights cannot be back-propagated
-through, and keeps the vision tower frozen via `lora.exclude_modules`.
-
-### Pushing the adapter to Hugging Face
-
-Set `HF_REPO` on the training command and the finished adapter is pushed
-automatically, with a model card generated from the resolved config
-(`src/training/model_card.py` — base model, data provenance, hyperparameters,
-the assistant-only-masking and `enable_thinking: false` caveats, and the vLLM
-serve command). To publish a run you already have:
+### Step 0 — clone, install, configure
 
 ```bash
-make lora-push HF_REPO=<user>/anything-finder-qwen25-7b-lora
-uv run scripts/push_lora.py --repo <user>/<repo> --dry-run   # render the card, upload nothing
+git clone <this-repo> && cd anything-finder
+make install                   # uv sync — creates .venv, installs runtime deps
+cp .env.example .env
 ```
 
-`HF_TOKEN` comes from the environment or `.env`.
+Edit `.env` and fill in at minimum:
 
-### 4–5. Capture
+```bash
+ANTHROPIC_API_KEY=sk-ant-...
+HF_TOKEN=hf_...
+HF_REPO=<you>/restaurant-finder-qwen25-7b-lora
+BREV_HOST=<your-gpu-box-ssh-alias>
+BREV_DIR=anything-finder        # remote checkout path — created for you, no need to pre-create
+LORA_CONFIG=configs/lora/qwen2_5-7b-qlora.yaml
+```
 
-`make compare-run` replays the **same** `COMPARE_LIMIT` eval rows through each
-backend with `AF_TRACE_DIR` set, so every run leaves a full trace:
+**Every `make` target that needs `BREV_HOST`/`HF_REPO`/`LORA_CONFIG` reads
+them as plain shell variables, not from `.env` directly** — so after editing
+`.env`, export it into your current shell before running anything:
 
-| Target | `LLM_BACKEND` | trace mode | runs → |
+```bash
+set -a; source .env; set +a
+```
+
+Do this once per new terminal tab/session — it does not persist automatically.
+
+### Step 1 — bring up the local geo stack
+
+The agent needs Nominatim (geocoding) and Overpass (POI search) reachable to
+run at all, even during data capture.
+
+```bash
+make up
+```
+
+First boot imports a Dallas OpenStreetMap extract into both services and can
+take **up to 10 minutes** — the target polls until both report healthy and
+prints `geo stack ready.` before returning. Subsequent runs are near-instant
+(the data persists in a local volume). If it ever reports "still not healthy"
+after the full wait, see [Troubleshooting](#troubleshooting).
+
+### Step 2 — build the training set from Claude's own trajectories
+
+```bash
+make data
+```
+
+This chains three steps and should print something close to:
+
+```
+wrote 333 -> data/lora/train.jsonl
+wrote  37 -> data/lora/val.jsonl
+tool schemas (4): read_food_preferences, get_current_location, geocode_location, search_restaurants
+```
+
+What happened, in order:
+
+1. `gen_eval_queries.py` writes 200 deterministic Dallas food queries with
+   ground-truth `target_neighborhood` / `target_cuisine` / `target_vibe`
+   labels to `data/eval/dallas_food_queries.csv`.
+2. `run_eval_queries.py` runs each one through the **real agent**, with Claude
+   as the LLM, against your local Nominatim/Overpass. This calls the
+   Anthropic API ~200 times — expect it to take a while and to cost a few
+   dollars. It writes `data/eval/dallas_food_runs.jsonl`, one row per query,
+   including the full tool-call transcript.
+3. `prepare_lora_data.py` turns those transcripts into a chat-format SFT
+   set — `data/lora/train.jsonl` / `val.jsonl` — dropping rows with an error
+   (a query that failed to geocode, etc.). Only the `transcript` field is
+   trusted; the flat `messages`/`prompt`/`completion` fields on each row
+   collapse a whole multi-turn trajectory into a single assistant turn and
+   are not usable for training. See `src/training/dataset.py`.
+
+Already have a captured dataset (e.g. from git) and just want the SFT files?
+Skip straight to `make lora-data`, step 3 alone.
+
+### Step 3 — sanity-check the data pipeline with no GPU
+
+Before spending any GPU time, confirm the tokenizer, chat template, and
+assistant-only masking are all doing the right thing:
+
+```bash
+make lora-smoke
+```
+
+This downloads a tiny model (`Qwen/Qwen3-0.6B`, a few hundred MB) and prints
+one fully-rendered training example with masked spans marked `·` — system
+prompt, user turns, and tool *results* should all be masked (the model isn't
+trained to predict those), while every assistant turn (including tool-call
+JSON) should be unmasked. If a whole conversation shows as unmasked or a whole
+conversation shows as masked, something is wrong with the data — stop here,
+don't proceed to a real training run.
+
+### Step 4 — train the LoRA adapter on the GPU box
+
+```bash
+make lora-train-remote
+```
+
+(`BREV_HOST`, `HF_REPO`, and `LORA_CONFIG` all come from the `.env` you sourced
+in Step 0 — no need to repeat them on the command line unless you want to
+override one for this run, e.g. `make lora-train-remote LORA_CONFIG=configs/lora/qwen3_8-27b-qlora.yaml`.)
+
+This does the following, and returns almost immediately (training continues
+in the background on the box, detached from your SSH session so it survives a
+dropped connection or a closed laptop lid):
+
+1. `rsync`s the repo to the box (excluding the OSM blobs, `.venv`, and scratch
+   telemetry — see `scripts/brev_train.sh`).
+2. Runs `scripts/brev_setup.sh` on first use: checks for an NVIDIA GPU, then
+   `uv sync --group training` — this is the step that pulls in the
+   CUDA-12.1-pinned `torch`/`vllm`/`transformers` stack from Step 0's driver
+   check.
+3. Launches `make lora-train` under `nohup` on the box.
+
+Watch it train:
+
+```bash
+make lora-logs                 # tail the raw training log — loss every 5 steps
+```
+
+```bash
+make lora-tensorboard          # graphical loss dashboard, updates live
+ssh -N -L 6006:localhost:6006 $BREV_HOST &
+open http://localhost:6006
+```
+
+`make lora-tensorboard` starts TensorBoard on the box pointed at the run's own
+log directory; the tunnel forwards it to your machine. It polls its event
+files every ~30s, so it's safe to open at any point after training starts —
+`make lora-tensorboard-stop` when you're done with it (it doesn't interfere
+with training either way). What "going well" looks like: `train/loss` drops
+steadily over the first epoch and flattens by the last one; `eval/loss`
+should track `train/loss` rather than climb away from it (that would mean
+overfitting the small validation set).
+
+For the default config (`configs/lora/qwen2_5-7b-qlora.yaml`, 333 training
+rows, 3 epochs), expect **~10–20 minutes** of actual training compute on a
+16–24 GB GPU (A10G/L4-class), plus a one-time ~5–10 minute setup cost on a
+fresh box (dependency install + base model download). On the training run
+finishing you should see a line like:
+
+```
+{'train_loss': 0.53..., 'epoch': 3.0}
+pushed -> <you>/restaurant-finder-qwen25-7b-lora
+```
+
+That last line only appears because `HF_REPO` was set — see the next section.
+
+### Step 5 — the adapter is now on Hugging Face
+
+Setting `HF_REPO` on the training command pushes the finished adapter
+automatically, along with a model card generated from the resolved config
+(`src/training/model_card.py`: base model, data provenance, hyperparameters,
+the assistant-only-masking and `enable_thinking: false` caveats, and the exact
+vLLM serve command to reproduce it). Already have a finished run and just want
+to publish it (no GPU, no retraining)?
+
+```bash
+make lora-push HF_REPO=<you>/<repo-name>
+uv run scripts/push_lora.py --repo <you>/<repo-name> --dry-run   # render the card, upload nothing
+```
+
+Want the adapter files locally too (e.g. to commit `data/lora/runs/` or
+inspect it) — this is optional, the Hub copy is already the source of truth:
+
+```bash
+make lora-fetch
+```
+
+### Step 6 — serve the base model and the adapter together
+
+```bash
+make vllm-remote LORA_DIR=data/lora/runs/qwen25-7b-restaurant-react-lora
+```
+
+One vLLM process serves **both** the base model and the LoRA adapter
+simultaneously (`--enable-lora --lora-modules af-lora=...`) — you don't need
+to relaunch it to switch between "before" and "after" comparisons. Open a
+tunnel and verify:
+
+```bash
+ssh -N -L 8000:localhost:8000 $BREV_HOST &
+curl -H "Authorization: Bearer EMPTY" http://localhost:8000/v1/models
+```
+
+You should see **two** entries: the base model id and `af-lora`. (The
+`Authorization: Bearer EMPTY` header is required even though the API key
+*value* is the literal string `EMPTY` — vLLM still checks for the header.)
+`make vllm-stop` when you're done with it — training and serving can't share
+the GPU at the same time, so stop one before starting the other.
+
+### Step 7 — replay the same queries through all three backends
+
+```bash
+make compare-run COMPARE_LIMIT=25
+```
+
+This runs three targets in sequence, each replaying the **same** first
+`COMPARE_LIMIT` rows of the eval CSV (deterministic file order, so `--limit N`
+is identical across all three — that's what makes it a comparison and not
+three unrelated samples) with `AF_TRACE_DIR` set, so every run leaves a full
+telemetry trace:
+
+| Target | `LLM_BACKEND` | trace mode | writes |
 | --- | --- | --- | --- |
 | `compare-run-sonnet` | `claude` | `claude/` | `data/eval/runs/claude.jsonl` |
 | `compare-run-qwen` | `vllm` | `raw-open-source/` | `data/eval/runs/raw-open-source.jsonl` |
 | `compare-run-lora` | `lora` | `finetuned-open-source/` | `data/eval/runs/finetuned-open-source.jsonl` |
 
-The eval CSV is deterministic and read in file order, so `--limit N` is the same
-N queries every time — that identity is what makes it a comparison. Student
+(Run one at a time with `make compare-run-sonnet` / `compare-run-qwen` /
+`compare-run-lora` if you want to inspect each independently.) Student
 captures deliberately avoid `data/eval/*_runs.jsonl`, which
-`prepare_lora_data.py` globs for the teacher's SFT set.
+`prepare_lora_data.py` globs for the teacher's SFT set — mixing them would let
+the student's own (possibly wrong) output leak into future training data.
 
-### 6–7. The report — `make compare`
+### Step 8 — build the report
 
-One self-contained `data/compare/report.html`: no server, no CDN, no fetch. It
-opens from disk and can be attached to a PR.
+```bash
+make traces-freeze             # telemetry/ -> committed data/traces/<mode>.jsonl.gz
+make compare                   # -> data/compare/report.html, opens automatically
+```
+
+One self-contained HTML file: no server, no CDN, no network fetch — it opens
+from disk and can be attached to a PR or a Slack message as-is.
 
 - **Leaderboard** — per mode: runs, error rate, LLM calls / run, tools / run,
   tokens / run, p50 latency, estimated cost, plus two behavioural rates —
-  *grounded* (resolved a location before searching) and *named area* (the answer
-  mentions the query's target neighbourhood). Best and worst per column are
-  tinted. Below it, the distribution of tool paths each mode actually took.
+  *grounded* (resolved a location before searching) and *named area* (the
+  answer mentions the query's target neighbourhood). Best/worst per column
+  tinted; below it, the distribution of tool paths each mode actually took.
 - **Side by side** — pick a query, get one column per mode: the final
-  recommendation, the tool chain with divergent steps highlighted, the token /
-  latency / cost strip, and the pass/fail flags.
-- **Drill-in** — every column expands into the same numbered-step conversation
-  view the live console uses (`scripts/ui_common.js` is shared by both), so a
-  disagreement can be traced to the exact tool call that caused it.
+  recommendation, the tool chain with divergent steps highlighted, a token /
+  latency / cost strip, pass/fail flags, and two dropdowns per result — **full
+  trace** (the numbered-step conversation view) and **raw JSON** (the exact
+  object every stat on the card was computed from).
+- By default the report only shows queries **every mode actually attempted**
+  (`--common-run-only`, on by default) — a query only claude happened to run
+  never shows as a blank column for the others. Pass `--no-common-run-only` to
+  see every row a single mode touched, `--common-success-only` to additionally
+  hide rows where any mode errored, or `--max-queries N` to cap the row count;
+  all three go through `make compare ARGS="..."`.
 
 `make traces-freeze` packs the scratch `telemetry/` tree into committed
-`data/traces/<mode>.jsonl.gz` bundles (merging, not clobbering). That is what
-makes the report reproducible from a fresh clone with no GPU and no API key —
+`data/traces/<mode>.jsonl.gz` bundles (merging, not clobbering) — that's what
+makes the report reproducible from a fresh clone with no GPU and no API key;
 `make compare` reads either the live tree or the frozen bundles.
 
 ### What is committed
@@ -341,13 +525,49 @@ makes the report reproducible from a fresh clone with no GPU and no API key —
 47–114 MB OSM extracts, the scratch `telemetry/` tree, and trained adapters
 (`data/lora/runs/`, which live on the Hub) are not.
 
-### Serving
+### Serving the adapter in the live app
 
-Uncomment the `vllm` service in `compose.claude.yaml`, or use
-`make vllm-remote`. Then `LLM_BACKEND=lora LLM_MODEL_LORA=af-lora
-LLM_BASE_URL=…`; `GET /meta` reports
+Uncomment the `vllm` service in `compose.claude.yaml`, or point
+`LLM_BASE_URL` at the box from `make vllm-remote`. Then
+`LLM_BACKEND=lora LLM_MODEL_LORA=af-lora LLM_BASE_URL=…`; `GET /meta` reports
 `{"backend":"lora","mode":"finetuned-open-source"}` and `make trace` files the
 run under `finetuned-open-source/`.
+
+### Which LoRA config to use
+
+| Config | Base model | GPU need | Notes |
+| --- | --- | --- | --- |
+| `configs/lora/qwen2_5-7b-qlora.yaml` *(default)* | `Qwen/Qwen2.5-7B-Instruct`, 4-bit QLoRA | 16 GB+ | Same model family as the raw baseline (`Qwen/Qwen2.5-7B-Instruct-AWQ`), so the report's "base" and "+ LoRA" columns differ only by the adapter. |
+| `configs/lora/qwen2_5-7b-lora-a100.yaml` | Same base, full bf16, no quantization | 24–40 GB | 2–4x faster wall-clock on an A100 — quantization overhead removed, bigger batches. Trains against the *true* bf16 weights the adapter will actually be served on top of, not a quantized approximation. See the comments in the file for the reasoning. |
+| `configs/lora/qwen3_8-27b-qlora.yaml` | `Qwen/Qwen3.8-27B`, 4-bit QLoRA | 48 GB+ | The bigger run. Trains on the BF16 repo (FP8 block-quantized weights can't be back-propagated through) and keeps the vision tower frozen via `lora.exclude_modules`. |
+| `configs/lora/smoke.yaml` | `Qwen/Qwen3-0.6B` | none (`--dry-run`) or minutes on CPU | Pipeline validation only — see Step 3. |
+
+Select one with `LORA_CONFIG=configs/lora/<file>.yaml` in `.env` (re-source
+your shell after changing it) — every `lora-*` target derives its run name
+from whichever config is currently set, so keep it consistent across a whole
+training → serving → capture cycle.
+
+### Troubleshooting
+
+Every one of these was hit and fixed while building this pipeline; the fixes
+are already baked into the repo, so following the steps above in order should
+not reproduce them. This table exists so that if something *does* go wrong —
+a different GPU box, a customized command, an upstream version bump — you
+recognize the failure immediately instead of debugging from scratch.
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `make up`'s health check spins for the full wait and then fails, even though the stack looks fine in `docker compose ps` | (Historical, already fixed in the Makefile.) The health-check `curl` hit Overpass's `data=[out:json]` URL without `-g`; curl's own URL-globbing treats `[...]` as a range expression and fails the request before it's even sent, every single poll. | Already fixed (`curl -sfg …`). If you see this again, add `-g` to any hand-rolled curl call against an Overpass-shaped URL. |
+| `AssertionError: CUDA not visible to torch` right after `uv sync --group training` on the GPU box | `torch`'s default (unpinned) PyPI wheel now bundles CUDA 13 runtime libs, which a driver reporting `CUDA Version: 12.2` (or lower) in `nvidia-smi` cannot run — CUDA minor-version compatibility does not extend across major versions. | Already pinned in `pyproject.toml` (`torch`/`torchvision`/`torchaudio` all sourced from the `pytorch-cu121` index). If you changed that pin, revert it or match it to your box's actual driver (see the Prerequisites GPU check above). |
+| `vllm: command not found` / `ModuleNotFoundError: No module named 'vllm'` | `vllm` wasn't declared as a dependency at all. | Already added to the `training` group. |
+| `ModuleNotFoundError: Could not import module 'ProcessorMixin'` when `vllm serve` starts | An unpinned `transformers` resolves to its newest release, whose breaking changes an older `vllm` (pinned to match the CUDA-12.1 `torch` build) can't import against. | Already capped (`transformers>=4.45,<5`). |
+| `"auto" tool choice requires --enable-auto-tool-choice and --tool-call-parser to be set` (a 400 from vLLM on every single request) | The agent always sends `tool_choice="auto"`; vLLM refuses that unless launched with matching flags. | Already baked into `scripts/brev_serve.sh` (`--enable-auto-tool-choice --tool-call-parser hermes` — `hermes` because Qwen's chat template renders tool calls in the Hermes `<tool_call>` format). If you ever hand-roll a `vllm serve` command, include both flags. |
+| The fine-tuned model's answers contain literal `<tool_call>` text instead of a clean recommendation, sometimes with malformed JSON like `{"name": "...", "{}": "{}"}` | `src/training/dataset.py` used to pre-serialize tool-call `arguments` into a JSON **string** (`json.dumps(...)`) — correct for the OpenAI wire format, but Qwen's own chat template applies its own JSON serialization when rendering a `<tool_call>` block. Handing it an already-stringified value double-encodes it, so the actual training text the model learned from had `"arguments": "{}"` (a quoted string) instead of `"arguments": {}` (a raw object) — off-distribution from anything the base model was pretrained on, and the LoRA generalized that malformation at inference. | Already fixed: `arguments` is now passed as a raw object, matching what the template's own instructions specify (`<args-json-object>`, not a string). If you're extending `dataset.py`, remember this rule: **hand the chat template raw Python objects, let it serialize them — never pre-serialize a field the template will serialize again.** |
+| `AnthropicInvalidRequestError: Error code: 400 - ... 'temperature is deprecated for this model'` when capturing Claude data | Newer Claude models (Sonnet 5+) reject the `temperature` parameter outright. `src/utils/llm.py` already has logic to omit it when unset — but `.env`/`.env.example` used to set `LLM_TEMPERATURE` unconditionally, forcing it through regardless. | Already commented out in both files. Leave `LLM_TEMPERATURE` unset for the `claude` backend; the `vllm`/`lora` backends still get a sane 0.2 default even when it's unset. |
+| A remote `ssh`/`rsync` command hangs for 30–120 seconds then eventually succeeds, or fails outright, right after a previous SSH session touched the same box | A stale multiplexed connection (`ControlMaster`/`ControlPersist` in `~/.brev/ssh_config` or your own SSH config) — the socket file exists but its master process died, so new connections queue behind a dead handle before falling back. | `rm -f ~/.ssh/brev-control-*` (or wherever your `ControlPath` points), then retry — the next connection establishes a fresh master. Harmless to run any time. |
+| `make vllm-remote` / `make lora-train-remote` launches something that dies instantly with an empty log, no error visible | The launched process was still attached to the SSH session that started it; a connection blip (see above) killed it before it could fully detach, even with `nohup`. | `scripts/brev_serve.sh` / `brev_train.sh` already detach fully (`setsid ... < /dev/null & disown`). Re-run the command after resetting the SSH connection as above. |
+| Training and serving can't both fit on the GPU / one silently evicts the other | A single GPU can't hold vLLM's KV cache reservation *and* run training at the same time — vLLM defaults to reserving 90% of VRAM up front. | `make vllm-stop` before `make lora-train-remote`, and vice versa. Check `ssh $BREV_HOST nvidia-smi` to confirm `0 MiB` used before starting the other. |
+| `curl .../v1/models` (or any vLLM request) returns `{"error":"Unauthorized"}` even with `--api-key EMPTY` on the server | vLLM's `--api-key EMPTY` still means "check for a matching `Authorization` header," not "skip the check." | Send `-H "Authorization: Bearer EMPTY"` on every request — `run_eval_queries.py` already does this via `LLM_API_KEY`. |
 
 ---
 
@@ -442,13 +662,15 @@ scripts/
   push_lora.py                  publish a finished adapter + card to HF (make lora-push)
   brev_setup.sh                 one-command brev.dev GPU bootstrap
   brev_train.sh  brev_serve.sh  remote training / vLLM launch (make lora-train-remote, vllm-remote)
+  brev_tensorboard.sh           live loss dashboard on the GPU box (make lora-tensorboard)
   sync_pyproject.py             legacy pyproject sync helper
 data/
   eval/                         query set + captured runs per mode        (committed)
   lora/                         train.jsonl, val.jsonl, tool_schemas.json (committed)
   traces/                       frozen telemetry bundles                  (committed)
   compare/report.html           the generated comparison report           (committed)
-configs/lora/                   qwen3_8-27b-qlora.yaml (real run) + smoke.yaml
+configs/lora/                   qwen2_5-7b-qlora.yaml (default), qwen2_5-7b-lora-a100.yaml,
+                                qwen3_8-27b-qlora.yaml (bigger run), smoke.yaml (pipeline check)
 charts/anything-finder/         Helm chart
 compose.claude.yaml             full local stack
 containerfile                   app image
