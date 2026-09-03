@@ -138,6 +138,58 @@ def test_a_mode_missing_a_query_degrades_gracefully(workspace):
     assert set(q2["results"]) == {"claude", "finetuned-open-source"}
 
 
+# ── trimming for a smaller, focused report ─────────────────────────────────
+
+
+def test_common_run_only_drops_rows_a_mode_never_attempted(workspace):
+    data = _build(workspace)
+    trimmed = bcr.filter_common_success(data, common_run_only=True)
+    assert [q["id"] for q in trimmed["queries"]] == ["q1"]  # q2 never ran raw-open-source
+
+
+def test_common_run_only_keeps_an_errored_attempt(workspace):
+    """An error still counts as 'ran' — common_run_only shows it, doesn't drop it."""
+    data = _build(workspace)
+    data["queries"][0]["results"]["claude"]["error"] = "boom"
+    trimmed = bcr.filter_common_success(data, common_run_only=True)
+    assert [q["id"] for q in trimmed["queries"]] == ["q1"]
+    q1 = trimmed["queries"][0]
+    assert q1["results"]["claude"]["error"] == "boom"
+
+
+def test_common_success_only_drops_rows_any_mode_missed_or_errored(workspace):
+    data = _build(workspace)
+    trimmed = bcr.filter_common_success(data, common_success_only=True)
+    ids = [q["id"] for q in trimmed["queries"]]
+    assert ids == ["q1"]  # q2 is missing from raw-open-source
+
+
+def test_common_success_only_drops_rows_with_any_error(workspace):
+    data = _build(workspace)
+    data["queries"][0]["results"]["claude"]["error"] = "boom"
+    trimmed = bcr.filter_common_success(data, common_success_only=True)
+    assert trimmed["queries"] == []
+
+
+def test_max_queries_caps_row_count_in_eval_set_order(workspace):
+    data = _build(workspace)
+    trimmed = bcr.filter_common_success(data, max_queries=1)
+    assert [q["id"] for q in trimmed["queries"]] == ["q1"]
+
+
+def test_trimming_recomputes_aggregates_over_the_kept_rows_only(workspace):
+    data = _build(workspace)
+    trimmed = bcr.filter_common_success(data, common_success_only=True)
+    claude_agg = next(a for a in trimmed["aggregates"] if a["mode"] == "claude")
+    assert claude_agg["runs"] == 1  # not the untrimmed 2
+
+
+def test_no_flags_leaves_the_dataset_untouched(workspace):
+    data = _build(workspace)
+    same = bcr.filter_common_success(data)
+    assert [q["id"] for q in same["queries"]] == [q["id"] for q in data["queries"]]
+
+
 def test_trace_falls_back_to_session_id(tmp_path):
     """Traces captured before eval_id existed still join, via session_id."""
     doc = _trace("q1", "claude")

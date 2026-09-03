@@ -84,11 +84,22 @@ def _convert_ai_message(msg: dict[str, Any]) -> dict[str, Any]:
                     {
                         "id": block["id"],
                         "type": "function",
+                        # NOTE: arguments is a raw object here, NOT a JSON string.
+                        # That's off the OpenAI wire format (where function.arguments
+                        # is a string) but matches what Qwen's own chat template
+                        # expects: it applies `| tojson` itself when rendering a
+                        # <tool_call> block. Handing it an already-serialized string
+                        # gets double-encoded — the template quotes the string AGAIN,
+                        # producing '"arguments": "{}"' in the actual training text
+                        # instead of '"arguments": {}'. The base model was never
+                        # pretrained on that double-encoded form, so the LoRA learns
+                        # an off-distribution representation and degrades on it at
+                        # inference (e.g. emitting `"{}": "{}"` instead of a valid
+                        # tool call). Verified by rendering both forms through the
+                        # real tokenizer's apply_chat_template.
                         "function": {
                             "name": block["name"],
-                            "arguments": json.dumps(
-                                block.get("input", {}), ensure_ascii=False
-                            ),
+                            "arguments": block.get("input", {}),
                         },
                     }
                 )

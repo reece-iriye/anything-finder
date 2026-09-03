@@ -43,10 +43,10 @@ def test_parallel_tool_calls_and_results_masked(fake_tokenizer):
             "content": "",
             "tool_calls": [
                 {"id": "a", "type": "function",
-                 "function": {"name": "read_food_preferences", "arguments": "{}"}},
+                 "function": {"name": "read_food_preferences", "arguments": {}}},
                 {"id": "b", "type": "function",
                  "function": {"name": "geocode_location",
-                              "arguments": '{"place": "Deep Ellum"}'}},
+                              "arguments": {"place": "Deep Ellum"}}},
             ],
         },
         {"role": "tool", "tool_call_id": "a", "name": "read_food_preferences",
@@ -95,7 +95,7 @@ def test_real_qwen_tokenizer_masks_assistant_only():
          "tool_calls": [
              {"id": "a", "type": "function",
               "function": {"name": "geocode_location",
-                           "arguments": '{"place": "Deep Ellum"}'}}]},
+                           "arguments": {"place": "Deep Ellum"}}}]},
         {"role": "tool", "tool_call_id": "a", "name": "geocode_location",
          "content": '{"lat": 1, "lon": 2}'},
         {"role": "assistant", "content": "Ramen Hakata."},
