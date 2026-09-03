@@ -210,7 +210,55 @@ overrides (`LLM_MODEL_AGENT`, `LLM_TEMPERATURE_AGENT`, …).
 | --- | --- | --- |
 | `vllm` *(default)* | Self-hosted vLLM / any OpenAI-compatible server. | `LLM_BASE_URL`, `LLM_MODEL` (default a ~7B quantized Qwen for a 16 GB GPU), `LLM_API_KEY` |
 | `claude` | Anthropic API (`langchain-anthropic`). | `ANTHROPIC_API_KEY`, `LLM_MODEL_CLAUDE` (default `claude-sonnet-4-6`) |
-| `lora` | Same vLLM endpoint with a trained LoRA adapter. | `LLM_MODEL_LORA` (HF path of the adapter) |
+| `lora` | Same vLLM endpoint with a trained LoRA adapter. | `LLM_MODEL_LORA` (served adapter name, e.g. `af-lora`, or an HF repo path) |
+
+---
+
+## Fine-tuning on brev.dev
+
+Distil the captured Claude tool-calling trajectories
+(`data/eval/*_runs.jsonl`, produced by `make eval-run`) into a LoRA adapter for
+`Qwen/Qwen3.8-27B`, then serve it on the FP8 repo in vLLM.
+
+The torch-free pipeline logic lives in `src/training/` (hermetically tested under
+`tests/unit/training/`); `scripts/` holds the thin CLIs. The training stack is a
+separate dependency group, kept out of the container:
+
+```bash
+# 1. Build the SFT dataset (hermetic, no GPU):
+make lora-data                       # -> data/lora/{train,val}.jsonl + tool_schemas.json
+make lora-smoke                      # dry-run: inspect the masked example (system/user/
+                                     # tool spans masked; every assistant turn trained)
+
+# 2. On a GPU box (>= 48 GB VRAM for the 27B QLoRA run):
+git clone <repo> && cd anything-finder
+HF_TOKEN=hf_... bash scripts/brev_setup.sh     # nvidia-smi check, uv, uv sync --group training
+uv run scripts/train_lora.py --config configs/lora/smoke.yaml    # cheap GPU-path check first
+make lora-train                                                  # the real run
+#   overrides: make lora-train ARGS="--set train.learning_rate=5e-5"
+#   multi-GPU: accelerate launch scripts/train_lora.py --config configs/lora/qwen3_8-27b-qlora.yaml
+```
+
+Notes:
+
+- **Base-model constraint.** `Qwen/Qwen3.8-27B-FP8` cannot be LoRA-trained (no
+  backprop through FP8 block-quantized weights). Train on the BF16 repo with
+  4-bit QLoRA; serve the adapter on the FP8 repo. vLLM keeps adapters in BF16 and
+  supports this — there is a small train/serve distribution mismatch; serving
+  `Qwen/Qwen3.8-27B` (one-line `VLLM_MODEL` change) removes it at the cost of VRAM.
+- The 27B is multimodal; `configs/lora/*.yaml` `lora.exclude_modules` keeps the
+  vision tower frozen. `scripts/train_lora.py` logs the adapted module list after
+  `get_peft_model` so an exclude-pattern miss is visible immediately.
+- Only 70 of the 86 captured runs are usable (16 carry geocoding errors). To grow
+  the set: bring the compose geo stack up so Nominatim has the full Dallas import,
+  then `make eval-run-sonnet ARGS="--resume"` across all 200 rows
+  (`scripts/gen_eval_queries.py` takes `--rows` / `--seed`). `make lora-data`
+  takes a repeatable `--input` glob so new run files merge in.
+- **Serve:** uncomment the `vllm` service in `compose.claude.yaml`, then
+  `LLM_BACKEND=lora LLM_MODEL_LORA=af-lora LLM_BASE_URL=http://vllm:8000/v1`.
+  `GET /meta` reports `{"backend":"lora","mode":"finetuned-open-source"}`;
+  `make trace` files the run under `finetuned-open-source/` for a span-for-span
+  comparison against `claude/`.
 
 ---
 
@@ -286,11 +334,16 @@ src/
     prompts.py                  load_prompt — markdown prompt loader
     telemetry.py                JsonFileTracer — per-run trace capture
   schemas/geo_search/           request / response models
+  training/                     torch-free LoRA pipeline: config, dataset, tool_schemas, masking
 prompts/restaurant_agent.md     the agent's system prompt
 scripts/
   trace_ui.py  trace_ui.html    the telemetry console (make trace)
   osm_prepare.py                OSM file server used by compose
+  prepare_lora_data.py          transcripts -> data/lora/{train,val}.jsonl (make lora-data)
+  train_lora.py                 PEFT + TRL trainer, --dry-run (make lora-train / lora-smoke)
+  brev_setup.sh                 one-command brev.dev GPU bootstrap
   sync_pyproject.py             legacy pyproject sync helper
+configs/lora/                   qwen3_8-27b-qlora.yaml (real run) + smoke.yaml
 charts/anything-finder/         Helm chart
 compose.claude.yaml             full local stack
 containerfile                   app image

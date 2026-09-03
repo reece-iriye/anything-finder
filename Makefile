@@ -1,4 +1,6 @@
-.PHONY: add add-dev remove remove-dev update install dev trace eval-queries eval-run eval-run-sonnet osm-convert
+.PHONY: add add-dev remove remove-dev update install dev trace eval-queries eval-run eval-run-sonnet osm-convert lora-data lora-smoke lora-train
+
+LORA_CONFIG ?= configs/lora/qwen3_8-27b-qlora.yaml
 
 TRACE_PORT ?= 7861
 AF_TRACE_DIR ?= telemetry
@@ -82,6 +84,24 @@ eval-run-sonnet:
 	NOMINATIM_BASE_URL=$(EVAL_NOMINATIM_URL) \
 	OVERPASS_BASE_URL=$(EVAL_OVERPASS_URL) \
 	uv run scripts/run_eval_queries.py $(ARGS)
+
+# ─── LoRA fine-tuning ──────────────────────────────────────────────────────
+# Distil the captured Claude trajectories (data/eval/*_runs.jsonl) into a LoRA
+# adapter for Qwen3.8-27B. Install the stack with `uv sync --group training`
+# (kept out of the container). See the README "Fine-tuning on brev.dev" section.
+
+# jsonl transcripts -> data/lora/{train,val}.jsonl + tool_schemas.json (hermetic).
+lora-data:
+	uv run scripts/prepare_lora_data.py $(ARGS)
+
+# Data + masking sanity check: no GPU. Reads the printed masked example end to
+# end — system/user/tool spans must be masked, every assistant turn trained.
+lora-smoke:
+	uv run scripts/train_lora.py --config configs/lora/smoke.yaml --dry-run
+
+# Full run (needs a GPU box + `uv sync --group training`). Pass ARGS for --set.
+lora-train:
+	uv run scripts/train_lora.py --config $(LORA_CONFIG) $(ARGS)
 
 osm-convert:
 	@test -f data/Dallas.osm.gz || { echo "data/Dallas.osm.gz not found"; exit 1; }

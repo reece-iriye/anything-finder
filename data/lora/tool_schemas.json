@@ -1,0 +1,83 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "read_food_preferences",
+      "description": "Read the current user's food preferences from their profile.",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_current_location",
+      "description": "Get the user's home location as a coordinate fallback when no location is mentioned.",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "geocode_location",
+      "description": "Geocode a place name or phrase mentioned in the user's query to coordinates.",
+      "parameters": {
+        "properties": {
+          "place": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "place"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "search_restaurants",
+      "description": "Search for restaurants near (lat, lon) within radius_m meters.\n\nIncrease radius_m and call again to widen the search when too few results\nare returned.",
+      "parameters": {
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lon": {
+            "type": "number"
+          },
+          "radius_m": {
+            "type": "integer"
+          },
+          "cuisine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "include_casual": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "lat",
+          "lon",
+          "radius_m"
+        ],
+        "type": "object"
+      }
+    }
+  }
+]

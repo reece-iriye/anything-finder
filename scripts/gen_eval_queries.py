@@ -1,6 +1,6 @@
 """Generate a synthetic eval set of Dallas food-search queries.
 
-Produces ``data/eval/dallas_food_queries.csv`` with 200 rows. Each row pairs a
+Produces ``data/eval/dallas_food_queries.csv`` (``--rows`` rows, default 200). Each row pairs a
 natural-language restaurant query (the kind the geo-search restaurant agent
 consumes) with a self-contained ``context_data`` food-preferences profile — the
 same shape as ``data/preferences/<user_id>.md``.
@@ -26,37 +26,36 @@ N_ROWS = 200
 OUT_PATH = Path(__file__).resolve().parents[1] / "data" / "eval" / "dallas_food_queries.csv"
 
 # --- Dallas neighbourhoods / landmarks the search should geocode against --------
+# Curated down to the locations that the local Nominatim import actually resolves:
+# every entry here produced at least one successful run in
+# data/eval/dallas_food_runs.jsonl. Dropped for never geocoding against the
+# Dallas extract: "Little Forest Hills", "State-Thomas in Uptown",
+# "Sylvan Thirty in West Dallas", "Lower Greenville", "the Cedars",
+# "Victory Park", "the West End". Re-add + re-verify if the OSM extract grows.
 NEIGHBORHOODS = [
     "Bishop Arts District",
-    "Deep Ellum",
-    "Lower Greenville",
-    "Knox-Henderson",
-    "Uptown Dallas",
-    "Oak Cliff",
-    "Trinity Groves",
-    "the Design District",
-    "Lakewood",
-    "Downtown Dallas",
-    "the Harwood District",
-    "Victory Park",
-    "the Cedars",
-    "Exposition Park near Fair Park",
-    "Sylvan Thirty in West Dallas",
-    "Oak Lawn",
-    "Cedar Springs",
-    "Mockingbird Station",
+    "the Bishop Arts strip on 7th Street",
+    "Bryan Place",
     "Casa Linda",
-    "the Katy Trail",
-    "Klyde Warren Park",
-    "the West End",
+    "Cedar Springs",
+    "Deep Ellum",
+    "Downtown Dallas",
+    "Exposition Park near Fair Park",
     "Greenville Avenue",
     "Henderson Avenue",
-    "State-Thomas in Uptown",
-    "Bryan Place",
     "Junius Heights",
-    "Little Forest Hills",
-    "the Bishop Arts strip on 7th Street",
+    "Klyde Warren Park",
+    "Knox-Henderson",
+    "Lakewood",
+    "Mockingbird Station",
+    "Oak Cliff",
+    "Oak Lawn",
+    "Trinity Groves",
+    "Uptown Dallas",
     "the Dallas Farmers Market",
+    "the Design District",
+    "the Harwood District",
+    "the Katy Trail",
 ]
 
 # --- Cravings: (phrase, cuisine hint for the tool) ----------------------------
@@ -228,13 +227,21 @@ def build_query(rng: random.Random) -> tuple[str, str, str | None, str]:
 
 
 def main() -> None:
-    rng = random.Random(SEED)
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--rows", type=int, default=N_ROWS, help=f"rows to generate (default {N_ROWS})")
+    parser.add_argument("--seed", type=int, default=SEED, help=f"RNG seed (default {SEED})")
+    args = parser.parse_args()
+    n_rows = args.rows
+
+    rng = random.Random(args.seed)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     rows: list[dict[str, str]] = []
     seen: set[str] = set()
     guard = 0
-    while len(rows) < N_ROWS and guard < N_ROWS * 50:
+    while len(rows) < n_rows and guard < n_rows * 50:
         guard += 1
         query, hood, cuisine, vibe = build_query(rng)
         if query in seen:
@@ -258,7 +265,7 @@ def main() -> None:
             }
         )
 
-    if len(rows) < N_ROWS:
+    if len(rows) < n_rows:
         raise SystemExit(f"only generated {len(rows)} unique queries; widen the pools")
 
     fieldnames = list(rows[0].keys())

@@ -47,4 +47,22 @@ dev = [
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pytest-httpx>=0.36.2",
+    "pyyaml>=6.0",
+]
+
+# Fine-tuning stack. Heavy + GPU-oriented; kept out of the container
+# (`containerfile` runs `uv sync --frozen --no-dev`) and installed on the brev.dev
+# box with `uv sync --group training`. See scripts/train_lora.py + configs/lora/.
+training = [
+    "torch",
+    "transformers",
+    "peft",
+    "trl",
+    "datasets",
+    "accelerate",
+    "bitsandbytes",
+    "sentencepiece",
+    "tensorboard",
+    "pyyaml",
+    "huggingface-hub",
 ]

@@ -177,8 +177,16 @@ services:
     # there is no `anything_finder` module to run with `python -m`.
     command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9022"]
 
-  # ─── vLLM (Optional: for local GPU inference) ──────────────────────────────
-  # Uncomment if you have NVIDIA GPU and want to run Qwen locally.
+  # ─── vLLM (Optional: for local GPU inference + LoRA serving) ───────────────
+  # Uncomment if you have an NVIDIA GPU and want to run Qwen locally. To serve
+  # the fine-tuned adapter: train it (`make lora-train`), then point the app at
+  # this service with LLM_BACKEND=lora, LLM_MODEL_LORA=af-lora,
+  # LLM_BASE_URL=http://vllm:8000/v1.
+  #
+  # NOTE: the adapter is trained against BF16 base weights (Qwen/Qwen3.8-27B) and
+  # served here against FP8 base weights. vLLM keeps adapters in BF16 and supports
+  # this; there is a small distribution mismatch. Swap VLLM_MODEL to
+  # Qwen/Qwen3.8-27B (no -FP8) to remove it at the cost of VRAM.
   #
   # vllm:
   #   image: vllm/vllm-openai:latest
@@ -189,11 +197,13 @@ services:
   #     - "8000:8000"
   #   volumes:
   #     - huggingface_cache:/root/.cache/huggingface
+  #     # Mount the finished run dir (adapter_config.json + adapter weights).
+  #     - ./data/lora/runs/qwen38-27b-restaurant-react-lora:/adapters/af-lora:ro
   #   command: >
-  #     vllm serve Qwen/Qwen3.8-27B
-  #       --api-key EMPTY
-  #       --gpu-memory-utilization 0.90
-  #       --max-model-len 8192
+  #     vllm serve ${VLLM_MODEL:-Qwen/Qwen3.8-27B-FP8}
+  #       --enable-lora --lora-modules af-lora=/adapters/af-lora
+  #       --max-lora-rank 32 --api-key EMPTY
+  #       --gpu-memory-utilization 0.90 --max-model-len 8192
   #   deploy:
   #     resources:
   #       reservations:

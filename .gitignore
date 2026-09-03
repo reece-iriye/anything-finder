@@ -10,7 +10,7 @@
 **/.env
 
 # data
-**/data/
+**/data/**/*
 !**/data/lora/
 !**/data/lora/**/*
 
