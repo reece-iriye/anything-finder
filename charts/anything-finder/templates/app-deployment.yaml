@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anything-finder
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        {{- include "anything-finder.labels" . | nindent 8 }}
+        app.kubernetes.io/component: app
+    spec:
+      containers:
+        - name: anything-finder
+          image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.app.service.port }}
+          env:
+            # ── app ──────────────────────────────────────────────────────
+            - name: APP_IP
+              value: "0.0.0.0"
+            - name: APP_PORT
+              value: {{ .Values.app.service.port | quote }}
+            - name: APP_LOG_LEVEL
+              value: {{ .Values.app.logLevel | quote }}
+            # ── postgres ─────────────────────────────────────────────────
+            - name: POSTGRES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: dsn
+            # ── nominatim ────────────────────────────────────────────────
+            - name: NOMINATIM_BASE_URL
+              value: "http://nominatim-service:{{ .Values.nominatim.service.port }}"
+            # ── overpass ─────────────────────────────────────────────────
+            - name: OVERPASS_BASE_URL
+              value: "http://overpass-service:{{ .Values.overpass.service.port }}"
+            # ── llm ──────────────────────────────────────────────────────
+            - name: LLM_BASE_URL
+              value: {{ .Values.llm.baseUrl | quote }}
+            - name: LLM_MODEL
+              value: {{ .Values.llm.model | quote }}
+            - name: LLM_API_KEY
+              {{- if .Values.llm.apiKeySecretRef.name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.llm.apiKeySecretRef.name }}
+                  key: {{ .Values.llm.apiKeySecretRef.key }}
+              {{- else }}
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: llm-api-key
+              {{- end }}
+            - name: LLM_TEMPERATURE
+              value: {{ .Values.llm.temperature | quote }}
+            - name: LLM_TIMEOUT_SECONDS
+              value: {{ .Values.llm.timeoutSeconds | quote }}
+            - name: LLM_MAX_RETRIES
+              value: {{ .Values.llm.maxRetries | quote }}
+            # ── per-role llm overrides (only emitted when non-empty) ──────
+            {{- with .Values.llm.roles.intent.model }}
+            - name: LLM_MODEL_INTENT
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.llm.roles.intent.temperature }}
+            - name: LLM_TEMPERATURE_INTENT
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.llm.roles.search.model }}
+            - name: LLM_MODEL_SEARCH
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.llm.roles.search.temperature }}
+            - name: LLM_TEMPERATURE_SEARCH
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.llm.roles.synthesize.model }}
+            - name: LLM_MODEL_SYNTHESIZE
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.llm.roles.synthesize.temperature }}
+            - name: LLM_TEMPERATURE_SYNTHESIZE
+              value: {{ . | quote }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.app.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.app.service.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi

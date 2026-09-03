@@ -23,12 +23,46 @@ dependencies = [
     "deepagents>=0.6.8",
     "polars>=1.41.2",
     "langgraph-checkpoint-postgres>=3.1.0",
-    "psycopg[binary,pool]>=3.3.0"
+    "psycopg[binary,pool]>=3.3.0",
+    "langchain-anthropic>=1.7.0",
 ]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+reportArgumentType = false
+reportGeneralTypeIssues = false
+
+[tool.pycodestyle]
+ignore = ["E", "W"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 addopts = "-m 'not live'"
 markers = [
     "live: tests that require a real vLLM endpoint and/or Postgres (opt-in)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-httpx>=0.36.2",
+    "pyyaml>=6.0",
+]
+
+# Fine-tuning stack. Heavy + GPU-oriented; kept out of the container
+# (`containerfile` runs `uv sync --frozen --no-dev`) and installed on the brev.dev
+# box with `uv sync --group training`. See scripts/train_lora.py + configs/lora/.
+training = [
+    "torch",
+    "transformers",
+    "peft",
+    "trl",
+    "datasets",
+    "accelerate",
+    "bitsandbytes",
+    "sentencepiece",
+    "tensorboard",
+    "pyyaml",
+    "huggingface-hub",
 ]

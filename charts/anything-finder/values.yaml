@@ -1,0 +1,155 @@
+# -----------------------------------------------------------------------
+# anything-finder Helm chart — base values
+#
+# All three test phases share this file. Override only what changes:
+#   helm install af ./charts/anything-finder \
+#     -f ./charts/anything-finder/values-phase2.yaml
+# -----------------------------------------------------------------------
+
+# ── App ────────────────────────────────────────────────────────────────
+app:
+  image:
+    repository: anything-finder
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  service:
+    port: 9022
+  logLevel: info
+
+# ── LLM ────────────────────────────────────────────────────────────────
+# baseUrl and model are set in the phase values file; there is no sensible
+# base default. All roles inherit the top-level model/temperature unless
+# overridden below.
+llm:
+  baseUrl: ""
+  model: ""
+  apiKey: EMPTY
+  # Reference a pre-existing Secret instead of inlining the key:
+  #   apiKeySecretRef:
+  #     name: llm-api-key
+  #     key: api-key
+  apiKeySecretRef: {}
+  timeoutSeconds: "30"
+  maxRetries: "2"
+  temperature: "0.2"
+  roles:
+    intent:
+      model: ""       # empty → inherits llm.model
+      temperature: "" # empty → inherits llm.temperature
+    search:
+      model: ""
+      temperature: ""
+    synthesize:
+      model: ""
+      temperature: "0.4"  # slightly warmer for creative response text
+
+# ── OSM data server ────────────────────────────────────────────────────
+# Downloads the regional PBF once and serves it over HTTP so that
+# Nominatim and Overpass can each import from the same local source
+# instead of hitting the internet independently.
+#
+# To cover a different region, swap pbfUrl to any Geofabrik extract:
+#   https://download.geofabrik.de/north-america/us.html
+osm:
+  pbfUrl: https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf
+  image: python:3.12-slim
+  service:
+    port: 8080
+  persistence:
+    size: 5Gi     # raw PBF only; ~700 MB for Texas, padded for safety
+    storageClass: standard
+
+# ── Postgres ───────────────────────────────────────────────────────────
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: anything_finder
+  user: postgres
+  password: postgres
+  service:
+    port: 5432
+  persistence:
+    size: 2Gi
+    storageClass: standard
+
+# ── Nominatim (geocoding) ──────────────────────────────────────────────
+# Imports from the shared osm-server on first start; subsequent restarts
+# use the already-imported database on its own PVC.
+nominatim:
+  enabled: true
+  image: mediagis/nominatim:4.4
+  replicationUrl: ""  # leave empty to disable live diff updates
+  service:
+    port: 8080
+  persistence:
+    size: 100Gi   # post-import Postgres DB; Texas is ~30–50 GB
+    storageClass: standard
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: "2"
+    limits:
+      memory: 8Gi
+
+# ── Overpass (OSM POI) ─────────────────────────────────────────────────
+# Also imports from the shared osm-server on first start.
+overpass:
+  enabled: true
+  image: wiktorn/overpass-api:latest
+  service:
+    port: 8080
+  persistence:
+    size: 20Gi    # post-import Overpass DB; Texas is ~8–12 GB
+    storageClass: standard
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: "1"
+    limits:
+      memory: 4Gi
+
+# ── LLM stub (phase 2 only) ────────────────────────────────────────────
+# A stdlib Python HTTP server that speaks the OpenAI chat-completions API.
+# Identifies which pipeline node is calling by request shape:
+#   response_format.json_schema present → parse_intent (returns intentJson)
+#   tools present, no tool result yet   → search first call (tool-call response)
+#   tools present, tool result exists   → search wrap-up (plain text)
+#   otherwise                           → synthesize (returns synthesizeText)
+llmStub:
+  enabled: false
+  image: python:3.12-slim
+  service:
+    port: 8000
+  # Override these in values-phase2.yaml to match your test scenario.
+  intentJson: '{"craving":"restaurant","vibe":[],"location_phrase":null}'
+  synthesizeText: "Here are some great restaurant options near you!"
+
+# ── vLLM (phase 3 only) ────────────────────────────────────────────────
+# Self-hosted vLLM on a GPU-backed kind node. Prerequisites:
+#   - NVIDIA device plugin installed in the cluster
+#   - kind node with GPU pass-through via nvidia-container-runtime
+vllm:
+  enabled: false
+  image: vllm/vllm-openai:latest
+  model: Qwen/Qwen2.5-7B-Instruct-AWQ
+  gpuMemoryUtilization: "0.90"
+  maxModelLen: "8192"
+  service:
+    port: 8000
+  persistence:
+    # Hugging Face model cache. AWQ variant is ~5 GB; padded for future swaps.
+    size: 20Gi
+    storageClass: standard
+  resources:
+    limits:
+      nvidia.com/gpu: "1"
+      memory: 16Gi
+    requests:
+      memory: 14Gi
+      cpu: "2"
+  tolerations:
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  nodeSelector: {}

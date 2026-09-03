@@ -1,0 +1,230 @@
+---
+services:
+  # ─── PostgreSQL (checkpointer) ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: af-postgres
+    environment:
+      POSTGRES_DB: anything_finder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── OSM Data Server ───────────────────────────────────────────────────────
+  # Serves pre-downloaded local OSM files over HTTP so Nominatim and Overpass
+  # can import from the same source. Converts Dallas.osm.gz → Dallas.osm.bz2
+  # on first run (cached in data/ thereafter).
+  osm-server:
+    image: python:3.12-slim
+    container_name: af-osm-server
+    working_dir: /app
+    environment:
+      OSM_DATA_DIR: /app/data
+      OSM_PBF_FILENAME: Dallas.osm.pbf
+      OSM_GZ_FILENAME: Dallas.osm.gz
+    command: python3 /app/scripts/osm_prepare.py
+    ports:
+      - "8081:8080"
+    volumes:
+      - .:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/Dallas.osm.pbf').close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  # ─── OSM bz2 sentinel ──────────────────────────────────────────────────────
+  # Becomes healthy only after osm_prepare.py finishes the gz→bz2 conversion.
+  osm-bz2-ready:
+    image: python:3.12-slim
+    container_name: af-osm-bz2-ready
+    volumes:
+      - .:/app
+    command:
+      - python3
+      - -c
+      - |
+        import time
+        from pathlib import Path
+        p = Path('/app/data/Dallas.osm.bz2')
+        while not p.exists():
+            print('Waiting for bz2...', flush=True)
+            time.sleep(30)
+        print('bz2 ready.', flush=True)
+        while True:
+            time.sleep(3600)
+    healthcheck:
+      test: ["CMD", "python3", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/app/data/Dallas.osm.bz2').exists() else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 120
+      start_period: 60s
+
+  # ─── Nominatim (Geocoding) ─────────────────────────────────────────────────
+  nominatim:
+    image: mediagis/nominatim:4.4
+    container_name: af-nominatim
+    shm_size: '1g'
+    environment:
+      PBF_URL: http://osm-server:8080/Dallas.osm.pbf
+      NOMINATIM_PASSWORD: nominatim
+    ports:
+      - "8082:8080"
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+      - ./scripts/nominatim-postgres-import.conf:/etc/postgresql/14/main/conf.d/zz-override.conf:ro
+    depends_on:
+      osm-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/search?q=Dallas&format=json&limit=1"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 600s
+
+  # ─── Overpass (POI Lookup) ─────────────────────────────────────────────────
+  overpass:
+    image: wiktorn/overpass-api:latest
+    container_name: af-overpass
+    environment:
+      OVERPASS_META: "no"
+      # No OVERPASS_MODE: the image imports from OVERPASS_PLANET_URL on first boot
+      # (empty volume) and then serves; `init` would import and immediately exit.
+      OVERPASS_PLANET_URL: http://osm-server:8080/Dallas.osm.bz2
+    ports:
+      - "8083:80"
+    volumes:
+      - overpass_data:/db
+    depends_on:
+      osm-server:
+        condition: service_healthy
+      osm-bz2-ready:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/api/interpreter?data=[out:json];out;"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ─── Anything Finder App ───────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: containerfile
+    container_name: af-app
+    environment:
+      # ─── App ───────────────────────────────────
+      APP_IP: 0.0.0.0
+      APP_PORT: 9022
+      APP_LOG_LEVEL: info
+
+      # ─── LLM Backend (Claude / Anthropic API) ──
+      LLM_BACKEND: claude
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env or your shell}
+      LLM_MODEL_CLAUDE: ${LLM_MODEL_CLAUDE:-claude-sonnet-4-6}
+      LLM_TEMPERATURE: "0.3"
+      LLM_TIMEOUT_SECONDS: "60"
+      LLM_MAX_RETRIES: "2"
+
+      # ─── Agent Config ──────────────────────────
+      FOOD_PREFERENCES_DIR: data/preferences
+      HOME_CITY: Dallas
+      HOME_STATE: TX
+
+      # ─── Telemetry ─────────────────────────────
+      # /workspace is the bind-mounted repo, so traces land in ./telemetry/.
+      # mode subdir is derived from LLM_BACKEND unless AF_TRACE_MODE is set.
+      AF_TRACE_DIR: /workspace/telemetry
+
+      # ─── PostgreSQL (Checkpointer) ─────────────
+      POSTGRES_DSN: postgresql://postgres:postgres@postgres:5432/anything_finder
+
+      # ─── Nominatim (Geocoding) ─────────────────
+      NOMINATIM_USE_EXTERNAL_API: "false"
+      NOMINATIM_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE: "false"
+      NOMINATIM_BASE_URL: http://nominatim:8080
+      NOMINATIM_TIMEOUT_SECONDS: "2.0"
+
+      # ─── Overpass (POI Lookup) ──────────────────
+      OVERPASS_USE_EXTERNAL_API: "false"
+      OVERPASS_USE_KUBERNETES_WITH_GEOSEARCH_NAMESPACE: "false"
+      OVERPASS_BASE_URL: http://overpass:80
+      OVERPASS_TIMEOUT_SECONDS: "3.0"
+    ports:
+      - "9022:9022"
+    volumes:
+      - .:/workspace
+      - app_cache:/root/.cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nominatim:
+        condition: service_healthy
+      overpass:
+        condition: service_healthy
+    # Use the containerfile CMD (uvicorn src.main:app --host 0.0.0.0 --port 9022);
+    # there is no `anything_finder` module to run with `python -m`.
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9022"]
+
+  # ─── vLLM (Optional: for local GPU inference + LoRA serving) ───────────────
+  # Uncomment if you have an NVIDIA GPU and want to run Qwen locally. To serve
+  # the fine-tuned adapter: train it (`make lora-train`), then point the app at
+  # this service with LLM_BACKEND=lora, LLM_MODEL_LORA=af-lora,
+  # LLM_BASE_URL=http://vllm:8000/v1.
+  #
+  # NOTE: the adapter is trained against BF16 base weights (Qwen/Qwen3.8-27B) and
+  # served here against FP8 base weights. vLLM keeps adapters in BF16 and supports
+  # this; there is a small distribution mismatch. Swap VLLM_MODEL to
+  # Qwen/Qwen3.8-27B (no -FP8) to remove it at the cost of VRAM.
+  #
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: af-vllm
+  #   environment:
+  #     CUDA_VISIBLE_DEVICES: "0"
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - huggingface_cache:/root/.cache/huggingface
+  #     # Mount the finished run dir (adapter_config.json + adapter weights).
+  #     - ./data/lora/runs/qwen38-27b-restaurant-react-lora:/adapters/af-lora:ro
+  #   command: >
+  #     vllm serve ${VLLM_MODEL:-Qwen/Qwen3.8-27B-FP8}
+  #       --enable-lora --lora-modules af-lora=/adapters/af-lora
+  #       --max-lora-rank 32 --api-key EMPTY
+  #       --gpu-memory-utilization 0.90 --max-model-len 8192
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 120s
+
+volumes:
+  postgres_data:
+  nominatim_data:
+  overpass_data:
+  app_cache:
+  # huggingface_cache:  # Uncomment with vllm service
+
+networks:
+  default:
+    name: af-network

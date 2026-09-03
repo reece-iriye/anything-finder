@@ -1,40 +1,42 @@
 FROM python:3.12-slim AS builder
 
-# Prevent Python from writing .pyc files & enable unbuffered logging
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# sys dep if any packages need compiling
+# Install uv directly from the official image binary
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Install build dependencies if needed for C-extension compilation
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir pipenv
+# Copy dependency definition files first for optimal layer caching
+COPY pyproject.toml uv.lock ./
 
-COPY pyproject.toml Pipfile Pipfile.lock ./
+# Freeze dependencies into a standalone virtual environment
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --no-dev
 
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
-
-# STAGE 2
+# STAGE 2: Runtime
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH"
 
-ENV APP_IP="0.0.0.0" \
-    APP_PORT="9022"
-
 WORKDIR /app
 
+# Copy virtual environment and project code
 COPY --from=builder /app/.venv /app/.venv
-
 COPY . /app
 
-RUN useradd -m appuser
+# Non-root security setup
+RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 
-CMD ["uvicorn", "src.main:app", "--host", ${APP_IP}, "--port", ${APP_PORT}]
+# Exec form ensures proper OS signal handling (SIGTERM/SIGINT)
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9022"]

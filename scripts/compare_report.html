@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anything Finder · Model comparison</title>
+<style>
+/* Shared tokens, cards, conversation + telemetry styling. */
+/*@include ui_common.css*/
+
+  /* ---- report-only layout ---- */
+  body { overflow-y:auto; }
+  .page { max-width:1400px; margin:0 auto; padding:0 26px 120px; }
+  header.rpt { display:flex; align-items:center; gap:14px; padding:18px 26px 14px; position:sticky; top:0; z-index:20;
+    background:var(--bg); border-bottom:1px solid var(--border); margin:0 -26px 22px; }
+  .brand { display:flex; align-items:center; gap:9px; font-weight:600; }
+  .brand .dot { width:9px; height:9px; border-radius:3px; background:var(--accent); box-shadow:0 0 10px 1px rgba(91,141,239,.5); }
+  .brand small { color:var(--ink-faint); font-weight:400; }
+  header.rpt .spacer { flex:1; }
+  .stamp { font-family:var(--mono); font-size:11px; color:var(--ink-faint); }
+
+  h2.sec { font-size:15px; margin:30px 0 4px; }
+  .lede { color:var(--ink-faint); font-size:12.5px; margin-bottom:16px; max-width:74ch; }
+
+  /* leaderboard */
+  .lb { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .lb th, .lb td { text-align:right; padding:9px 12px; border-bottom:1px solid var(--border-soft); white-space:nowrap; }
+  .lb th { color:var(--ink-faint); font-weight:600; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; }
+  .lb td.mode, .lb th.mode { text-align:left; }
+  .lb tbody tr:hover { background:var(--panel-2); }
+  .lb td.num { font-family:var(--mono); }
+  .lb .best { color:var(--green); font-weight:650; }
+  .lb .worst { color:var(--amber); }
+  .lb-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--panel); padding:4px 8px 2px; }
+
+  .pathlist { display:flex; flex-direction:column; gap:6px; margin-top:12px; }
+  .pathrow { display:grid; grid-template-columns:1fr 60px; gap:12px; align-items:center; font-size:11.5px; }
+  .pathrow .sig { font-family:var(--mono); color:var(--ink-dim); overflow:hidden; text-overflow:ellipsis; }
+  .pathrow .n { font-family:var(--mono); color:var(--ink-faint); text-align:right; }
+
+  /* query picker */
+  .picker { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  select, .search { background:var(--panel); border:1px solid var(--border); border-radius:9px;
+    color:var(--ink); font:inherit; font-size:12.5px; padding:8px 11px; }
+  select { max-width:min(720px,100%); }
+  .search { width:230px; }
+
+  /* side-by-side columns */
+  .cols { display:grid; gap:14px; align-items:start;
+    grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); }
+  .col { border:1px solid var(--border); border-radius:12px; background:var(--panel); overflow:hidden; }
+  .col-head { padding:12px 14px; border-bottom:1px solid var(--border-soft); background:var(--panel-2);
+    display:flex; flex-direction:column; gap:7px; }
+  .col-head .chips { display:flex; gap:5px; flex-wrap:wrap; }
+  .col-body { padding:13px 14px 15px; }
+  .answer { white-space:pre-wrap; font-size:12.5px; line-height:1.6; }
+  .missing { color:var(--ink-faint); font-style:italic; font-size:12.5px; }
+  .errbox { color:var(--red); background:#2e1a1a; border:1px solid #5a2f2c; border-radius:8px;
+    padding:9px 11px; font-family:var(--mono); font-size:11.5px; white-space:pre-wrap; }
+  .pathchain { display:flex; flex-wrap:wrap; gap:5px; align-items:center; font-family:var(--mono); font-size:10.5px; }
+  .pathchain .step { border:1px solid var(--border-soft); background:var(--panel-3); color:var(--ink-dim);
+    border-radius:5px; padding:1px 6px; }
+  .pathchain .step.diff { border-color:#463b23; color:var(--amber); }
+  .pathchain .arr { color:var(--ink-faint); }
+  .statline { display:flex; flex-wrap:wrap; gap:4px 12px; font-family:var(--mono); font-size:10.5px;
+    color:var(--ink-faint); margin-top:11px; }
+  .statline b { color:var(--ink-dim); font-weight:600; }
+  .flags { display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; }
+  .flag { font-size:10px; border-radius:5px; padding:1px 6px; border:1px solid var(--border-soft);
+    background:var(--panel-3); color:var(--ink-faint); font-family:var(--mono); }
+  .flag.ok { color:var(--green); border-color:#274636; background:#132119; }
+  .flag.no { color:var(--red); border-color:#5a2f2c; background:#2e1a1a; }
+  .targets { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+
+  .drill { margin-top:14px; border-top:1px solid var(--border-soft); padding-top:6px; }
+  .drill > summary { cursor:pointer; list-style:none; font-size:11.5px; color:var(--accent);
+    padding:6px 0; display:flex; gap:7px; align-items:center; }
+  .drill > summary::-webkit-details-marker { display:none; }
+  .drill > summary::before { content:"▸"; transition:transform .12s; }
+  .drill[open] > summary::before { transform:rotate(90deg); }
+  .drill .feed { padding:8px 0 4px; }
+  .drill .turn { margin-bottom:16px; }
+</style>
+</head>
+<body>
+<header class="rpt">
+  <div class="brand"><span class="dot"></span> Anything&nbsp;Finder <small>· model comparison</small></div>
+  <div class="pills" id="viewToggle">
+    <button class="pill on" data-view="leaderboard">Leaderboard</button>
+    <button class="pill" data-view="queries">Side by side</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="stamp" id="stamp"></div>
+</header>
+
+<div class="page"><main id="main"><div class="empty">Loading…</div></main></div>
+
+<script>
+/* Shared primitives + the conversation renderer, also used by the live
+   telemetry console (make trace). */
+/*@include ui_common.js*/
+
+/* The joined dataset, inlined by scripts/build_compare_report.py. */
+const DATA = /*@dataset*/null;
+
+/* Human-readable mode names, in the order the story goes:
+   teacher → student → student after distillation. */
+const MODE_LABEL = {
+  "claude": "Claude (teacher)",
+  "raw-open-source": "Qwen (base)",
+  "finetuned-open-source": "Qwen + LoRA",
+};
+const label = m => MODE_LABEL[m] || m;
+
+let V = { view:"leaderboard", qi:0, filter:"" };
+
+/* ---------- leaderboard ---------- */
+
+/* Columns of the comparison table. `good` says which direction is better, so
+   the best/worst cells can be tinted without hardcoding per-metric logic. */
+const COLS = [
+  {k:"runs",             t:"runs",        good:0,  f:v=>v},
+  {k:"error_rate",       t:"errors",      good:-1, f:(v,a)=>`${a.errors} (${(v*100).toFixed(0)}%)`},
+  {k:"llm_calls_mean",   t:"LLM / run",   good:-1, f:v=>v},
+  {k:"tool_calls_mean",  t:"tools / run", good:-1, f:v=>v},
+  {k:"tokens_per_run",   t:"tokens / run",good:-1, f:v=>fmt(v)},
+  {k:"output_tokens",    t:"output tok",  good:0,  f:v=>fmt(v)},
+  {k:"latency_p50",      t:"p50 latency", good:-1, f:v=>v==null?"—":v+"s"},
+  {k:"est_cost_usd",     t:"est. cost",   good:-1, f:v=>v==null?"—":"$"+v.toFixed(4)},
+  {k:"grounded_search",  t:"grounded",    good:+1, f:v=>v==null?"—":(v*100).toFixed(0)+"%"},
+  {k:"hit_neighborhood", t:"named area",  good:+1, f:v=>v==null?"—":(v*100).toFixed(0)+"%"},
+];
+
+function renderLeaderboard(){
+  const main = $("#main"); main.innerHTML = "";
+  const aggs = DATA.aggregates || [];
+  if (!aggs.length){ main.innerHTML = `<div class="empty">No runs captured yet. Run <b>make compare-run</b>.</div>`; return; }
+
+  const h2 = el("h2","sec","Leaderboard");
+  const lede = el("div","lede");
+  lede.innerHTML = `Every mode ran the same queries. <b>grounded</b> = resolved a location before searching; ` +
+    `<b>named area</b> = the final answer mentions the query's target neighbourhood. Cost is estimated from ` +
+    `list prices and only priced for Claude models.`;
+  main.append(h2, lede);
+
+  // best/worst per column, so a glance shows who wins each metric
+  const extremes = {};
+  COLS.forEach(c => {
+    if (!c.good) return;
+    const vals = aggs.map(a=>a[c.k]).filter(v=>v!=null);
+    if (vals.length < 2) return;
+    extremes[c.k] = {best: c.good>0?Math.max(...vals):Math.min(...vals),
+                     worst: c.good>0?Math.min(...vals):Math.max(...vals)};
+  });
+
+  const wrap = el("div","lb-wrap");
+  const rows = aggs.map(a => {
+    const cells = COLS.map(c => {
+      const v = a[c.k];
+      const e = extremes[c.k];
+      const cls = e && v!=null ? (v===e.best?" best":(v===e.worst?" worst":"")) : "";
+      return `<td class="num${cls}">${v==null?"—":c.f(v,a)}</td>`;
+    }).join("");
+    return `<tr><td class="mode">${modeChip(a)}</td>${cells}</tr>`;
+  }).join("");
+  wrap.innerHTML = `<table class="lb">
+    <thead><tr><th class="mode">mode</th>${COLS.map(c=>`<th>${esc(c.t)}</th>`).join("")}</tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  main.appendChild(wrap);
+
+  const h3 = el("h2","sec","Tool paths taken");
+  const lede2 = el("div","lede");
+  lede2.innerHTML = `The sequence of tools each run actually called, most common first. A fine-tuned model that ` +
+    `learned the loop should converge on the teacher's shape.`;
+  main.append(h3, lede2);
+
+  const cols = el("div","cols");
+  aggs.forEach(a => {
+    const c = el("div","col");
+    const total = a.runs || 1;
+    const paths = Object.entries(a.tool_paths||{}).map(([sig,n]) =>
+      `<div class="pathrow"><span class="sig" title="${esc(sig)}">${esc(sig)}</span>
+        <span class="n">${n} · ${(n/total*100).toFixed(0)}%</span></div>`).join("");
+    c.innerHTML = `<div class="col-head"><div class="chips">${modeChip(a)}</div></div>
+      <div class="col-body"><div class="pathlist">${paths||'<span class="missing">no runs</span>'}</div></div>`;
+    cols.appendChild(c);
+  });
+  main.appendChild(cols);
+}
+
+function modeChip(a){
+  return `<span class="chip mode">${esc(label(a.mode))}</span>` +
+    (a.models||[]).map(m=>`<span class="chip model">${esc(m)}</span>`).join("");
+}
+
+/* ---------- side by side ---------- */
+
+function visibleQueries(){
+  const f = V.filter.trim().toLowerCase();
+  if (!f) return DATA.queries;
+  return DATA.queries.filter(q => (q.query||"").toLowerCase().includes(f) || (q.id||"").includes(f));
+}
+
+function renderQueries(){
+  const main = $("#main"); main.innerHTML = "";
+  const list = visibleQueries();
+  if (!DATA.queries.length){ main.innerHTML = `<div class="empty">No runs captured yet. Run <b>make compare-run</b>.</div>`; return; }
+
+  const picker = el("div","picker");
+  const sel = el("select");
+  list.forEach((q,i) => {
+    const o = el("option", null, `${q.id} — ${q.query || "(no query text)"}`);
+    o.value = String(i);
+    sel.appendChild(o);
+  });
+  if (V.qi >= list.length) V.qi = 0;
+  sel.value = String(V.qi);
+  sel.onchange = () => { V.qi = Number(sel.value); renderQueries(); };
+
+  const search = el("input","search");
+  search.placeholder = "filter queries…";
+  search.value = V.filter;
+  search.oninput = () => { V.filter = search.value; V.qi = 0; renderQueries(); };
+
+  const nav = el("div","pills");
+  const prev = el("button","pill","‹ prev"), next = el("button","pill","next ›");
+  prev.onclick = () => { V.qi = (V.qi - 1 + list.length) % list.length; renderQueries(); };
+  next.onclick = () => { V.qi = (V.qi + 1) % list.length; renderQueries(); };
+  nav.append(prev,next);
+
+  picker.append(sel, search, nav, el("span","stamp", `${list.length} / ${DATA.queries.length} queries`));
+  main.appendChild(picker);
+
+  if (!list.length){ main.appendChild(el("div","empty","No query matches that filter.")); return; }
+  const q = list[V.qi];
+
+  const head = el("div");
+  head.innerHTML = `<h2 class="sec" style="margin-top:6px">${esc(q.query || "(no query text)")}</h2>`;
+  const targets = el("div","targets");
+  targets.innerHTML = `<span class="chip">id ${esc(q.id)}</span>` +
+    (q.target_neighborhood?`<span class="chip">area · ${esc(q.target_neighborhood)}</span>`:"") +
+    (q.target_cuisine?`<span class="chip">cuisine · ${esc(q.target_cuisine)}</span>`:"") +
+    (q.target_vibe?`<span class="chip">vibe · ${esc(q.target_vibe)}</span>`:"");
+  main.append(head, targets);
+
+  // A tool step is highlighted when the modes disagree at that position.
+  const paths = DATA.modes.map(m => (q.results[m]||{}).tool_path || []);
+  const divergent = i => new Set(paths.filter(p=>p.length>i).map(p=>p[i])).size > 1;
+
+  const cols = el("div","cols");
+  DATA.modes.forEach(mode => cols.appendChild(resultColumn(mode, q.results[mode], divergent)));
+  main.appendChild(cols);
+}
+
+function resultColumn(mode, r, divergent){
+  const c = el("div","col");
+  const head = el("div","col-head");
+  head.innerHTML = `<div class="chips"><span class="chip mode">${esc(label(mode))}</span>` +
+    (r && r.model?`<span class="chip model">${esc(r.model)}</span>`:"") + `</div>`;
+  c.appendChild(head);
+
+  const body = el("div","col-body");
+  if (!r){
+    body.innerHTML = `<div class="missing">This mode has no run for this query.</div>`;
+    c.appendChild(body); return c;
+  }
+
+  head.insertAdjacentHTML("beforeend", `<div class="pathchain">${
+    (r.tool_path||[]).map((n,i)=>`<span class="step${divergent(i)?" diff":""}">${esc(n)}</span>`).join('<span class="arr">→</span>')
+    || '<span class="missing">no tools called</span>'}</div>`);
+
+  if (r.error) body.innerHTML = `<div class="errbox">${esc(r.error)}</div>`;
+  else if (r.answer) body.innerHTML = `<div class="answer">${mdInline(r.answer)}</div>`;
+  else body.innerHTML = `<div class="missing">No final answer was produced.</div>`;
+
+  const t = r.totals || {};
+  const stat = el("div","statline");
+  stat.innerHTML =
+    `<span><b>${t.llm_calls??"—"}</b> LLM</span>` +
+    `<span><b>${t.tool_calls??(r.tool_path||[]).length}</b> tools</span>` +
+    `<span><b>${fmt(t.input_tokens)}</b> in</span>` +
+    `<span><b>${fmt(t.output_tokens)}</b> out</span>` +
+    (t.cache_read_tokens?`<span><b>${fmt(t.cache_read_tokens)}</b> cache</span>`:"") +
+    (r.latency_s!=null?`<span><b>${r.latency_s}</b>s</span>`:"") +
+    (t.est_cost_usd?`<span><b>$${t.est_cost_usd.toFixed(4)}</b></span>`:"");
+  body.appendChild(stat);
+
+  const flags = el("div","flags");
+  flags.innerHTML = [
+    flagHTML("grounded", r.grounded_search),
+    flagHTML("named area", r.hit_neighborhood),
+    flagHTML("named cuisine", r.hit_cuisine),
+  ].join("");
+  body.appendChild(flags);
+
+  if (r.trace){
+    const d = el("details","drill");
+    d.innerHTML = `<summary>${IC.eye} full trace — ${(r.trace.spans||[]).length} spans</summary>`;
+    // Built once, on first open: a run is a lot of DOM.
+    d.addEventListener("toggle", () => {
+      if (!d.open || d.dataset.built) return;
+      d.dataset.built = "1";
+      d.appendChild(renderConversationInto(el("div","feed"), r.trace, {primer:false, question:false}));
+    });
+    body.appendChild(d);
+  }
+
+  c.appendChild(body);
+  return c;
+}
+
+function flagHTML(name, v){
+  if (v == null) return `<span class="flag">${esc(name)} n/a</span>`;
+  return `<span class="flag ${v?"ok":"no"}">${v?"✓":"✗"} ${esc(name)}</span>`;
+}
+
+/* ---------- boot ---------- */
+function render(){
+  [...$("#viewToggle").children].forEach(b=>b.classList.toggle("on", b.dataset.view===V.view));
+  V.view === "leaderboard" ? renderLeaderboard() : renderQueries();
+}
+$("#viewToggle").onclick = e => { const b=e.target.closest(".pill"); if(!b) return; V.view=b.dataset.view; render(); };
+
+if (DATA){
+  $("#stamp").textContent = `${DATA.queries.length} queries · ${DATA.modes.length} modes · generated ${new Date(DATA.generated_at).toLocaleString()}`;
+  render();
+} else {
+  $("#main").innerHTML = `<div class="empty">No data was inlined into this file. Rebuild it with <b>make compare</b>.</div>`;
+}
+</script>
+</body>
+</html>

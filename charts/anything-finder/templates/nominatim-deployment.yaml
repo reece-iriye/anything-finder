@@ -1,0 +1,70 @@
+{{- if .Values.nominatim.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nominatim
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: nominatim
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: nominatim
+  template:
+    metadata:
+      labels:
+        {{- include "anything-finder.labels" . | nindent 8 }}
+        app.kubernetes.io/component: nominatim
+    spec:
+      initContainers:
+        # Block import until the PBF is fully available from osm-server.
+        - name: wait-for-pbf
+          image: busybox:stable
+          command:
+            - sh
+            - -c
+            - |
+              URL="http://osm-server-service:{{ .Values.osm.service.port }}/{{ include "anything-finder.pbfFilename" . }}"
+              echo "Waiting for PBF at $URL ..."
+              until wget -q --spider "$URL"; do sleep 15; done
+              echo "PBF is available."
+      containers:
+        - name: nominatim
+          image: {{ .Values.nominatim.image }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PBF_URL
+              value: "http://osm-server-service:{{ .Values.osm.service.port }}/{{ include "anything-finder.pbfFilename" . }}"
+            {{- if .Values.nominatim.replicationUrl }}
+            - name: REPLICATION_URL
+              value: {{ .Values.nominatim.replicationUrl | quote }}
+            {{- end }}
+            - name: NOMINATIM_PASSWORD
+              value: nominatim
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/14/main
+          readinessProbe:
+            httpGet:
+              path: /search?q=Texas&format=json&limit=1
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.nominatim.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: nominatim-pvc
+{{- end }}

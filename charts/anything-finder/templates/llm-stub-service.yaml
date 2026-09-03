@@ -1,0 +1,16 @@
+{{- if .Values.llmStub.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-stub-service
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: llm-stub
+spec:
+  selector:
+    app.kubernetes.io/component: llm-stub
+  ports:
+    - name: http
+      port: {{ .Values.llmStub.service.port }}
+      targetPort: 8000
+{{- end }}

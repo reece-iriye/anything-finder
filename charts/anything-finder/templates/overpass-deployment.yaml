@@ -1,0 +1,71 @@
+{{- if .Values.overpass.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: overpass
+  labels:
+    {{- include "anything-finder.labels" . | nindent 4 }}
+    app.kubernetes.io/component: overpass
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: overpass
+  template:
+    metadata:
+      labels:
+        {{- include "anything-finder.labels" . | nindent 8 }}
+        app.kubernetes.io/component: overpass
+    spec:
+      initContainers:
+        # Block import until the PBF is fully available from osm-server.
+        - name: wait-for-pbf
+          image: busybox:stable
+          command:
+            - sh
+            - -c
+            - |
+              URL="http://osm-server-service:{{ .Values.osm.service.port }}/{{ include "anything-finder.pbfFilename" . }}"
+              echo "Waiting for PBF at $URL ..."
+              until wget -q --spider "$URL"; do sleep 15; done
+              echo "PBF is available."
+      containers:
+        - name: overpass
+          image: {{ .Values.overpass.image }}
+          ports:
+            - containerPort: 80
+          env:
+            # OVERPASS_MODE=init performs a fresh import from OVERPASS_PLANET_URL.
+            # If a future image version uses different var names, check:
+            # https://github.com/wiktorn/Overpass-API
+            - name: OVERPASS_META
+              value: "no"
+            - name: OVERPASS_MODE
+              value: "init"
+            - name: OVERPASS_PLANET_URL
+              value: "http://osm-server-service:{{ .Values.osm.service.port }}/{{ include "anything-finder.pbfFilename" . }}"
+          volumeMounts:
+            - name: data
+              mountPath: /db
+          readinessProbe:
+            httpGet:
+              path: /api/interpreter?data=[out:json];out;
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /api/interpreter?data=[out:json];out;
+              port: 80
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          resources:
+            {{- toYaml .Values.overpass.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: overpass-pvc
+{{- end }}

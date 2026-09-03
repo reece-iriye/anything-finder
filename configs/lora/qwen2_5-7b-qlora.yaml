@@ -1,0 +1,66 @@
+# Default run: distil the Claude restaurant-ReAct trajectories into a LoRA
+# adapter for Qwen2.5-7B-Instruct — the SAME family as the raw-open-source
+# baseline (LLM_MODEL defaults to Qwen/Qwen2.5-7B-Instruct-AWQ), so the
+# "raw" and "finetuned" columns of `make compare` differ only by the adapter.
+#
+# Fits a 16 GB GPU with 4-bit QLoRA, and one vLLM process can serve the base
+# model and the adapter at once (no relaunch between capture runs).
+#
+#   uv run scripts/train_lora.py --config configs/lora/qwen2_5-7b-qlora.yaml
+#   uv run scripts/train_lora.py --config configs/lora/qwen2_5-7b-qlora.yaml --set train.learning_rate=5e-5
+#
+# For the bigger run see configs/lora/qwen3_8-27b-qlora.yaml.
+
+run_name: qwen25-7b-restaurant-react-lora
+seed: 20260902
+output_dir: data/lora/runs/qwen25-7b-restaurant-react-lora
+
+model:
+  base_model: Qwen/Qwen2.5-7B-Instruct   # BF16 base. The AWQ repo is for SERVING only.
+  dtype: bfloat16
+  trust_remote_code: true
+  attn_implementation: flash_attention_2   # auto-falls back to sdpa
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_compute_dtype: bfloat16
+  bnb_4bit_use_double_quant: true
+  gradient_checkpointing: true
+
+data:
+  train_file: data/lora/train.jsonl
+  eval_file: data/lora/val.jsonl
+  tool_schemas: data/lora/tool_schemas.json
+  max_seq_len: 4096
+  chat_template_kwargs: {enable_thinking: false}
+  train_on_assistant_only: true
+  on_overlong: drop                   # drop | truncate
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  exclude_modules: []                 # text-only model: no vision tower to freeze
+  modules_to_save: []
+
+train:
+  num_train_epochs: 3
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 1.0e-4
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  max_grad_norm: 1.0
+  optim: paged_adamw_8bit
+  bf16: true
+  logging_steps: 5
+  eval_strategy: epoch
+  save_strategy: epoch
+  save_total_limit: 3
+  report_to: [tensorboard]
+
+hub:
+  push_to_hub: false
+  hub_model_id: null                  # <hf-user>/anything-finder-qwen25-7b-lora
+  hub_private_repo: true
