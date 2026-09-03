@@ -237,6 +237,155 @@ through three backends — Claude, the untouched Qwen, and Qwen+LoRA — and
 render a report that shows whether the small model actually learned the
 teacher's behaviour.
 
+### What LoRA (and QLoRA) actually do
+
+Skip this if you already know how LoRA works. Everything below uses the
+**actual numbers this repo trains with** (`configs/lora/qwen2_5-7b-qlora.yaml`
+on `Qwen/Qwen2.5-7B-Instruct`), not a toy example.
+
+**Full fine-tuning** would update every weight matrix in the model directly.
+Each of Qwen2.5-7B's 28 decoder layers has 7 such matrices — `q_proj`,
+`k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` — for a
+total of **7.66 billion** parameters. Training all of them means an Adam
+optimizer state (a momentum and a variance term per parameter, both usually
+kept in fp32) on top of the weights and gradients themselves — three to four
+extra copies of a 7.66B-parameter model, which is why full fine-tuning
+normally needs multiple large GPUs.
+
+**LoRA** ([Hu et al., 2021](https://arxiv.org/abs/2106.09685)) sidesteps this
+by **freezing every original weight matrix** and, for each one you want to
+adapt, learning a *low-rank correction* instead of touching the matrix
+itself. For a frozen weight `W` (shape `d_out × d_in`), LoRA adds two small
+trained matrices:
+
+```
+h = W·x  +  (alpha / r) · B·A·x
+    ^^^         ^^^^^
+  frozen     the only part that trains
+
+  A : r × d_in     (rank r, input-facing)
+  B : d_out × r    (rank r, output-facing)
+```
+
+`A` and `B` together form a rank-`r` approximation of what a full update to
+`W` would look like — `B·A` has shape `d_out × d_in`, same as `W`, but because
+it factors through a bottleneck of width `r`, storing and training it costs
+only `r·(d_in + d_out)` parameters instead of `d_in·d_out`. `A`'s row count
+and `B`'s column count are both exactly `r` — that's the "rank" the name
+refers to, and it's the *only* new hyperparameter; everything else about `A`
+and `B`'s shape is dictated by the layer they're attached to.
+
+This repo's config sets `lora.r: 16`, `lora.alpha: 32` (so the scaling factor
+`alpha/r` above is `2`), and adapts all 7 projection matrices per layer:
+`q_proj`, `k_proj`, `v_proj`, `o_proj` from **self-attention**, plus
+`gate_proj`, `up_proj`, `down_proj` from the MLP block. Worth being precise
+about that first group: **Qwen2.5, like GPT and Llama, is decoder-only — it
+has no cross-attention layer anywhere in it.** Cross-attention is specific to
+encoder-decoder architectures (the original Transformer, T5, Whisper's
+decoder attending over a separate audio encoder), where the query comes from
+one stack and the keys/values from another. Every attention layer here is
+*causal self-attention*: `q_proj`/`k_proj`/`v_proj`/`o_proj` all read from and
+write back to the same sequence.
+
+Qwen2.5-7B uses grouped-query attention, so `k_proj`/`v_proj` are narrower
+than `q_proj`/`o_proj` — the table below shows how `A`/`B`'s shapes track each
+layer's actual `(d_in, d_out)`, and what fine-tuning that one matrix would
+otherwise cost:
+
+| Matrix | Full shape (`d_out × d_in`) | Full params | `A` shape (`r × d_in`) | `B` shape (`d_out × r`) | LoRA params | % of full |
+| --- | --- | --- | --- | --- | --- | --- |
+| `q_proj`, `o_proj` | 3584 × 3584 | 12,845,056 | 16 × 3584 | 3584 × 16 | 114,688 | 0.89% |
+| `k_proj`, `v_proj` | 512 × 3584 | 1,835,008 | 16 × 3584 | 512 × 16 | 65,536 | 3.57% |
+| `gate_proj`, `up_proj` | 18944 × 3584 | 67,895,296 | 16 × 3584 | 18944 × 16 | 360,448 | 0.53% |
+| `down_proj` | 3584 × 18944 | 67,895,296 | 16 × 18944 | 3584 × 16 | 360,448 | 0.53% |
+
+Not an estimate — this is what's actually sitting in the files. Reading layer
+0's weights straight out of the base model's checkpoint and the trained
+adapter's `adapter_model.safetensors` gives, key for key (PyTorch's
+`nn.Linear` stores weights as `[out_features, in_features]`, so a shape below
+reads as `d_out × d_in`):
+
+```
+# base model, model.layers[0].self_attn / .mlp   (frozen — no lora_* keys exist for these)
+self_attn.q_proj.weight   [3584, 3584]        self_attn.k_proj.weight  [512, 3584]
+self_attn.v_proj.weight   [512, 3584]         self_attn.o_proj.weight  [3584, 3584]
+mlp.gate_proj.weight      [18944, 3584]       mlp.up_proj.weight       [18944, 3584]
+mlp.down_proj.weight      [3584, 18944]
+
+# adapter_model.safetensors, the SAME layer 0 — this is the entire trained delta
+self_attn.q_proj.lora_A.weight  [16, 3584]    self_attn.q_proj.lora_B.weight  [3584, 16]
+self_attn.k_proj.lora_A.weight  [16, 3584]    self_attn.k_proj.lora_B.weight  [512, 16]
+self_attn.v_proj.lora_A.weight  [16, 3584]    self_attn.v_proj.lora_B.weight  [512, 16]
+self_attn.o_proj.lora_A.weight  [16, 3584]    self_attn.o_proj.lora_B.weight  [3584, 16]
+mlp.gate_proj.lora_A.weight     [16, 3584]    mlp.gate_proj.lora_B.weight     [18944, 16]
+mlp.up_proj.lora_A.weight       [16, 3584]    mlp.up_proj.lora_B.weight       [18944, 16]
+mlp.down_proj.lora_A.weight     [16, 18944]   mlp.down_proj.lora_B.weight     [3584, 16]
+```
+
+Look at `q_proj` specifically: the frozen weight is `[3584, 3584]` — a full
+12.8M-parameter, full-rank matrix. `lora_A` is `[16, 3584]` and `lora_B` is
+`[3584, 16]` — multiplying them back together, `lora_B @ lora_A`, gives a
+`[3584, 3584]` matrix again (same shape the frozen weight has, so it can be
+added elementwise) — but because it factors through that 16-wide bottleneck,
+it can only ever express a **rank-16** correction, not an arbitrary one, and
+it costs 114,688 parameters to store instead of 12,845,056. That gap — same
+output shape, a small fraction of the parameters, because the correction is
+constrained to be low-rank — is the entire idea LoRA is named after.
+
+Summed across all 7 matrices × 28 layers, that's **40,370,176 trainable
+parameters out of 7,655,986,688 total — 0.53%.** (These are the exact numbers
+`train_lora.py` prints at the start of every real run via
+`model.print_trainable_parameters()` — not an estimate.) The "7,655,986,688
+total" is the *entire* 7B model, frozen weights included — it doesn't shrink
+or go anywhere; every one of those parameters still runs on every forward
+pass, exactly as pretrained. It's only the 40M `lora_A`/`lora_B` values layered
+on top that receive gradients and get saved as the adapter. Everything else
+about the model — its weights, its knowledge, its general language
+ability — never moves, which is why
+the whole `configs/lora/qwen2_5-7b-qlora.yaml` run in this walkthrough trains
+in minutes on one GPU instead of requiring a multi-GPU cluster.
+
+**QLoRA** ([Dettmers et al., 2023](https://arxiv.org/abs/2305.14314)) is a
+second, independent optimization on top of LoRA, and it's easy to conflate
+the two — LoRA already made the *trainable* parameter count tiny (0.53%
+above), but the *frozen* 7.66B-parameter backbone still has to sit in GPU
+memory the whole time just to be read during every forward and backward pass.
+At bf16 (2 bytes/param) that's **~15.3 GB** for the frozen weights alone,
+before any activations, gradients, or the LoRA matrices themselves — tight on
+a 16 GB GPU, impossible on smaller ones. QLoRA's contribution is entirely
+about that frozen half:
+
+- **4-bit NF4 quantization of the frozen weights.** `bnb_4bit_quant_type: nf4`
+  in this repo's config stores each frozen weight in ~4 bits using a data
+  type (NormalFloat4) shaped for how pretrained neural network weights are
+  actually distributed — clustered near zero, roughly Gaussian — rather than
+  a generic uniform 4-bit integer. This alone drops the frozen backbone from
+  ~15.3 GB to **~3.8 GB**.
+- **Dequantize-on-the-fly, not "train in 4-bit."** The 4-bit weights are never
+  used directly in a matmul — right before each forward/backward pass touches
+  a frozen matrix, it's expanded back to bf16 in-memory, used, and discarded.
+  The LoRA `A`/`B` matrices themselves are ordinary bf16 tensors with real
+  gradients throughout — QLoRA never touches how *they* train, only how the
+  frozen weights sit in memory between uses.
+- **Double quantization** (`bnb_4bit_use_double_quant: true`) — even the small
+  per-block scale factors the 4-bit scheme needs are themselves quantized,
+  saving a further ~0.4 bits/parameter on top of the above.
+- **Paged optimizers** (`optim: paged_adamw_8bit` in this repo's training
+  config) spill optimizer state to CPU RAM under memory pressure — like OS
+  virtual-memory paging — so a batch-size spike degrades speed instead of
+  crashing with an out-of-memory error.
+
+So: **LoRA decides what gets trained (0.53% of the model); QLoRA decides how
+cheaply the other 99.47% can sit in memory while that happens.** They compose
+because they solve different problems — this is exactly why
+`configs/lora/qwen2_5-7b-qlora.yaml` sets *both* `lora.r: 16` *and*
+`load_in_4bit: true`. It's also why the A100 variant,
+`configs/lora/qwen2_5-7b-lora-a100.yaml`, turns `load_in_4bit` **off**: an
+A100 has enough VRAM to hold the frozen weights in plain bf16, so it skips
+QLoRA's quantize/dequantize overhead entirely and trains faster — while
+keeping `lora.r: 16` unchanged, because LoRA's parameter savings are worth
+keeping regardless of how much VRAM you have.
+
 ### Prerequisites
 
 | What | Why | Where to get it |
