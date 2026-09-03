@@ -1,0 +1,83 @@
+# A100 variant of qwen2_5-7b-qlora.yaml — same data, same LoRA target modules,
+# same effective batch size (so it's still comparable), but tuned for a GPU
+# with real headroom instead of a 16GB ceiling:
+#
+#   - load_in_4bit: false — trains against the TRUE bf16 base weights instead
+#     of a dequantized NF4 approximation. Removes bnb's per-layer quant/
+#     dequant kernels from every forward+backward, which is most of the
+#     speedup (quantization overhead, not step count, is why QLoRA is slow).
+#     Bonus: the adapter is optimized against the same weights it will be
+#     served on top of (vLLM serves bf16/AWQ, not NF4), so this is arguably
+#     the more correct training setup, not just the faster one.
+#   - per_device_train_batch_size: 4, gradient_accumulation_steps: 2 keeps the
+#     effective batch at 8 (same as the QLoRA config, so learning_rate/
+#     schedule stay valid) while cutting the number of accumulation
+#     microsteps 4x — fewer, bigger matmuls, much better GPU utilization.
+#   - optim: adamw_torch_fused — paged_adamw_8bit exists to keep the optimizer
+#     off the GPU under memory pressure; on an A100 that pressure is gone, so
+#     use the fused fp32 optimizer instead (faster, no paging overhead). Adam
+#     state here is tiny anyway (only ~0.5-1% of params are LoRA-trainable).
+#   - gradient_checkpointing: false — trades the ~30-40% step-time cost of
+#     recomputation for extra activation memory. A 7B model at batch 4 /
+#     seq_len 4096 with no quantization comfortably fits 40GB; if you're on a
+#     shared/smaller A100 (or see an OOM), flip this back to true first before
+#     touching batch size.
+#
+# Expect roughly 2-4x faster wall-clock than qwen2_5-7b-qlora.yaml for the
+# same ~126 total steps -- call it 3-6 minutes of compute instead of 10-20.
+#
+#   uv run scripts/train_lora.py --config configs/lora/qwen2_5-7b-lora-a100.yaml
+#
+# If you're on an 80GB A100, you can push further: per_device_train_batch_size: 8,
+# gradient_accumulation_steps: 1 (same effective batch=8, one microstep per step).
+
+run_name: qwen25-7b-restaurant-react-lora-a100
+seed: 20260902
+output_dir: data/lora/runs/qwen25-7b-restaurant-react-lora-a100
+
+model:
+  base_model: Qwen/Qwen2.5-7B-Instruct   # true bf16 weights, no bnb quantization
+  dtype: bfloat16
+  trust_remote_code: true
+  attn_implementation: flash_attention_2   # auto-falls back to sdpa
+  load_in_4bit: false
+  gradient_checkpointing: false           # flip to true first if you OOM
+
+data:
+  train_file: data/lora/train.jsonl
+  eval_file: data/lora/val.jsonl
+  tool_schemas: data/lora/tool_schemas.json
+  max_seq_len: 4096
+  chat_template_kwargs: {enable_thinking: false}
+  train_on_assistant_only: true
+  on_overlong: drop                   # drop | truncate
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  exclude_modules: []                 # text-only model: no vision tower to freeze
+  modules_to_save: []
+
+train:
+  num_train_epochs: 3
+  per_device_train_batch_size: 4      # was 1 — same effective batch via fewer accum steps
+  gradient_accumulation_steps: 2      # was 8
+  learning_rate: 1.0e-4
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  max_grad_norm: 1.0
+  optim: adamw_torch_fused            # was paged_adamw_8bit — no paging needed
+  bf16: true
+  logging_steps: 5
+  eval_strategy: epoch
+  save_strategy: epoch
+  save_total_limit: 3
+  report_to: [tensorboard]
+
+hub:
+  push_to_hub: false
+  hub_model_id: null                  # <hf-user>/anything-finder-qwen25-7b-lora
+  hub_private_repo: true
