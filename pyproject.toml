@@ -53,9 +53,25 @@ dev = [
 # Fine-tuning stack. Heavy + GPU-oriented; kept out of the container
 # (`containerfile` runs `uv sync --frozen --no-dev`) and installed on the brev.dev
 # box with `uv sync --group training`. See scripts/train_lora.py + configs/lora/.
+#
+# torch is pinned to a CUDA 12.1 build (below) rather than the PyPI default,
+# because PyPI's unadorned `torch` wheel now bundles CUDA 13 runtime libs
+# (nvidia-cublas-13.x etc.) which plenty of brev.dev / cloud GPU images can't
+# run — their driver reports "CUDA Version: 12.2" (`nvidia-smi`), i.e. driver
+# 535.x, which only supports CUDA <= 12.2 runtimes. cu121 wheels are backward
+# compatible with that driver; cu13 wheels are not. If your box's driver is
+# newer (`nvidia-smi` shows CUDA Version >= 12.4), you can drop the pin.
 training = [
-    "torch",
-    "transformers",
+    "torch>=2.4,<2.6",
+    # Listed explicitly (vllm also pulls these transitively) so the
+    # tool.uv.sources index pin below actually applies to them — a source
+    # override only takes effect for a package that's a direct dependency
+    # of this project, not a transitive one pulled in by vllm itself.
+    "torchvision>=0.19,<0.21",
+    "torchaudio>=2.4,<2.6",
+    # vllm 0.7.3 (below) predates transformers' v5 breaking changes
+    # (ProcessorMixin import rework) — cap it to the last v4 line.
+    "transformers>=4.45,<5",
     "peft",
     "trl",
     "datasets",
@@ -65,4 +81,15 @@ training = [
     "tensorboard",
     "pyyaml",
     "huggingface-hub",
+    "vllm",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+torchaudio = { index = "pytorch-cu121" }

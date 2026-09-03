@@ -88,7 +88,7 @@ up:
 	@echo "waiting for nominatim ($(EVAL_NOMINATIM_URL)) and overpass ($(EVAL_OVERPASS_URL))…"
 	@for i in $$(seq 1 120); do \
 	  n=$$(curl -sf "$(EVAL_NOMINATIM_URL)/search?q=Dallas&format=json&limit=1" >/dev/null && echo ok || echo no); \
-	  o=$$(curl -sf "$(EVAL_OVERPASS_URL)/api/interpreter?data=[out:json];out;" >/dev/null && echo ok || echo no); \
+	  o=$$(curl -sfg "$(EVAL_OVERPASS_URL)/api/interpreter?data=[out:json];out;" >/dev/null && echo ok || echo no); \
 	  if [ "$$n" = ok ] && [ "$$o" = ok ]; then echo "geo stack ready."; exit 0; fi; \
 	  printf "\r  nominatim=%s overpass=%s  (%ds)" "$$n" "$$o" $$((i*10)); sleep 10; \
 	done; \

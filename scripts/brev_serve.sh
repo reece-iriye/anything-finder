@@ -20,6 +20,8 @@
 #   MAX_LORA_RANK LoRA rank cap          (default 32)
 #   VLLM_PORT     remote + local port    (default 8000)
 #   HF_TOKEN      forwarded for gated repos (optional)
+#   FORCE_SETUP   set to 1 to re-run brev_setup.sh even if .venv exists
+#   SKIP_SYNC     set to 1 to skip the rsync (e.g. right after lora-train-remote)
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -38,6 +40,29 @@ if [ "${1:-}" = "--stop" ]; then
   exit 0
 fi
 
+if [ "${SKIP_SYNC:-0}" != "1" ]; then
+  echo "== sync -> $BREV_HOST:$BREV_DIR =="
+  ssh "$BREV_HOST" "mkdir -p '$BREV_DIR/logs'"
+  rsync -az --delete-after \
+    --exclude '.git/' \
+    --exclude '.venv/' \
+    --exclude '__pycache__/' \
+    --exclude '*.egg-info/' \
+    --exclude 'telemetry/' \
+    --exclude 'data/*.osm*' \
+    --exclude 'data/lora/runs/' \
+    --exclude 'data/eval/' \
+    --exclude 'logs/' \
+    ./ "$BREV_HOST:$BREV_DIR/"
+fi
+
+echo "== setup =="
+if [ "${FORCE_SETUP:-0}" = "1" ] || ! ssh "$BREV_HOST" "test -d '$BREV_DIR/.venv'"; then
+  ssh "$BREV_HOST" "cd '$BREV_DIR' && HF_TOKEN='${HF_TOKEN:-}' bash scripts/brev_setup.sh"
+else
+  echo "  .venv present — skipping (FORCE_SETUP=1 to re-run)"
+fi
+
 LORA_FLAGS=""
 if [ -n "${LORA_DIR:-}" ]; then
   if ! ssh "$BREV_HOST" "test -f '$BREV_DIR/$LORA_DIR/adapter_config.json'"; then
@@ -53,6 +78,7 @@ ssh "$BREV_HOST" "mkdir -p '$BREV_DIR/logs'"
 ssh "$BREV_HOST" "cd '$BREV_DIR' && export PATH=\$HOME/.local/bin:\$PATH && \
   HF_TOKEN='${HF_TOKEN:-}' nohup uv run --group training vllm serve '$MODEL' \
     --port $VLLM_PORT --api-key EMPTY --gpu-memory-utilization 0.90 --max-model-len 8192 \
+    --enable-auto-tool-choice --tool-call-parser hermes \
     $LORA_FLAGS > 'logs/vllm.log' 2>&1 & echo \$! > '$PIDFILE'; cat '$PIDFILE'"
 
 cat <<EOF
