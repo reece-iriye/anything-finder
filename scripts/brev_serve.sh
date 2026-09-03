@@ -52,6 +52,7 @@ if [ "${SKIP_SYNC:-0}" != "1" ]; then
     --exclude 'data/*.osm*' \
     --exclude 'data/lora/runs/' \
     --exclude 'data/eval/' \
+    --exclude 'logs/' \
     ./ "$BREV_HOST:$BREV_DIR/"
 fi
 

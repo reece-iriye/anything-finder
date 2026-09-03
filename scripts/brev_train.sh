@@ -54,6 +54,7 @@ rsync -az --delete-after \
   --exclude 'data/*.osm*' \
   --exclude 'data/lora/runs/' \
   --exclude 'data/eval/' \
+  --exclude 'logs/' \
   ./ "$BREV_HOST:$BREV_DIR/"
 
 echo "== setup =="
