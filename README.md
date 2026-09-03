@@ -1,6 +1,6 @@
-# Anything Finder
+# Restaurant Finder
 
-Agentic search for things to do near you — a counter to general-web AI search that
+Agentic search for restaurants near you — a counter to general-web AI search that
 increasingly buries local results. The first capability is an **AI restaurant search**:
 send a natural-language request and an LLM agent geocodes the location, searches
 OpenStreetMap for matching eateries, and writes back a short, human recommendation.
